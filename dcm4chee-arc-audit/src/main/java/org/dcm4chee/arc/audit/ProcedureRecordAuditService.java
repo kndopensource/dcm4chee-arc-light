@@ -181,45 +181,47 @@ class ProcedureRecordAuditService {
     private static ActiveParticipantBuilder[] activeParticipants(AuditLogger auditLogger, AuditInfo auditInfo) {
         ActiveParticipantBuilder[] activeParticipantBuilder = new ActiveParticipantBuilder[3];
         String calledUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
-        AuditMessages.UserIDTypeCode calledUserIDTypeCode = userIDTypeCode(calledUserID);
+//        AuditMessages.UserIDTypeCode calledUserIDTypeCode = userIDTypeCode(calledUserID);
         boolean isHL7Forward = auditInfo.getField(AuditInfo.IS_OUTGOING_HL7) != null;
-        ActiveParticipantBuilder.Builder callingUserParticipant = callingUserParticipant(auditInfo, calledUserIDTypeCode);
+//        ActiveParticipantBuilder.Builder callingUserParticipant = callingUserParticipant(auditInfo, calledUserIDTypeCode);
+        ActiveParticipantBuilder.Builder callingUserParticipant = callingUserParticipant(auditInfo);
         activeParticipantBuilder[0] = isHL7Forward
                 ? callingUserParticipant.build()
                 : callingUserParticipant.isRequester().build();
         activeParticipantBuilder[1] = new ActiveParticipantBuilder.Builder(
                 calledUserID,
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(calledUserIDTypeCode)
+  //              .userIDTypeCode(calledUserIDTypeCode)
                 .altUserID(AuditLogger.processID())
                 .build();
         if (isHL7Forward)
             activeParticipantBuilder[2] = new ActiveParticipantBuilder.Builder(
                     auditLogger.getDevice().getDeviceName(),
                     getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+    //                .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .altUserID(AuditLogger.processID())
                     .isRequester()
                     .build();
         return activeParticipantBuilder;
     }
 
-    private static ActiveParticipantBuilder.Builder callingUserParticipant(
-            AuditInfo auditInfo, AuditMessages.UserIDTypeCode archiveUserIDTypeCode) {
+//    private static ActiveParticipantBuilder.Builder callingUserParticipant(
+//            AuditInfo auditInfo, AuditMessages.UserIDTypeCode archiveUserIDTypeCode) {
+    private static ActiveParticipantBuilder.Builder callingUserParticipant(AuditInfo auditInfo) {
         String callingUserID = auditInfo.getField(AuditInfo.CALLING_USERID);
-        return new ActiveParticipantBuilder.Builder(callingUserID, auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID));
+        return new ActiveParticipantBuilder.Builder(callingUserID, auditInfo.getField(AuditInfo.CALLING_HOST));
+                    //.userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID));
     }
 
     private static String getLocalHostName(AuditLogger auditLogger) {
         return auditLogger.getConnections().get(0).getHostname();
     }
 
-    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
-        return userID.indexOf('/') != -1
-                ? AuditMessages.UserIDTypeCode.URI
-                : userID.indexOf('|') != -1
-                    ? AuditMessages.UserIDTypeCode.ApplicationFacility
-                    : AuditMessages.UserIDTypeCode.StationAETitle;
-    }
+//    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
+//        return userID.indexOf('/') != -1
+//                ? AuditMessages.UserIDTypeCode.URI
+//                : userID.indexOf('|') != -1
+//                    ? AuditMessages.UserIDTypeCode.ApplicationFacility
+//                    : AuditMessages.UserIDTypeCode.StationAETitle;
+//    }
 }

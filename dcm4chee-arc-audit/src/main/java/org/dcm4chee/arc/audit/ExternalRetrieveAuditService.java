@@ -114,25 +114,25 @@ class ExternalRetrieveAuditService {
         ActiveParticipantBuilder[] activeParticipants = new ActiveParticipantBuilder[4];
         String userID = auditInfo.getField(AuditInfo.CALLING_USERID);
         activeParticipants[0] = new ActiveParticipantBuilder.Builder(userID, auditInfo.getField(AuditInfo.CALLING_HOST))
-                .userIDTypeCode(AuditMessages.userIDTypeCode(userID))
+                //.userIDTypeCode(AuditMessages.userIDTypeCode(userID))
                 .isRequester()
                 .build();
         activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.MOVE_USER_ID),
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
+                //.userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
                 .altUserID(AuditLogger.processID())
                 .build();
         activeParticipants[2] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.CALLED_USERID),
                 auditInfo.getField(AuditInfo.CALLED_HOST))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+                //.userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .roleIDCode(eventType.source)
                 .build();
         activeParticipants[3] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.DEST_USER_ID),
                 auditInfo.getField(AuditInfo.DEST_NAP_ID))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+                //.userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .roleIDCode(eventType.destination)
                 .build();
         return activeParticipants;
@@ -146,27 +146,27 @@ class ExternalRetrieveAuditService {
         activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                 userID,
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+//                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .altUserID(AuditLogger.processID())
                 .isRequester()
                 .build();
         activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.MOVE_USER_ID),
                 auditInfo.getField(AuditInfo.CALLED_HOST))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+  //              .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .roleIDCode(eventType.source)
                 .build();
         activeParticipants[2] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.DEST_USER_ID),
                 auditInfo.getField(AuditInfo.DEST_NAP_ID))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+    //            .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .roleIDCode(eventType.destination)
                 .build();
         try {
             activeParticipants[3] = new ActiveParticipantBuilder.Builder(
                     findSCP,
                     aeCache.findApplicationEntity(findSCP).getConnections().get(0).getHostname())
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+      //              .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                     .build();
         } catch (ConfigurationException e) {
             LOG.info("Exception caught on getting hostname for C-FINDSCP : {}", e.getMessage());

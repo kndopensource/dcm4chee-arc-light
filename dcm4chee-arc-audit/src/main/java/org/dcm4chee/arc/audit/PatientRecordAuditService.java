@@ -195,7 +195,7 @@ class PatientRecordAuditService {
         return new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.CALLING_USERID),
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+                //.userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                 .altUserID(AuditLogger.processID())
                 .isRequester();
     }
@@ -211,7 +211,7 @@ class PatientRecordAuditService {
                 : new ActiveParticipantBuilder.Builder(
                     calledUserID,
                     getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+                  //  .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                     .altUserID(AuditLogger.processID());
 
         activeParticipantBuilder[0] = pdqService(et, auditInfo);
@@ -220,7 +220,7 @@ class PatientRecordAuditService {
             activeParticipantBuilder[2] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
+                   // .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
                     .isRequester()
                     .build();
 
@@ -231,8 +231,8 @@ class PatientRecordAuditService {
         String pdqServiceURI = auditInfo.getField(AuditInfo.PDQ_SERVICE_URI);
         return new ActiveParticipantBuilder.Builder(
                 pdqServiceURI, null)
-                .userIDTypeCode(pdqServiceURI.indexOf('/') != -1
-                        ? AuditMessages.UserIDTypeCode.URI : AuditMessages.UserIDTypeCode.StationAETitle)
+//                .userIDTypeCode(pdqServiceURI.indexOf('/') != -1
+//                        ? AuditMessages.UserIDTypeCode.URI : AuditMessages.UserIDTypeCode.StationAETitle)
                 .roleIDCode(et.source)
                 .build();
     }
@@ -242,19 +242,19 @@ class PatientRecordAuditService {
         ActiveParticipantBuilder[] activeParticipantBuilder = new ActiveParticipantBuilder[2];
         String archiveUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
         String callingUserID = auditInfo.getField(AuditInfo.CALLING_USERID);
-        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = userIDTypeCode(archiveUserID);
+     //   AuditMessages.UserIDTypeCode archiveUserIDTypeCode = userIDTypeCode(archiveUserID);
 
         activeParticipantBuilder[0] = new ActiveParticipantBuilder.Builder(
                 archiveUserID,
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(archiveUserIDTypeCode)
+       //         .userIDTypeCode(archiveUserIDTypeCode)
                 .altUserID(AuditLogger.processID())
                 .roleIDCode(et.destination)
                 .build();
         activeParticipantBuilder[1] = new ActiveParticipantBuilder.Builder(
                 callingUserID,
                 auditInfo.getField(AuditInfo.CALLING_HOST))
-                .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
+         //       .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
                 .isRequester()
                 .roleIDCode(et.source)
                 .build();
@@ -284,7 +284,7 @@ class PatientRecordAuditService {
             activeParticipantBuilder[2] = new ActiveParticipantBuilder.Builder(
                     auditLogger.getDevice().getDeviceName(),
                     getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+//                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .altUserID(AuditLogger.processID())
                     .isRequester()
                     .build();
@@ -292,13 +292,13 @@ class PatientRecordAuditService {
             activeParticipantBuilder[2] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
+  //                  .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
                     .isRequester()
                     .build();
             activeParticipantBuilder[3] = new ActiveParticipantBuilder.Builder(
                     calledUserID,
                     getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
+    //                .userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
                     .altUserID(AuditLogger.processID())
                     .build();
         }
@@ -313,7 +313,7 @@ class PatientRecordAuditService {
         return new ActiveParticipantBuilder.Builder(
                 hl7ReceivingAppWithFacility,
                 hl7AppReceiver.getConnections().get(0).getHostname())
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.ApplicationFacility)
+      //          .userIDTypeCode(AuditMessages.UserIDTypeCode.ApplicationFacility)
                 .roleIDCode(et.destination)
                 .build();
     }
@@ -323,7 +323,7 @@ class PatientRecordAuditService {
         return new ActiveParticipantBuilder.Builder(
                 hl7SendingAppWithFacility,
                 hl7AppSender.getConnections().get(0).getHostname())
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.ApplicationFacility)
+        //        .userIDTypeCode(AuditMessages.UserIDTypeCode.ApplicationFacility)
                 .roleIDCode(et.source)
                 .build();
     }
@@ -332,11 +332,11 @@ class PatientRecordAuditService {
         return auditLogger.getConnections().get(0).getHostname();
     }
 
-    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
-        return userID.indexOf('/') != -1
-                ? AuditMessages.UserIDTypeCode.URI
-                : userID.indexOf('|') != -1
-                    ? AuditMessages.UserIDTypeCode.ApplicationFacility
-                    : AuditMessages.UserIDTypeCode.StationAETitle;
-    }
+//    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
+//        return userID.indexOf('/') != -1
+//                ? AuditMessages.UserIDTypeCode.URI
+//                : userID.indexOf('|') != -1
+//                    ? AuditMessages.UserIDTypeCode.ApplicationFacility
+//                    : AuditMessages.UserIDTypeCode.StationAETitle;
+//    }
 }

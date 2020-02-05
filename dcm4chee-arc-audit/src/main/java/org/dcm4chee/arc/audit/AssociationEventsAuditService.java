@@ -92,12 +92,12 @@ class AssociationEventsAuditService {
         ActiveParticipantBuilder[] activeParticipantBuilders = new ActiveParticipantBuilder[2];
         activeParticipantBuilders[0] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.CALLING_USERID), auditInfo.getField(AuditInfo.CALLING_HOST))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+                //.userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .isRequester()
                 .build();
         activeParticipantBuilders[1] = new ActiveParticipantBuilder.Builder(
                 auditInfo.getField(AuditInfo.CALLED_USERID), auditInfo.getField(AuditInfo.CALLED_HOST))
-                .userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
+                //.userIDTypeCode(AuditMessages.UserIDTypeCode.StationAETitle)
                 .build();
         return activeParticipantBuilders;
     }

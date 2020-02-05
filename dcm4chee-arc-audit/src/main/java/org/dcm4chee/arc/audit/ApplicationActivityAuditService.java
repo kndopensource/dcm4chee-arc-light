@@ -89,7 +89,7 @@ class ApplicationActivityAuditService {
         activeParticipantBuilder[0] = new ActiveParticipantBuilder.Builder(
                 archiveUserID,
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(userIDTypeCode(archiveUserID))
+             //   .userIDTypeCode(userIDTypeCode(archiveUserID))
                 .altUserID(AuditLogger.processID())
                 .roleIDCode(eventType.destination)
                 .build();
@@ -98,7 +98,7 @@ class ApplicationActivityAuditService {
             activeParticipantBuilder[1] = new ActiveParticipantBuilder.Builder(
                     callingUser,
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.userIDTypeCode(callingUser))
+                  //  .userIDTypeCode(AuditMessages.userIDTypeCode(callingUser))
                     .isRequester()
                     .roleIDCode(eventType.source)
                     .build();
@@ -110,9 +110,9 @@ class ApplicationActivityAuditService {
         return auditLogger.getConnections().get(0).getHostname();
     }
 
-    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
-        return  userID.indexOf('/') != -1
-                ? AuditMessages.UserIDTypeCode.URI
-                : AuditMessages.UserIDTypeCode.DeviceName;
-    }
+//    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
+//        return  userID.indexOf('/') != -1
+//                ? AuditMessages.UserIDTypeCode.URI
+//                : AuditMessages.UserIDTypeCode.DeviceName;
+//    }
 }

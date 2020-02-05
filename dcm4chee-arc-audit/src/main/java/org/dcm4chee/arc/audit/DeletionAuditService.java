@@ -216,23 +216,23 @@ class DeletionAuditService {
 
         if (eventType.eventClass == AuditUtils.EventClass.USER_DELETED) {
             String archiveUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
-            AuditMessages.UserIDTypeCode archiveUserIDTypeCode = archiveUserIDTypeCode(archiveUserID);
+            //AuditMessages.UserIDTypeCode archiveUserIDTypeCode = archiveUserIDTypeCode(archiveUserID);
             activeParticipantBuilder[0] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
+              //      .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
                     .isRequester().build();
             activeParticipantBuilder[1] = new ActiveParticipantBuilder.Builder(
                     archiveUserID,
                     getLocalHostName(auditLogger))
-                    .userIDTypeCode(archiveUserIDTypeCode)
+                //    .userIDTypeCode(archiveUserIDTypeCode)
                     .altUserID(AuditLogger.processID())
                     .build();
         } else
             activeParticipantBuilder[0] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+                  //  .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .altUserID(AuditLogger.processID())
                     .isRequester().build();
         return activeParticipantBuilder;

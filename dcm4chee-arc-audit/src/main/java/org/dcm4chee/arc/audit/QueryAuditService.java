@@ -123,29 +123,29 @@ class QueryAuditService {
         ActiveParticipantBuilder[] activeParticipants = new ActiveParticipantBuilder[2];
         String archiveUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
         String callingUserID = auditInfo.getField(AuditInfo.CALLING_USERID);
-        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = userIDTypeCode(archiveUserID);
+//        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = userIDTypeCode(archiveUserID);
         activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                 callingUserID,
                 auditInfo.getField(AuditInfo.CALLING_HOST))
-                .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
+  //              .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
                 .isRequester()
                 .roleIDCode(eventType.source)
                 .build();
         activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                 archiveUserID,
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(archiveUserIDTypeCode)
+    //            .userIDTypeCode(archiveUserIDTypeCode)
                 .altUserID(AuditLogger.processID())
                 .roleIDCode(eventType.destination)
                 .build();
         return activeParticipants;
     }
 
-    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
-        return (qidoQuery = userID.indexOf('/') != -1)
-                ? AuditMessages.UserIDTypeCode.URI
-                : AuditMessages.UserIDTypeCode.StationAETitle;
-    }
+//    private static AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
+//        return (qidoQuery = userID.indexOf('/') != -1)
+//                ? AuditMessages.UserIDTypeCode.URI
+//                : AuditMessages.UserIDTypeCode.StationAETitle;
+//    }
 
     private static String getLocalHostName(AuditLogger auditLogger) {
         return auditLogger.getConnections().get(0).getHostname();

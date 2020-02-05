@@ -93,24 +93,24 @@ class ConnectionEventsAuditService {
             activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                     auditInfo.getField(AuditInfo.CALLED_USERID),
                     auditInfo.getField(AuditInfo.CALLED_HOST))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+                    //.userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .altUserID(AuditLogger.processID())
                     .build();
             activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                     auditInfo.getField(AuditInfo.CALLING_USERID),
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.NodeID)
+                    //.userIDTypeCode(AuditMessages.UserIDTypeCode.NodeID)
                     .isRequester().build();
         } else {
             activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                     auditInfo.getField(AuditInfo.CALLED_USERID),
                     auditInfo.getField(AuditInfo.CALLED_HOST))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.NodeID)
+                   // .userIDTypeCode(AuditMessages.UserIDTypeCode.NodeID)
                     .build();
             activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                     auditInfo.getField(AuditInfo.CALLING_USERID),
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+                   // .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .altUserID(AuditLogger.processID())
                     .isRequester().build();
         }

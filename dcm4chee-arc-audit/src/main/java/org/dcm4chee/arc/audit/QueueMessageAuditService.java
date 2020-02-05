@@ -110,19 +110,19 @@ class QueueMessageAuditService {
             activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     auditLogger.getConnections().get(0).getHostname())
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+//                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .isRequester().build();
         } else {
             activeParticipants = new ActiveParticipantBuilder[2];
             activeParticipants[0] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
+  //                  .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
                     .isRequester().build();
             activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                     calledUserID,
                     auditLogger.getConnections().get(0).getHostname())
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
+    //                .userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
                     .build();
         }
         return activeParticipants;

@@ -82,14 +82,15 @@ class SoftwareConfigurationAuditService {
         String calledUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
         if (callingUserID != null) {
             activeParticipantBuilders[0] = new ActiveParticipantBuilder.Builder(calledUserID, getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.URI).build();
+                   // .userIDTypeCode(AuditMessages.UserIDTypeCode.URI)
+                    .build();
             activeParticipantBuilders[1]
                     = new ActiveParticipantBuilder.Builder(callingUserID, auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
+//                    .userIDTypeCode(AuditMessages.userIDTypeCode(callingUserID))
                     .isRequester().build();
         } else
             activeParticipantBuilders[0] = new ActiveParticipantBuilder.Builder(calledUserID, getLocalHostName(auditLogger))
-                    .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
+  //                  .userIDTypeCode(AuditMessages.UserIDTypeCode.DeviceName)
                     .isRequester().build();
         return activeParticipantBuilders;
     }

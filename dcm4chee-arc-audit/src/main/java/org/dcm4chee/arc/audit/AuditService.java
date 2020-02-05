@@ -495,16 +495,17 @@ public class AuditService {
         String callingHost = auditInfo.getField(AuditInfo.CALLING_HOST);
         String calledUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
         activeParticipants[0] = new ActiveParticipantBuilder.Builder(calledUserID, getLocalHostName(logger))
-                .userIDTypeCode(userIDTypeCode(calledUserID)).build();
+                //.userIDTypeCode(userIDTypeCode(calledUserID))
+                .build();
         activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                 callingUserID, callingHost != null ? callingHost : getLocalHostName(logger))
-                .userIDTypeCode(callingHost != null
-                        ? AuditMessages.userIDTypeCode(callingUserID) : AuditMessages.UserIDTypeCode.DeviceName)
+//                .userIDTypeCode(callingHost != null
+//                        ? AuditMessages.userIDTypeCode(callingUserID) : AuditMessages.UserIDTypeCode.DeviceName)
                 .isRequester().build();
         String impaxEndpoint = auditInfo.getField(AuditInfo.IMPAX_ENDPOINT);
         activeParticipants[2] = new ActiveParticipantBuilder.Builder(
                 impaxEndpoint, impaxEndpointHost(impaxEndpoint))
-                .userIDTypeCode(userIDTypeCode(impaxEndpoint))
+//                .userIDTypeCode(userIDTypeCode(impaxEndpoint))
                 .build();
         return activeParticipants;
     }
@@ -607,11 +608,11 @@ public class AuditService {
         ActiveParticipantBuilder[] activeParticipantBuilder = new ActiveParticipantBuilder[3];
         String callingUserID = auditInfo.getField(AuditInfo.CALLING_USERID);
         String archiveUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
-        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = userIDTypeCode(archiveUserID);
+//        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = userIDTypeCode(archiveUserID);
         activeParticipantBuilder[0] = new ActiveParticipantBuilder.Builder(
                 archiveUserID,
                 getLocalHostName(auditLogger))
-                .userIDTypeCode(archiveUserIDTypeCode)
+  //              .userIDTypeCode(archiveUserIDTypeCode)
                 .altUserID(AuditLogger.processID())
                 .roleIDCode(eventType.destination)
                 .build();
@@ -619,15 +620,15 @@ public class AuditService {
         String callingHost = auditInfo.getField(AuditInfo.CALLING_HOST);
         ActiveParticipantBuilder.Builder requester = new ActiveParticipantBuilder.Builder(
                 callingUserID, callingHost != null ? callingHost : getLocalHostName(auditLogger))
-                .userIDTypeCode(callingHost != null
-                        ? remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID)
-                        : AuditMessages.UserIDTypeCode.DeviceName)
+//                .userIDTypeCode(callingHost != null
+//                        ? remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID)
+//                        : AuditMessages.UserIDTypeCode.DeviceName)
                 .isRequester();
         if (impaxEndpoint != null) {
             activeParticipantBuilder[1] = requester.build();
             activeParticipantBuilder[2] = new ActiveParticipantBuilder.Builder(
                     impaxEndpoint, impaxEndpointHost(impaxEndpoint))
-                    .userIDTypeCode(userIDTypeCode(impaxEndpoint))
+//                    .userIDTypeCode(userIDTypeCode(impaxEndpoint))
                     .roleIDCode(eventType.source)
                     .build();
         } else
@@ -989,26 +990,26 @@ public class AuditService {
         }
     }
 
-    private AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
-        return userID.indexOf('/') != -1
-                ? AuditMessages.UserIDTypeCode.URI
-                : userID.indexOf('|') != -1
-                ? AuditMessages.UserIDTypeCode.ApplicationFacility
-                : userID.equals(device.getDeviceName())
-                ? AuditMessages.UserIDTypeCode.DeviceName
-                : AuditMessages.UserIDTypeCode.StationAETitle;
-    }
-
-    static AuditMessages.UserIDTypeCode remoteUserIDTypeCode(
-            AuditMessages.UserIDTypeCode archiveUserIDTypeCode, String remoteUserID) {
-        if (remoteUserID != null)
-            return remoteUserID.indexOf('|') != -1
-                    ? AuditMessages.UserIDTypeCode.ApplicationFacility
-                    : archiveUserIDTypeCode == AuditMessages.UserIDTypeCode.URI
-                    ? AuditMessages.userIDTypeCode(remoteUserID)
-                    : AuditMessages.UserIDTypeCode.StationAETitle;
-
-        LOG.warn("Remote user ID was not set during spooling.");
-        return null;
-    }
+//    private AuditMessages.UserIDTypeCode userIDTypeCode(String userID) {
+//        return userID.indexOf('/') != -1
+//                ? AuditMessages.UserIDTypeCode.URI
+//                : userID.indexOf('|') != -1
+//                ? AuditMessages.UserIDTypeCode.ApplicationFacility
+//                : userID.equals(device.getDeviceName())
+//                ? AuditMessages.UserIDTypeCode.DeviceName
+//                : AuditMessages.UserIDTypeCode.StationAETitle;
+//    }
+//
+//    static AuditMessages.UserIDTypeCode remoteUserIDTypeCode(
+//            AuditMessages.UserIDTypeCode archiveUserIDTypeCode, String remoteUserID) {
+//        if (remoteUserID != null)
+//            return remoteUserID.indexOf('|') != -1
+//                    ? AuditMessages.UserIDTypeCode.ApplicationFacility
+//                    : archiveUserIDTypeCode == AuditMessages.UserIDTypeCode.URI
+//                    ? AuditMessages.userIDTypeCode(remoteUserID)
+//                    : AuditMessages.UserIDTypeCode.StationAETitle;
+//
+//        LOG.warn("Remote user ID was not set during spooling.");
+//        return null;
+//    }
 }

@@ -147,11 +147,11 @@ class StorageCommitAuditService {
             AuditUtils.EventType eventType, AuditLogger auditLogger, AuditInfo auditInfo) {
         ActiveParticipantBuilder[] activeParticipants = new ActiveParticipantBuilder[2];
         String archiveUserID = auditInfo.getField(AuditInfo.CALLED_USERID);
-        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = archiveUserIDTypeCode(archiveUserID);
+//        AuditMessages.UserIDTypeCode archiveUserIDTypeCode = archiveUserIDTypeCode(archiveUserID);
         ActiveParticipantBuilder.Builder archive = new ActiveParticipantBuilder.Builder(
                 archiveUserID,
                 auditLogger.getConnections().get(0).getHostname())
-                .userIDTypeCode(archiveUserIDTypeCode)
+  //              .userIDTypeCode(archiveUserIDTypeCode)
                 .altUserID(AuditLogger.processID())
                 .roleIDCode(eventType.destination);
         String callingUserID = auditInfo.getField(AuditInfo.CALLING_USERID);
@@ -159,7 +159,7 @@ class StorageCommitAuditService {
             activeParticipants[1] = new ActiveParticipantBuilder.Builder(
                     callingUserID,
                     auditInfo.getField(AuditInfo.CALLING_HOST))
-                    .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
+    //                .userIDTypeCode(AuditService.remoteUserIDTypeCode(archiveUserIDTypeCode, callingUserID))
                     .isRequester()
                     .roleIDCode(eventType.source).build();
         else
@@ -168,9 +168,9 @@ class StorageCommitAuditService {
         return activeParticipants;
     }
 
-    private static AuditMessages.UserIDTypeCode archiveUserIDTypeCode(String userID) {
-        return  userID.indexOf('/') != -1
-                ? AuditMessages.UserIDTypeCode.URI
-                : AuditMessages.UserIDTypeCode.StationAETitle;
-    }
+//    private static AuditMessages.UserIDTypeCode archiveUserIDTypeCode(String userID) {
+//        return  userID.indexOf('/') != -1
+//                ? AuditMessages.UserIDTypeCode.URI
+//                : AuditMessages.UserIDTypeCode.StationAETitle;
+//    }
 }
