@@ -5,14 +5,13 @@ import {AeListService} from "../../configuration/ae-list/ae-list.service";
 import {Observable} from "rxjs/Observable";
 import {HttpErrorHandler} from "../../helpers/http-error-handler";
 import {ExportDialogComponent} from "../../widgets/dialogs/export/export.component";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {ConfirmComponent} from "../../widgets/dialogs/confirm/confirm.component";
 import {DatePipe} from "@angular/common";
 import {j4care} from "../../helpers/j4care.service";
 import * as FileSaver from 'file-saver';
 import {WindowRefService} from "../../helpers/window-ref.service";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
-import "rxjs/add/observable/forkJoin";
 import {LoadingBarService} from '@ngx-loading-bar/core';
 import {environment} from "../../../environments/environment";
 import {CsvUploadComponent} from "../../widgets/dialogs/csv-upload/csv-upload.component";
@@ -26,6 +25,8 @@ import {SelectDropdown} from "../../interfaces";
 import {RetrieveMonitoringService} from "./retrieve-monitoring.service";
 import {DevicesService} from "../../configuration/devices/devices.service";
 import {KeycloakService} from "../../helpers/keycloak-service/keycloak.service";
+import {forkJoin} from "rxjs/internal/observable/forkJoin";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'retrieve-monitoring',
@@ -50,20 +51,20 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     count;
     timer = {
         started:false,
-        startText:"Start Auto Refresh",
-        stopText:"Stop Auto Refresh"
+        startText:$localize `:@@start_auto_refresh:Start Auto Refresh`,
+        stopText:$localize `:@@stop_auto_refresh:Stop Auto Refresh`
     };
     allActionsActive = [];
     allActionsOptions = [
         {
             value:"cancel",
-            label:"Cancel all matching tasks"
+            label:$localize `:@@cancel_all_matching_tasks:Cancel all matching tasks`
         },{
             value:"reschedule",
-            label:"Reschedule all matching tasks"
+            label:$localize `:@@reschedule_all_matching_tasks:Reschedule all matching tasks`
         },{
             value:"delete",
-            label:"Delete all matching tasks"
+            label:$localize `:@@delete_all_matching_tasks:Delete all matching tasks`
         }
     ];
     allAction;
@@ -172,9 +173,9 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
         this.filterObject = {
             limit:20
         };
-        Observable.forkJoin(
-            this.aeListService.getAes().map(aet=> this.permissionService.filterAetDependingOnUiConfig(aet,'external')),
-            this.aeListService.getAets().map(aet=> this.permissionService.filterAetDependingOnUiConfig(aet,'internal')),
+        forkJoin(
+            this.aeListService.getAes().pipe(map(aet=> this.permissionService.filterAetDependingOnUiConfig(aet,'external'))),
+            this.aeListService.getAets().pipe(map(aet=> this.permissionService.filterAetDependingOnUiConfig(aet,'internal'))),
             this.service.getDevices()
         ).subscribe((response)=>{
             this.remoteAET = this.destinationAET = (<any[]>j4care.extendAetObjectWithAlias(response[0])).map(ae => {
@@ -270,10 +271,10 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     };
     downloadCsv(){
         this.confirm({
-            content:"Do you want to use semicolon as delimiter?",
-            cancelButton:"No",
-            saveButton:"Yes",
-            result:"yes"
+            content:$localize `:@@use_semicolon_delimiter:Do you want to use semicolon as delimiter?`,
+            cancelButton:$localize `:@@No:No`,
+            saveButton:$localize `:@@Yes:Yes`,
+            result:$localize `:@@yes:yes`
         }).subscribe((ok)=>{
             let semicolon = false;
             if(ok)
@@ -312,41 +313,41 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                     tag:"input",
                     type:"checkbox",
                     filterKey:"withoutScheduling",
-                    description:"Without Scheduling"
+                    description:$localize `:@@without_scheduling:Without Scheduling`
                 },{
                     tag:"range-picker-time",
                     type:"text",
                     filterKey:"scheduledTime",
-                    description:"Scheduled times"
+                    description:$localize `:@@scheduled_times:Scheduled times`
                 },
                 {
                     tag:"input",
                     type:"checkbox",
                     filterKey:"semicolon",
-                    description:"Use semicolon as delimiter"
+                    description:$localize `:@@use_semicolon_as_delimiter:Use semicolon as delimiter`
                 },
                 {
                     tag:"select",
                     options:this.remoteAET,
                     showStar:true,
                     filterKey:"LocalAET",
-                    description:"Local AET",
-                    placeholder:"Local AET",
+                    description:$localize `:@@local_aet:Local AET`,
+                    placeholder:$localize `:@@local_aet:Local AET`,
                     validation:Validators.required
                 },{
                     tag:"select",
                     options:this.remoteAET,
                     showStar:true,
                     filterKey:"RemoteAET",
-                    description:"Remote AET",
-                    placeholder:"Remote AET",
+                    description:$localize `:@@remote_aet:Remote AET`,
+                    placeholder:$localize `:@@remote_aet:Remote AET`,
                     validation:Validators.required
                 },{
                     tag:"input",
                     type:"number",
                     filterKey:"field",
-                    description:"Field",
-                    placeholder:"Field",
+                    description:$localize `:@@field:Field`,
+                    placeholder:$localize `:@@field:Field`,
                     validation:Validators.minLength(1),
                     defaultValue:1
                 },{
@@ -354,8 +355,8 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                     options:this.remoteAET,
                     showStar:true,
                     filterKey:"DestinationAET",
-                    description:"Destination AET",
-                    placeholder:"Destination AET",
+                    description:$localize `:@@destination_aet:Destination AET`,
+                    placeholder:$localize `:@@destination_aet:Destination AET`,
                     validation:Validators.required
                 }
                 ,{
@@ -363,22 +364,22 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                     options:this.queueNames,
                     showStar:true,
                     filterKey:"dcmQueueName",
-                    placeholder:"Queue Name",
-                    description:"Queue Name"
+                    placeholder:$localize `:@@queue_name:Queue Name`,
+                    description:$localize `:@@queue_name:Queue Name`
                 }
                 ,{
                     tag:"input",
                     type:"number",
                     filterKey:"priority",
-                    description:"Priority",
-                    placeholder:"Priority"
+                    description:$localize `:@@priority:Priority`,
+                    placeholder:$localize `:@@priority:Priority`
                 },
                 {
                     tag:"input",
                     type:"text",
                     filterKey:"batchID",
-                    description:"Batch ID",
-                    placeholder:"Batch ID"
+                    description:$localize `:@@batch_id:Batch ID`,
+                    placeholder:$localize `:@@batch_id:Batch ID`
                 }
             ],
             prepareUrl:(filter)=>{
@@ -404,7 +405,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
         });
     }
     allActionChanged(e){
-        let text = `Are you sure, you want to ${this.allAction} all matching tasks?`;
+        let text = $localize `:@@matching_task_question:Are you sure, you want to ${Globalvar.getActionText(this.allAction)} all matching tasks?`;
         let filter = Object.assign({}, this.filterObject);
         delete filter.limit;
         delete filter.offset;
@@ -416,11 +417,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                 switch (this.allAction){
                 case "cancel":
                             this.service.cancelAll(this.filterObject).subscribe((res)=>{
-                                this.mainservice.setMessage({
-                                    'title': 'Info',
-                                    'text': res.count + ' tasks canceled successfully!',
-                                    'status': 'info'
-                                });
+                                this.mainservice.showMsg($localize `:@@tasks_canceled:${res.count} ' tasks canceled successfully!`);
                                 this.cfpLoadingBar.complete();
                             }, (err) => {
                                 this.cfpLoadingBar.complete();
@@ -439,7 +436,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                                     filter["scheduledTime"] = res.schema_model.scheduledTime;
                                 }
                                 this.service.rescheduleAll(filter).subscribe((res)=>{
-                                    this.mainservice.showMsg(res.count + ' tasks rescheduled successfully!');
+                                    this.mainservice.showMsg($localize `:@@tasks_rescheduled:${res.count}:@@count: tasks rescheduled successfully!`);
                                     this.cfpLoadingBar.complete();
                                 }, (err) => {
                                     this.cfpLoadingBar.complete();
@@ -454,11 +451,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                     break;
                 case "delete":
                         this.service.deleteAll(this.filterObject).subscribe((res)=>{
-                            this.mainservice.setMessage({
-                                'title': 'Info',
-                                'text': res.deleted + ' tasks deleted successfully!',
-                                'status': 'info'
-                            });
+                            this.mainservice.showMsg($localize `:@@tasks_deleted:${res.deleted} tasks deleted successfully!`)
                             this.cfpLoadingBar.complete();
                         }, (err) => {
                             this.cfpLoadingBar.complete();
@@ -474,7 +467,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     }
     deleteBatchedTask(batchedTask){
         this.confirm({
-            content: 'Are you sure you want to delete all tasks to this batch?'
+            content: $localize `:@@task_delete_question:Are you sure you want to delete all tasks to this batch?`
         }).subscribe(ok=>{
             if(ok){
                 if(batchedTask.properties.batchID){
@@ -483,11 +476,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                     delete filter["limit"];
                     delete filter["offset"];
                     this.service.deleteAll(filter).subscribe((res)=>{
-                        this.mainservice.setMessage({
-                            'title': 'Info',
-                            'text': res.deleted + ' tasks deleted successfully!',
-                            'status': 'info'
-                        });
+                        this.mainservice.showMsg($localize `:@@tasks_deleted:${res.deleted} tasks deleted successfully!`)
                         this.cfpLoadingBar.complete();
                         this.getTasks(0)
                     }, (err) => {
@@ -495,11 +484,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                         this.httpErrorHandler.handleError(err);
                     });
                 }else{
-                    this.mainservice.setMessage({
-                        'title': 'Error',
-                        'text': 'Batch ID not found!',
-                        'status': 'error'
-                    });
+                    this.mainservice.showError($localize `:@@batch_id_not_found:Batch ID not found!`);
                 }
             }
         });
@@ -507,7 +492,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     delete(match){
         let $this = this;
         let parameters: any = {
-            content: 'Are you sure you want to delete this task?'
+            content: $localize `:@@delete_task_question:Are you sure you want to delete this task?`
         };
         this.confirm(parameters).subscribe(result => {
             if (result){
@@ -518,11 +503,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                             // match.properties.status = 'CANCELED';
                             $this.cfpLoadingBar.complete();
                             $this.getTasks(match.offset||0);
-                            $this.mainservice.setMessage({
-                                'title': 'Info',
-                                'text': 'Task deleted successfully!',
-                                'status': 'info'
-                            });
+                            this.mainservice.showMsg($localize `:@@task_deleted:Task deleted successfully!`)
                         },
                         (err) => {
                             $this.cfpLoadingBar.complete();
@@ -534,7 +515,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     cancel(match) {
         let $this = this;
         let parameters: any = {
-            content: 'Are you sure you want to cancel this task?'
+            content: $localize `:@@want_to_cancel_this_task:Are you sure you want to cancel this task?`
         };
         this.confirm(parameters).subscribe(result => {
             if (result){
@@ -544,11 +525,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                         (res) => {
                             match.properties.status = 'CANCELED';
                             $this.cfpLoadingBar.complete();
-                            $this.mainservice.setMessage({
-                                'title': 'Info',
-                                'text': 'Task canceled successfully!',
-                                'status': 'info'
-                            });
+                            this.mainservice.showMsg($localize `:@@task_canceled:Task canceled successfully!`)
                         },
                         (err) => {
                             $this.cfpLoadingBar.complete();
@@ -560,7 +537,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     };
     onFormChange(filters){
  /*       this.allActionsActive = this.allActionsOptions.filter((o)=>{
-            if(filters.status == "SCHEDULED" || filters.status == "IN PROCESS"){
+            if(filters.status == "SCHEDULED" || filters.status == $localize `:@@retrieve-monitoring.in_process:IN PROCESS`){
                 return o.value != 'reschedule';
             }else{
                 if(filters.status === '*' || !filters.status || filters.status === '')
@@ -573,7 +550,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     reschedule(match) {
         let $this = this;
         let parameters: any = {
-            content: 'Are you sure you want to reschedule this task?'
+            content: $localize `:@@want_to_reschedule_this_task:Are you sure you want to reschedule this task?`
         };
         this.confirm(parameters).subscribe(result => {
             if (result){
@@ -592,7 +569,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                                     (res) => {
                                         $this.getTasks(match.offset||0);
                                         $this.cfpLoadingBar.complete();
-                                        $this.mainservice.showMsg('Task rescheduled successfully!');
+                                        this.mainservice.showMsg($localize `:@@task_rescheduled:Task rescheduled successfully!`)
                                     },
                                     (err) => {
                                         $this.cfpLoadingBar.complete();
@@ -612,7 +589,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
     }
     executeAll(mode){
         this.confirm({
-            content: `Are you sure you want to ${mode} selected entries?`
+            content: $localize `:@@action_selected_entries_question:Are you sure you want to ${Globalvar.getActionText(mode)} selected entries?`
         }).subscribe(result => {
             if (result){
                 this.cfpLoadingBar.start();
@@ -701,11 +678,7 @@ export class RetrieveMonitoringComponent implements OnInit,OnDestroy {
                 }else{
                     $this.cfpLoadingBar.complete();
                     $this.externalRetrieveEntries = [];
-                    $this.mainservice.setMessage({
-                        'title': 'Info',
-                        'text': 'No tasks found!',
-                        'status': 'info'
-                    });
+                    this.mainservice.showMsg($localize `:@@no_tasks_found:No tasks found!`)
                 }
             },
             err => {

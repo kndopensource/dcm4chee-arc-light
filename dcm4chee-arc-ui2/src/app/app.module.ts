@@ -3,31 +3,26 @@ import {LOCALE_ID, NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { RouterModule }   from '@angular/router';
 import {AppComponent} from './app.component';
-import {
-    MatCheckboxModule,
-    MatIconModule,
-    MatProgressBarModule,
-    MatDialogConfig,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
-    MatRadioModule,
-    MatMenuModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MAT_DATE_FORMATS,
-    DateAdapter,
-    MAT_DATE_LOCALE, MatButtonModule,
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatNativeDateModule, MAT_DATE_FORMATS, DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { ControlComponent } from './configuration/control/control.component';
 import { QueuesComponent } from './monitoring/queues/queues.component';
 import { OrderByPipe } from './pipes/order-by.pipe';
 import { GetKeyPipe } from './pipes/get-key.pipe';
 import {WidgetsModule, WidgetsComponents} from './widgets/widgets.module';
-import {CommonModule, DatePipe} from '@angular/common';
+import {CommonModule, DatePipe, registerLocaleData} from '@angular/common';
 import { FormatDAPipe } from './pipes/format-da.pipe';
 import { FormatTMPipe } from './pipes/format-tm.pipe';
 import { FormatTagPipe } from './pipes/format-tag.pipe';
@@ -115,6 +110,10 @@ import { SelectionsDicomViewComponent } from './study/study/selections-dicom-vie
 import {SelectionsDicomViewService} from "./study/study/selections-dicom-view/selections-dicom-view.service";
 import {MY_FORMATS} from "./constants/globalvar";
 import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter} from "@angular/material-moment-adapter";
+
+/*import localeEn from '@angular/common/locales/en';
+
+registerLocaleData(localeEn, 'en-US');*/
 
 @NgModule({
     declarations: [

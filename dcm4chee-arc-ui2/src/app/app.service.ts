@@ -1,5 +1,5 @@
 import {Injectable, OnInit, OnDestroy} from '@angular/core';
-import {Observable, Subject, Subscription} from 'rxjs';
+import {Observable, Subject, Subscription, of} from 'rxjs';
 import {User} from './models/user';
 import * as _ from 'lodash';
 import {WindowRefService} from "./helpers/window-ref.service";
@@ -10,6 +10,8 @@ import {j4care} from "./helpers/j4care.service";
 import {DcmWebApp} from "./models/dcm-web-app";
 import {Router} from "@angular/router";
 import {Error} from "tslint/lib/error";
+import {map, switchMap} from "rxjs/operators";
+import { loadTranslations } from '@angular/localize';
 
 @Injectable()
 export class AppService implements OnInit, OnDestroy{
@@ -49,7 +51,7 @@ export class AppService implements OnInit, OnDestroy{
 
     isSecure(){
         if(typeof this.securedValue === "boolean"){
-            return Observable.of(this.securedValue);
+            return of(this.securedValue);
         }else{
             return this.secured.asObservable();
         }
@@ -119,21 +121,21 @@ export class AppService implements OnInit, OnDestroy{
     }
     showError(msg:string){
         this.setMessageSource.next({
-            "title":"Error",
+            "title":$localize `:@@msg.error:Error`,
             "text":msg,
             "status":"error"
         })
     }
     showMsg(msg:string){
         this.setMessageSource.next({
-            "title":"Info",
+            "title":$localize `:@@msg.info:Info`,
             "text":msg,
             "status":"info"
         })
     }
     showWarning(msg:string){
         this.setMessageSource.next({
-            "title":"Warning",
+            "title":$localize `:@@msg.warning:Warning`,
             "text":msg,
             "status":"warning"
         })
@@ -208,46 +210,46 @@ export class AppService implements OnInit, OnDestroy{
 
     getMyWebApps(){
         if(_.hasIn(this.global,"myDevice")){
-            return Observable.of((<DcmWebApp[]>_.get(this.global.myDevice,"dcmDevice.dcmWebApp")).map((dcmWebApp:DcmWebApp)=>{
+            return of((<DcmWebApp[]>_.get(this.global.myDevice,"dcmDevice.dcmWebApp")).map((dcmWebApp:DcmWebApp)=>{
                 dcmWebApp.dcmKeycloakClientID = (<any[]>_.get(this.global.myDevice,"dcmDevice.dcmKeycloakClient")).filter(keycloakClient=>{
                     return keycloakClient.dcmKeycloakClientID === dcmWebApp.dcmKeycloakClientID;
                 })[0];
                 return dcmWebApp;
             }));
         }else{
-            return this.getMyDevice().map(res=>{
+            return this.getMyDevice().pipe(map(res=>{
                 return (<DcmWebApp[]>_.get(res,"dcmDevice.dcmWebApp")).map((dcmWebApp:DcmWebApp)=>{
                     dcmWebApp.dcmKeycloakClientID = (<any[]>_.get(this.global.myDevice,"dcmDevice.dcmKeycloakClient")).filter(keycloakClient=>{
                         return keycloakClient.dcmKeycloakClientID === dcmWebApp.dcmKeycloakClientID;
                     })[0];
                     return dcmWebApp;
                 });
-            })
+            }))
         }
     }
 
     getUiConfig(){
         if(_.hasIn(this.global,"uiConfig")){
-            return Observable.of(this.global.uiConfig);
+            return of(this.global.uiConfig);
         }else{
-            return this.getMyDevice().map(res=>{
+            return this.getMyDevice().pipe(map(res=>{
                 return _.get(res,"dcmDevice.dcmuiConfig[0]");
-            })
+            }))
         }
     }
     getMyDevice(){
         if(_.hasIn(this.global,"myDevice")){
-            return Observable.of(this.global.myDevice);
+            return of(this.global.myDevice);
         }else{
             let deviceName;
             let archiveDeviceName;
             return this.$httpClient.get('../devicename')
-                .switchMap(res => {
+                .pipe(switchMap(res => {
                     deviceName = (_.get(res,"UIConfigurationDeviceName") || _.get(res,"dicomDeviceName"));
                     archiveDeviceName = _.get(res,"dicomDeviceName");
                     return this.$httpClient.get('../devices/' + deviceName)
-                })
-                .map((res)=>{
+                }))
+                .pipe(map((res)=>{
                     try{
                         let global = _.cloneDeep(this.global) || {};
                         global["uiConfig"] = _.get(res,"dcmDevice.dcmuiConfig[0]");
@@ -257,16 +259,16 @@ export class AppService implements OnInit, OnDestroy{
                         this.setGlobal(global);
                     }catch(e){
                         console.warn("Permission not found!",e);
-                        this.showError("Permission not found!");
+                        this.showError($localize `:@@app.permission_not_found:Permission not found!`);
                     }
                     return res;
-                });
+                }));
         }
     }
     getKeycloakJson(){
         if(!this.global || !this.global.notSecure){
             return this.$httpClient.get("./rs/keycloak.json")
-                .map((res:any)=>{
+                .pipe(map((res:any)=>{
                     if(_.isEmpty(res)){
                         console.log("ojbect is empty",res);
                         this.updateGlobal("notSecure", true);
@@ -286,10 +288,10 @@ export class AppService implements OnInit, OnDestroy{
                     this.updateGlobal("notSecure", true);
                     console.log("err",err);
                     this.setSecured(false);
-                    Observable.throw(err);
-                })
+                    throw(err);
+                }))
         }else{
-            return Observable.of({})
+            return of({})
         }
     }
 

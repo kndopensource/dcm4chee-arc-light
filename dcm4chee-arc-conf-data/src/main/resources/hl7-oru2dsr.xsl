@@ -21,39 +21,41 @@
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="rad128"/>
+          <xsl:call-template name="rad128">
+            <xsl:with-param name="ed" select="$ed"/>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
 
       <xsl:apply-templates select="PID"/>
       <xsl:apply-templates select="PV1"/>
-      <xsl:apply-templates select="OBR"/>
-      <!--Content Sequence-->
-      <DicomAttribute tag="0040A730" vr="SQ">
-        <xsl:call-template name="const-obsctx"/>
-        <xsl:apply-templates select="OBR" mode="obsctx"/>
-        <xsl:apply-templates select="OBX[field[3]/component='SR Text']" mode="txt"/>
-      </DicomAttribute>
+
+      <xsl:choose>
+        <xsl:when test="$ed">
+          <xsl:call-template name="ed"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="sr-const-attrs"/>
+          <!--Content Sequence-->
+          <DicomAttribute tag="0040A730" vr="SQ">
+            <xsl:call-template name="const-obsctx"/>
+            <xsl:apply-templates select="OBR" mode="obsctx"/>
+            <xsl:choose>
+              <xsl:when test="$valueType = 'HD'">
+                <xsl:apply-templates select="OBX[field[3]/component='SR Text']" mode="txt"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:apply-templates select="OBX" mode="rad128"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </DicomAttribute>
+        </xsl:otherwise>
+      </xsl:choose>
     </NativeDicomModel>
   </xsl:template>
 
   <xsl:template name="rad28">
     <xsl:param name="ed"/>
-    <!--SOP Class UID-->
-    <xsl:call-template name="attr">
-      <xsl:with-param name="tag" select="'00080018'"/>
-      <xsl:with-param name="vr" select="'UI'"/>
-      <xsl:with-param name="val">
-        <xsl:choose>
-          <xsl:when test="$ed">
-            <xsl:value-of select="'1.2.840.10008.5.1.4.1.1.104.1'"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="'1.2.840.10008.5.1.4.1.1.88.11'"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:with-param>
-    </xsl:call-template>
     <!--SOP Instance UID-->
     <xsl:call-template name="attr">
       <xsl:with-param name="tag" select="'00080018'"/>
@@ -64,15 +66,116 @@
     <xsl:call-template name="attr">
       <xsl:with-param name="tag" select="'0020000E'"/>
       <xsl:with-param name="vr" select="'UI'"/>
-      <xsl:with-param name="val" select="normalize-space(../OBX[field[3]/component='Series Instance UID'][1]/field[5])"/>
+      <xsl:with-param name="val" select="normalize-space(OBX[field[3]/component='Series Instance UID'][1]/field[5])"/>
     </xsl:call-template>
-    <xsl:if test="$ed">
-      <xsl:call-template name="ed"/>
-    </xsl:if>
+    <!-- Study Instance UID -->
+    <xsl:variable name="studyUID"
+                  select="normalize-space(OBX[field[3]/component='Study Instance UID']/field[5])"/>
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'0020000D'"/>
+      <xsl:with-param name="vr" select="'UI'"/>
+      <xsl:with-param name="val" select="$studyUID"/>
+    </xsl:call-template>
+    <xsl:apply-templates select="OBR">
+      <xsl:with-param name="sr" select="$ed"/>
+      <xsl:with-param name="studyUID" select="$studyUID"/>
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template name="rad128">
+    <xsl:param name="ed"/>
+    <!-- Study Instance UID -->
+    <xsl:variable name="studyUID" select="normalize-space(OBX[field[3]/component='DICOM Study']/field[5])"/>
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'0020000D'"/>
+      <xsl:with-param name="vr" select="'UI'"/>
+      <xsl:with-param name="val" select="$studyUID"/>
+    </xsl:call-template>
+    <xsl:apply-templates select="OBR">
+      <xsl:with-param name="sr" select="$ed"/>
+      <xsl:with-param name="studyUID" select="$studyUID"/>
+    </xsl:apply-templates>
+  </xsl:template>
 
+  <xsl:template name="sr-const-attrs">
+    <!--Modality-->
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00080060'"/>
+      <xsl:with-param name="vr" select="'CS'"/>
+      <xsl:with-param name="val" select="'SR'"/>
+    </xsl:call-template>
+    <!--Referenced Performed Procedure Step Sequence-->
+    <DicomAttribute tag="00081111" vr="SQ"/>
+    <!--SOP Class UID-->
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00080016'"/>
+      <xsl:with-param name="vr" select="'UI'"/>
+      <xsl:with-param name="val" select="'1.2.840.10008.5.1.4.1.1.88.11'"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="ed-const-attrs">
+    <xsl:param name="mimeType"/>
+    <xsl:choose>
+      <xsl:when test="$mimeType='text/xml'">
+        <xsl:call-template name="ed-cda-const-attrs"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--SOP Class UID-->
+        <xsl:call-template name="attr">
+          <xsl:with-param name="tag" select="'00080016'"/>
+          <xsl:with-param name="vr" select="'UI'"/>
+          <xsl:with-param name="val" select="'1.2.840.10008.5.1.4.1.1.104.1'"/>
+        </xsl:call-template>
+        <!--Modality-->
+        <xsl:call-template name="attr">
+          <xsl:with-param name="tag" select="'00080060'"/>
+          <xsl:with-param name="vr" select="'CS'"/>
+          <xsl:with-param name="val" select="'DOC'"/>
+        </xsl:call-template>
+        <!--Conversion Type-->
+        <xsl:call-template name="attr">
+          <xsl:with-param name="tag" select="'00080064'"/>
+          <xsl:with-param name="vr" select="'CS'"/>
+          <xsl:with-param name="val" select="'SD'"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!--Burned In Annotation-->
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00280301'"/>
+      <xsl:with-param name="vr" select="'CS'"/>
+      <xsl:with-param name="val" select="'NO'"/>
+    </xsl:call-template>
+    <!--Content Date-->
+    <DicomAttribute tag="00080023" vr="DA"/>
+    <!--Content Time-->
+    <DicomAttribute tag="00080033" vr="TM"/>
+    <!--Acquisition Date Time-->
+    <DicomAttribute tag="0008002A" vr="DT"/>
+    <!--Document Title-->
+    <DicomAttribute tag="00420010" vr="ST"/>
+  </xsl:template>
+
+  <xsl:template name="ed-cda-const-attrs">
+    <!--SOP Class UID-->
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00080016'"/>
+      <xsl:with-param name="vr" select="'UI'"/>
+      <xsl:with-param name="val" select="'1.2.840.10008.5.1.4.1.1.104.2'"/>
+    </xsl:call-template>
+    <!--Modality-->
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00080060'"/>
+      <xsl:with-param name="vr" select="'CS'"/>
+      <xsl:with-param name="val" select="'SR'"/>
+    </xsl:call-template>
+    <!--Conversion Type-->
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00080064'"/>
+      <xsl:with-param name="vr" select="'CS'"/>
+      <xsl:with-param name="val" select="'WSD'"/>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="const-attrs">
@@ -82,22 +185,18 @@
     <DicomAttribute tag="00080030" vr="TM"/>
     <!--Accession Number-->
     <DicomAttribute tag="00080050" vr="SH"/>
-    <!--Modality-->
-    <xsl:call-template name="attr">
-      <xsl:with-param name="tag" select="'00080060'"/>
-      <xsl:with-param name="vr" select="'CS'"/>
-      <xsl:with-param name="val" select="'SR'"/>
-    </xsl:call-template>
     <!--Manufacturer-->
     <DicomAttribute tag="00080070" vr="LO"/>
     <!--Referring Physician's Name-->
     <DicomAttribute tag="00080090" vr="PN"/>
-    <!--Referenced Performed Procedure Step Sequence-->
-    <DicomAttribute tag="00081111" vr="SQ"/>
     <!--Study ID-->
     <DicomAttribute tag="00200010" vr="SH"/>
     <!--Series Number-->
-    <DicomAttribute tag="00200011" vr="IS"/>
+    <xsl:call-template name="attr">
+      <xsl:with-param name="tag" select="'00200011'"/>
+      <xsl:with-param name="vr" select="'IS'"/>
+      <xsl:with-param name="val" select="'1'"/>
+    </xsl:call-template>
     <!--Instance Number-->
     <xsl:call-template name="attr">
       <xsl:with-param name="tag" select="'00200013'"/>
@@ -127,35 +226,14 @@
     <DicomAttribute tag="0040A504" vr="SQ"/>
   </xsl:template>
 
-  <xsl:template name="studyUID">
-    <xsl:variable name="uid-rad28" select="normalize-space(../OBX[field[3]/component='Study Instance UID'][1]/field[5])"/>
-    <xsl:variable name="uid-rad128" select="normalize-space(../OBX[field[3]/component='DICOM Study'][1]/field[5])"/>
-    <xsl:choose>
-      <xsl:when test="$uid-rad28">
-        <xsl:value-of select="$uid-rad28"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$uid-rad128"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <xsl:template match="OBR">
+    <xsl:param name="ed"/>
+    <xsl:param name="studyUID"/>
     <!--Content Date/Time-->
     <xsl:call-template name="attrDATM">
       <xsl:with-param name="datag">00080023</xsl:with-param>
       <xsl:with-param name="tmtag">00080033</xsl:with-param>
       <xsl:with-param name="val" select="field[7]"/>
-    </xsl:call-template>
-    <!-- Take Study Instance UID from first referenced Image - if available -->
-    <xsl:variable name="suid">
-      <xsl:call-template name="studyUID"/>
-    </xsl:variable>
-    <!-- Study Instance UID -->
-    <xsl:call-template name="attr">
-      <xsl:with-param name="tag" select="'0020000D'"/>
-      <xsl:with-param name="vr" select="'UI'"/>
-      <xsl:with-param name="val" select="$suid"/>
     </xsl:call-template>
     <!--Accession Number-->
     <xsl:call-template name="attr">
@@ -163,45 +241,47 @@
       <xsl:with-param name="vr" select="'SH'"/>
       <xsl:with-param name="val" select="field[18]"/>
     </xsl:call-template>
-    <!--Referenced Request Sequence-->
-    <DicomAttribute tag="0040A370" vr="SQ">
-      <Item number="1">
-        <!-- Study Instance UID -->
-        <xsl:call-template name="attr">
-          <xsl:with-param name="tag" select="'0020000D'"/>
-          <xsl:with-param name="vr" select="'UI'"/>
-          <xsl:with-param name="val" select="$suid"/>
-        </xsl:call-template>
-        <!--Accession Number-->
-        <DicomAttribute tag="00080050" vr="SH"/>
-        <!--Referenced Study Sequence-->
-        <DicomAttribute tag="00081110" vr="SQ"/>
-        <!--Requested Procedure Description and Code Sequence-->
-        <xsl:call-template name="ce2codeItemWithDesc">
-          <xsl:with-param name="descTag" select="'00321060'"/>
-          <xsl:with-param name="seqTag" select="'00321064'"/>
-          <xsl:with-param name="codedEntry" select="field[4]"/>
-        </xsl:call-template>
-        <!-- Requested Procedure ID -->
-        <xsl:call-template name="attr">
-          <xsl:with-param name="tag" select="'00401001'"/>
-          <xsl:with-param name="vr" select="'SH'"/>
-          <xsl:with-param name="val" select="string(field[19]/text())"/>
-        </xsl:call-template>
-        <!--Placer Order Number / Imaging Service Request-->
-        <xsl:call-template name="attr">
-          <xsl:with-param name="tag" select="'00402016'"/>
-          <xsl:with-param name="vr" select="'LO'"/>
-          <xsl:with-param name="val" select="field[2]"/>
-        </xsl:call-template>
-        <!--Filler Order Number / Imaging Service Request-->
-        <xsl:call-template name="attr">
-          <xsl:with-param name="tag" select="'00402017'"/>
-          <xsl:with-param name="vr" select="'LO'"/>
-          <xsl:with-param name="val" select="field[3]"/>
-        </xsl:call-template>
-      </Item>
-    </DicomAttribute>
+    <xsl:if test="not($ed)">
+      <!--Referenced Request Sequence-->
+      <DicomAttribute tag="0040A370" vr="SQ">
+        <Item number="1">
+          <!-- Study Instance UID -->
+          <xsl:call-template name="attr">
+            <xsl:with-param name="tag" select="'0020000D'"/>
+            <xsl:with-param name="vr" select="'UI'"/>
+            <xsl:with-param name="val" select="$studyUID"/>
+          </xsl:call-template>
+          <!--Accession Number-->
+          <DicomAttribute tag="00080050" vr="SH"/>
+          <!--Referenced Study Sequence-->
+          <DicomAttribute tag="00081110" vr="SQ"/>
+          <!--Requested Procedure Description and Code Sequence-->
+          <xsl:call-template name="ce2codeItemWithDesc">
+            <xsl:with-param name="descTag" select="'00321060'"/>
+            <xsl:with-param name="seqTag" select="'00321064'"/>
+            <xsl:with-param name="codedEntry" select="field[4]"/>
+          </xsl:call-template>
+          <!-- Requested Procedure ID -->
+          <xsl:call-template name="attr">
+            <xsl:with-param name="tag" select="'00401001'"/>
+            <xsl:with-param name="vr" select="'SH'"/>
+            <xsl:with-param name="val" select="string(field[19]/text())"/>
+          </xsl:call-template>
+          <!--Placer Order Number / Imaging Service Request-->
+          <xsl:call-template name="attr">
+            <xsl:with-param name="tag" select="'00402016'"/>
+            <xsl:with-param name="vr" select="'LO'"/>
+            <xsl:with-param name="val" select="field[2]"/>
+          </xsl:call-template>
+          <!--Filler Order Number / Imaging Service Request-->
+          <xsl:call-template name="attr">
+            <xsl:with-param name="tag" select="'00402017'"/>
+            <xsl:with-param name="vr" select="'LO'"/>
+            <xsl:with-param name="val" select="field[3]"/>
+          </xsl:call-template>
+        </Item>
+      </DicomAttribute>
+    </xsl:if>
     <!-- Verifying Observer Sequence -->
     <DicomAttribute tag="0040A073" vr="SQ">
       <Item number="1">
@@ -393,6 +473,119 @@
     </Item>
   </xsl:template>
 
+  <xsl:template match="OBX" mode="rad128">
+    <xsl:variable name="valueType" select="field[2]"/>
+    <xsl:variable name="observationID" select="field[3]"/>
+
+    <Item number="1">
+      <!--Relationship Type-->
+      <xsl:call-template name="attr">
+        <xsl:with-param name="tag" select="'0040A010'"/>
+        <xsl:with-param name="vr" select="'CS'"/>
+        <xsl:with-param name="val" select="'CONTAINS'"/>
+      </xsl:call-template>
+      <!--Value Type-->
+      <xsl:call-template name="attr">
+        <xsl:with-param name="tag" select="'0040A040'"/>
+        <xsl:with-param name="vr" select="'CS'"/>
+        <xsl:with-param name="val" select="'CONTAINER'"/>
+      </xsl:call-template>
+      <!--Concept Name Code Sequence-->
+      <xsl:call-template name="codeItem">
+        <xsl:with-param name="sqtag" select="'0040A043'"/>
+        <xsl:with-param name="code" select="$observationID/text()"/>
+        <xsl:with-param name="scheme" select="$observationID/component[2]"/>
+        <xsl:with-param name="meaning" select="$observationID/component[1]"/>
+      </xsl:call-template>
+      <!--Continuity Of Content-->
+      <xsl:call-template name="attr">
+        <xsl:with-param name="tag" select="'0040A050'"/>
+        <xsl:with-param name="vr" select="'CS'"/>
+        <xsl:with-param name="val" select="'SEPARATE'"/>
+      </xsl:call-template>
+      <!--Content Sequence-->
+      <DicomAttribute tag="0040A730" vr="SQ">
+        <Item number="1">
+          <!--Relationship Type-->
+          <xsl:call-template name="attr">
+            <xsl:with-param name="tag" select="'0040A010'"/>
+            <xsl:with-param name="vr" select="'CS'"/>
+            <xsl:with-param name="val" select="'CONTAINS'"/>
+          </xsl:call-template>
+          <!--Value Type-->
+          <xsl:call-template name="attr">
+            <xsl:with-param name="tag" select="'0040A040'"/>
+            <xsl:with-param name="vr" select="'CS'"/>
+            <xsl:with-param name="val">
+              <xsl:choose>
+                <xsl:when test="$valueType = 'TX'">
+                  <xsl:value-of select="'TEXT'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'CODE'"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+          <!--Concept Name Code Sequence-->
+          <xsl:choose>
+            <xsl:when test="$observationID/text() = '18783-1'">
+              <xsl:call-template name="codeItem">
+                <xsl:with-param name="sqtag" select="'0040A043'"/>
+                <xsl:with-param name="code" select="'121075'"/>
+                <xsl:with-param name="scheme" select="'Recommendation'"/>
+                <xsl:with-param name="meaning" select="'DCM'"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$observationID/text() = '11487-6'">
+              <xsl:call-template name="codeItem">
+                <xsl:with-param name="sqtag" select="'0040A043'"/>
+                <xsl:with-param name="code" select="$observationID/text()"/>
+                <xsl:with-param name="scheme" select="'Consultation Request'"/>
+                <xsl:with-param name="meaning" select="$observationID/component[2]"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$observationID/text() = '74466-4'">
+              <xsl:call-template name="codeItem">
+                <xsl:with-param name="sqtag" select="'0040A043'"/>
+                <xsl:with-param name="code" select="$observationID/text()"/>
+                <xsl:with-param name="scheme" select="'Feedback'"/>
+                <xsl:with-param name="meaning" select="$observationID/component[2]"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="codeItem">
+                <xsl:with-param name="sqtag" select="'0040A043'"/>
+                <xsl:with-param name="code" select="'121071'"/>
+                <xsl:with-param name="scheme" select="'Finding'"/>
+                <xsl:with-param name="meaning" select="'DCM'"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="$valueType = 'TX'">
+              <!--Text Value-->
+              <xsl:call-template name="attr">
+                <xsl:with-param name="tag" select="'0040A160'"/>
+                <xsl:with-param name="vr" select="'UT'"/>
+                <xsl:with-param name="val">
+                  <xsl:apply-templates select="field[5]" mode="txt"/>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <!--Concept Code Sequence-->
+              <xsl:call-template name="ce2codeItem">
+                <xsl:with-param name="seqTag" select="'0040A168'"/>
+                <xsl:with-param name="codedEntry" select="field[5]"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </Item>
+      </DicomAttribute>
+    </Item>
+  </xsl:template>
+
   <xsl:template match="OBX" mode="txt">
     <xsl:variable name="text">
       <xsl:apply-templates select="field[5]" mode="txt"/>
@@ -432,9 +625,11 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template match="text()" mode="txt">
     <xsl:value-of select='.'/>
   </xsl:template>
+
   <xsl:template match="escape" mode="txt">
     <xsl:choose>
       <xsl:when test="text()='.br' or translate(text(), 'daA0', 'DDD')='XD'">
@@ -457,6 +652,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name="text">
     <xsl:param name="hcode" select="'121070'"/>
     <xsl:param name="hname" select="'Findings'"/>
@@ -524,11 +720,40 @@
 
   <xsl:template name="ed">
     <xsl:variable name="obx5" select="OBX/field[5]"/>
+    <xsl:variable name="mimeType">
+      <xsl:choose>
+        <xsl:when test="$obx5/component[1] = 'Application'">
+          <xsl:value-of select="'application/pdf'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'text/xml'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:call-template name="ed-const-attrs">
+      <xsl:with-param name="mimeType" select="$mimeType"/>
+    </xsl:call-template>
     <xsl:call-template name="attr">
       <xsl:with-param name="tag" select="'00420012'"/>
       <xsl:with-param name="vr" select="'LO'"/>
-      <xsl:with-param name="val" select="concat($obx5/component[1], '/', $obx5/component[2])"/>
+      <xsl:with-param name="val" select="$mimeType"/>
     </xsl:call-template>
+    <xsl:choose>
+      <xsl:when test="$mimeType = 'text/xml'">
+        <xsl:call-template name="attr">
+          <xsl:with-param name="tag" select="'0040A160'"/>
+          <xsl:with-param name="vr" select="'UT'"/>
+          <xsl:with-param name="val" select="$obx5/component[4]"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <DicomAttribute tag="00420011" vr="OB">
+          <InlineBinary>
+            <xsl:value-of select="$obx5/component[4]"/>
+          </InlineBinary>
+        </DicomAttribute>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>

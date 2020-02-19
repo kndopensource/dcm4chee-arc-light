@@ -55,6 +55,7 @@ import org.dcm4che3.net.hl7.service.HL7Service;
 import org.dcm4che3.util.UIDUtils;
 import org.dcm4chee.arc.conf.ArchiveHL7ApplicationExtension;
 import org.dcm4chee.arc.conf.HL7ORUAction;
+import org.dcm4chee.arc.conf.SPSStatus;
 import org.dcm4chee.arc.patient.PatientService;
 import org.dcm4chee.arc.procedure.ProcedureService;
 import org.dcm4chee.arc.store.StoreContext;
@@ -135,6 +136,7 @@ class ImportReportService extends DefaultHL7Service {
                 arcHL7App.importReportTemplateURI(),
                 tr -> arcHL7App.importReportTemplateParams().forEach(tr::setParameter));
 
+        adjustAttrs(attrs);
         if (!attrs.containsValue(Tag.StudyInstanceUID)) {
             List<String> suids = storeService.studyIUIDsByAccessionNo(attrs.getString(Tag.AccessionNumber));
             switch (suids.size()) {
@@ -155,6 +157,15 @@ class ImportReportService extends DefaultHL7Service {
             attrs.setString(Tag.SeriesInstanceUID, VR.UI,
                     UIDUtils.createNameBasedUID(attrs.getBytes(Tag.SOPInstanceUID)));
         processHL7ORUAction(arcHL7App, s, ae, msg, attrs);
+    }
+
+    private void adjustAttrs(Attributes attrs) {
+        if (!attrs.contains(Tag.MIMETypeOfEncapsulatedDocument)
+                || !attrs.getString(Tag.MIMETypeOfEncapsulatedDocument).equals("text/xml"))
+            return;
+
+        attrs.setBytes(Tag.EncapsulatedDocument, VR.OB, attrs.getString(Tag.TextValue).getBytes());
+        attrs.remove(Tag.TextValue);
     }
 
     private void adjustStudyIUID(Attributes attrs, ArchiveHL7ApplicationExtension arcHL7App, HL7Segment msh)
@@ -214,7 +225,7 @@ class ImportReportService extends DefaultHL7Service {
                     if (action == HL7ORUAction.IMPORT_REPORT)
                         store(arcHL7App, s, ae, msg, attrs);
                     else
-                        procedureService.updateSPSStatusToCompleted(attrs.getString(Tag.StudyInstanceUID));
+                        procedureService.updateMWLStatus(attrs.getString(Tag.StudyInstanceUID), SPSStatus.COMPLETED);
                 });
     }
 

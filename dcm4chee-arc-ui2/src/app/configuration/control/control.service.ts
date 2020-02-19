@@ -12,7 +12,7 @@ export class ControlService {
         private appservices:AppService
     ) { }
 
-    fetchStatus = (url?) => this.$http.get(`${this.removeSlashOnTheEndOfUrl(url) || ''}/dcm4chee-arc/ctrl/status`).map(res => j4care.redirectOnAuthResponse(res));
+    fetchStatus = (url?) => this.$http.get(`${this.removeSlashOnTheEndOfUrl(url) || ''}/dcm4chee-arc/ctrl/status`);
     startArchive = (url?) => this.$http.post(`${this.removeSlashOnTheEndOfUrl(url) || ''}/dcm4chee-arc/ctrl/start`, {});
     stopArchive = (url?) => this.$http.post(`${this.removeSlashOnTheEndOfUrl(url) || ''}/dcm4chee-arc/ctrl/stop`, {});
     reloadArchive = (url?) => this.$http.post(`${this.removeSlashOnTheEndOfUrl(url) || ''}/dcm4chee-arc/ctrl/reload`, {});
@@ -33,16 +33,16 @@ export class ControlService {
                 calculatedWidth:"20%"
             },
             {
-                title:"Device name",
+                title:$localize `:@@control.device_name:Device name`,
                 code:"dcmuiDeviceURLName",
-                description:"Archive device name",
+                description:$localize `:@@control.archive_device_name:Archive device name`,
                 widthWeight:1,
                 calculatedWidth:"20%"
             },
             {
-                title:"Device description",
+                title:$localize `:@@control.device_description:Device description`,
                 code:"dicomDescription",
-                description:"Archive device description",
+                description:$localize `:@@control.archive_device_description:Archive device description`,
                 widthWeight:3,
                 calculatedWidth:"20%"
             },
@@ -54,20 +54,20 @@ export class ControlService {
                 calculatedWidth:"20%"
             },
             {
-                title:"Model name",
+                title:$localize `:@@control.model_name:Model name`,
                 code:"dicomManufacturerModelName",
-                description:"Manufacturer model name",
+                description:$localize `:@@control.manufacturer_model_name:Manufacturer model name`,
                 widthWeight:1,
                 calculatedWidth:"20%"
             },
             {
-                title:"Primary device type",
+                title:$localize `:@@control.primary_device_type:Primary device type`,
                 code:"dicomPrimaryDeviceType",
                 widthWeight:1,
                 calculatedWidth:"20%"
             },
             {
-                title:"Software version",
+                title:$localize `:@@control.software_version:Software version`,
                 code:"dicomSoftwareVersion",
                 widthWeight:1,
                 calculatedWidth:"20%"

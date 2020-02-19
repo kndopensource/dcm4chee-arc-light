@@ -28,7 +28,7 @@ export class RangePickerComponent implements OnInit {
     @ViewChild('fromTimeCalendar', {static: true}) fromTimeCalendarObject;
     @ViewChild('toCalendar', {static: true}) toCalendarObject;
     @ViewChild('singleCalendar', {static: true}) singleCalendarObject;
-    @ViewChild('picker', {static: false}) picker;
+    @ViewChild('picker') picker;
     SplitStudyDateRange;
     fromModel;
     fromTimeModel;
@@ -56,7 +56,7 @@ export class RangePickerComponent implements OnInit {
     ) {}
     ngOnInit(){
         this.mode = this.mode || "range";
-        this.header = this.header || "Range picker";
+        this.header = this.header || $localize `:@@range-picker.range_picker:Range picker`;
         if(this.datePickerMode || this.onlySingleMode){
             this.mode = "single";
         }

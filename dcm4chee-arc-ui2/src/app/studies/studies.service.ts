@@ -12,6 +12,8 @@ import {Globalvar} from "../constants/globalvar";
 import {HttpErrorResponse, HttpHeaders} from "@angular/common/http";
 import {SelectDropdown} from "../interfaces";
 import {StorageSystemsService} from "../monitoring/storage-systems/storage-systems.service";
+import {of} from "rxjs/internal/observable/of";
+import {throwError} from "rxjs/internal/observable/throwError";
 declare var DCM4CHE: any;
 declare var window: any;
 
@@ -83,11 +85,7 @@ export class StudiesService {
                     }
                 });
                 if(endAes.length === 0){
-                    this.mainservice.setMessage({
-                        'title': "Error",
-                        'text': "Accepted User Roles in the AETs are missing, add at least one role per AET (ArchiveDevice -> AET -> Archive Network AE -> Accepted User Role)",
-                        'status': "error"
-                    });
+                    this.mainservice.showError($localize `:@@accepted_user_roles_in_the_aets_are_missing:Accepted User Roles in the AETs are missing, add at least one role per AET (ArchiveDevice -> AET -> Archive Network AE -> Accepted User Role)`);
                     console.log("getAes(user,aes); studies.service.ts):");
                     console.group();
                     console.log("user",user);
@@ -97,11 +95,7 @@ export class StudiesService {
                 }
                 return endAes;
             }else{
-                this.mainservice.setMessage({
-                    'title': "Error",
-                    'text': "No AETs found, please use the device-configurator or the LDAP-Browser to configure one!",
-                    'status': "error"
-                });
+                this.mainservice.showError($localize `:@@no_aets_found:No AETs found, please use the device-configurator or the LDAP-Browser to configure one!`);
             }
         }
     }
@@ -185,24 +179,24 @@ export class StudiesService {
 
 /*    setExpiredDate(aet,studyUID, expiredDate){
         let url = `../aets/${aet}/rs/studies/${studyUID}/expire/${expiredDate}`
-        return this.$http.put(url,{}).map(res => j4care.redirectOnAuthResponse(res));
+        return this.$http.put(url,{});
     }*/
 
     getPrepareParameterForExpiriationDialog(study, exporters, infinit){
         let expiredDate:Date;
         let yearRange = "1800:2100";
-        let title = "Set expired date for the study.";
+        let title = $localize `:@@studies.set_expired_date_for_the_study.:Set expired date for the study.`;
         let schema:any = [
             [
                 [
                     {
                         tag:"label",
-                        text:"Expired date"
+                        text:$localize `:@@studies.expired_date:Expired date`
                     },
                     {
                         tag:"p-calendar",
                         filterKey:"expiredDate",
-                        description:"Expired Date"
+                        description:$localize `:@@studies.expired_date:Expired Date`
                     }
                 ]
             ]
@@ -214,24 +208,24 @@ export class StudiesService {
                     setExpirationDateToNever:false,
                     FreezeExpirationDate:false
                 };
-                title = "Unfreeze/Unprotect Expiration Date of the Study";
+                title = $localize `:@@studies.unfreeze_unprotect_expiration_date_of_the_study:Unfreeze/Unprotect Expiration Date of the Study`;
                 schema = [
                     [
                         [
                             {
                                 tag:"label",
-                                text:"Expired Date"
+                                text:$localize `:@@studies.expired_date:Expired Date`
                             },
                             {
                                 tag:"p-calendar",
                                 filterKey:"expiredDate",
-                                description:"Expired Date"
+                                description:$localize `:@@studies.expired_date:Expired Date`
                             }
                         ]
                     ]
                 ];
             }else{
-                title = "Freeze/Protect Expiration Date of the Study";
+                title = $localize `:@@studies.freeze_protect_expiration_date_of_the_study:Freeze/Protect Expiration Date of the Study`;
                 schemaModel = {
                     setExpirationDateToNever:true,
                     FreezeExpirationDate:true
@@ -241,7 +235,7 @@ export class StudiesService {
                         [
                             {
                                 tag:"label",
-                                text:"Expired date",
+                                text:$localize `:@@studies.expired_date:Expired date`,
                                 showIf:(model)=>{
                                     return !model.setExpirationDateToNever
                                 }
@@ -249,7 +243,7 @@ export class StudiesService {
                             {
                                 tag:"p-calendar",
                                 filterKey:"expiredDate",
-                                description:"Expired Date",
+                                description:$localize `:@@studies.expired_date:Expired Date`,
                                 showIf:(model)=>{
                                     return !model.setExpirationDateToNever
                                 }
@@ -261,8 +255,8 @@ export class StudiesService {
                         {
                             tag:"checkbox",
                             filterKey:"setExpirationDateToNever",
-                            description:"Set Expiration Date to 'never' if you want also to protect the study",
-                            text:"Set Expiration Date to 'never' if you want also to protect the study"
+                            description:$localize `:@@studies.set_expiration_date_to_never_if_you_want_also_to_protect_the_study:Set Expiration Date to 'never' if you want also to protect the study`,
+                            text:$localize `:@@studies.set_expiration_date_to_never_if_you_want_also_to_protect_the_study:Set Expiration Date to 'never' if you want also to protect the study`
                         }
                         ],[
                             {
@@ -271,8 +265,8 @@ export class StudiesService {
                             {
                                 tag:"checkbox",
                                 filterKey:"FreezeExpirationDate",
-                                description:"Freeze Expiration Date",
-                                text:"Freeze Expiration Date"
+                                description:$localize `:@@studies.freeze_expiration_date:Freeze Expiration Date`,
+                                text:$localize `:@@studies.freeze_expiration_date:Freeze Expiration Date`
                             }
                         ]
                     ]
@@ -289,16 +283,16 @@ export class StudiesService {
             schemaModel = {
                 expiredDate:j4care.formatDate(expiredDate,'yyyyMMdd')
             };
-            title += "<p>Set exporter if you wan't to export on expiration date too.";
+            title += $localize `:@@studies.set_exporter_if_you_wan't_to_export_on_expiration_date_too:<p>Set exporter if you wan't to export on expiration date too.`;
             schema[0].push([
                 {
                     tag:"label",
-                    text:"Exporter"
+                    text:$localize `:@@exporter:Exporter`
                 },
                 {
                     tag:"select",
                     filterKey:"exporter",
-                    description:"Exporter",
+                    description:$localize `:@@exporter:Exporter`,
                     options:exporters.map(exporter=> new SelectDropdown(exporter.id, exporter.description || exporter.id))
                 }])
         }
@@ -308,7 +302,7 @@ export class StudiesService {
             result: {
                 schema_model: schemaModel
             },
-            saveButton: 'SAVE'
+            saveButton: $localize `:@@SAVE:SAVE`
         };
     }
     setExpiredDate(aet,studyUID, expiredDate, exporter, params?:any){
@@ -428,7 +422,7 @@ export class StudiesService {
 
     getPatientIod(){
         if (this._patientIod) {
-            return Observable.of(this._patientIod);
+            return of(this._patientIod);
         } else {
             return this.$http.get('assets/iod/patient.iod.json')
         }
@@ -436,7 +430,7 @@ export class StudiesService {
     getStudyIod(){
         console.log('_patientIod', this._studyIod);
         if (this._studyIod) {
-            return Observable.of(this._studyIod);
+            return of(this._studyIod);
         } else {
             return this.$http.get('assets/iod/study.iod.json')
         }
@@ -444,7 +438,7 @@ export class StudiesService {
     getMwlIod(){
         console.log('_mwlIod', this._mwlIod);
         if (this._mwlIod) {
-            return Observable.of(this._mwlIod);
+            return of(this._mwlIod);
         } else {
             return this.$http.get(
                 'assets/iod/mwl.iod.json'
@@ -676,7 +670,7 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
                 headers
             )
             ,
-            successMsg:'Patient ID changed successfully!'
+            successMsg:$localize `:@@studies.patient_id_changed_successfully:Patient ID changed successfully!`
         };
     }
     getHl7ApplicationNameFormAETtitle(aet, aes){
@@ -688,7 +682,7 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
     }
     changePatientID(oldPatientID, newPatientID, patientData, aet, sendingHl7App, receivingHl7App, accesMode){
         if(oldPatientID === newPatientID){
-            return Observable.of(null);
+            return of(null);
         }else{
             if(accesMode === 'internal'){
                 return this.$http.post(
@@ -710,7 +704,7 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
         let url;
         if(accesMode === 'external'){
             if(!sendingHl7App || !receivingHl7App){
-                return Observable.throw(new Error('Hl7Applications not found!'));
+                return throwError({error:$localize `:@@hl7_applications_not_found!:Hl7Applications not found!`});
             }else{
                 url = `../hl7apps/${sendingHl7App}/hl7/${receivingHl7App}/patients?queue=true`;
             }
@@ -727,11 +721,7 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
         let url;
         if(externalInternalAetMode === 'external'){
             if(!internalAppName || !externalAppName){
-                this.mainservice.setMessage({
-                    'title': 'Error',
-                    'text': 'Hl7Applications not found!',
-                    'status': 'error'
-                });
+                this.mainservice.showError($localize `:@@hl7_applications_not_found:Hl7Applications not found!`);
                 return null;
             }else{
                 url = `../hl7apps/${internalAppName}/hl7/${externalAppName}/patients`;
@@ -780,7 +770,7 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
                             )
                             // .map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;}),
                             ,
-                        successMsg:'Patient saved successfully!'
+                        successMsg:$localize `:@@patient_saved_successfully:Patient saved successfully!`
                     };
             }else{
                if(externalInternalAetMode === 'external' && modifyMode === 'create'){
@@ -792,14 +782,10 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
                        )
                            // .map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;})
                        ,
-                       successMsg:'Patient created successfully!'
+                       successMsg:$localize `:@@patient_created_successfully:Patient created successfully!`
                    };
                }else{
-                   this.mainservice.setMessage( {
-                       'title': 'Error',
-                       'text': 'Something went wrong, reload the page and try again!',
-                       'status': 'error'
-                   });
+                   this.mainservice.showError($localize `:@@something_went_wrong,_reload_the_page_and_try_again:Something went wrong, reload the page and try again!`);
                    return null;
                }
             }
@@ -816,14 +802,10 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
                     )
                         // .map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;})
                     ,
-                        successMsg:'Patient created successfully!'
+                        successMsg:$localize `:@@patient_created_successfully:Patient created successfully!`
                 };
             }else{
-                this.mainservice.setMessage({
-                    'title': 'Error',
-                    'text': 'Patient ID is required!',
-                    'status': 'error'
-                });
+                this.mainservice.showError($localize `:@@patient_id_is_required:Patient ID is required!`);
                 return null;
             }
         }
@@ -860,9 +842,9 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
         return this.$http.get('../attribute-set/DIFF_RS')
     }
     queryNationalPationtRegister(patientID){
-        // return Observable.of([{"00081190":{"vr":"UR","Value":["http://shefki-lifebook:8080/dcm4chee-arc/aets/DCM4CHEE/rs"]},"00100010":{"vr":"PN","Value":[{"Alphabetic":"test12SELAM"}]},"00100020":{"vr":"LO","Value":["pid1"]},"00100040":{"vr":"CS","Value":["F"]},"00201200":{"vr":"IS","Value":[0]},"77770010":{"vr":"LO","Value":["DCM4CHEE Archive 5"]},"77771010":{"vr":"DT","Value":["20180315123826.668"]},"77771011":{"vr":"DT","Value":["20180315125113.826"]}}]);
-        // return Observable.of([{"00080052":{"vr":"CS","Value":["PATIENT"]},"00100010":{"vr":"PN","Value":[{"Alphabetic":"PROBST^KATHY"}]},"00100020":{"vr":"LO","Value":["ALGO00001"]},"00100030":{"vr":"DA","Value":["19000101"]},"00100040":{"vr":"CS","Value":["F"]}}])
-        // return Observable.of([])
+        // return of([{"00081190":{"vr":"UR","Value":["http://shefki-lifebook:8080/dcm4chee-arc/aets/DCM4CHEE/rs"]},"00100010":{"vr":"PN","Value":[{"Alphabetic":"test12SELAM"}]},"00100020":{"vr":"LO","Value":["pid1"]},"00100040":{"vr":"CS","Value":["F"]},"00201200":{"vr":"IS","Value":[0]},"77770010":{"vr":"LO","Value":["DCM4CHEE Archive 5"]},"77771010":{"vr":"DT","Value":["20180315123826.668"]},"77771011":{"vr":"DT","Value":["20180315125113.826"]}}]);
+        // return of([{"00080052":{"vr":"CS","Value":["PATIENT"]},"00100010":{"vr":"PN","Value":[{"Alphabetic":"PROBST^KATHY"}]},"00100020":{"vr":"LO","Value":["ALGO00001"]},"00100030":{"vr":"DA","Value":["19000101"]},"00100040":{"vr":"CS","Value":["F"]}}])
+        // return of([])
        return this.$http.get(`../xroad/RR441/${patientID}`)
     }
     queryPatientDemographics(patientID:string, PDQServiceID:string,url?:string){
@@ -887,7 +869,7 @@ clipboard.hasPatient = haspatient || (_.size(clipboard.patient) > 0);
 
     getStorageSystems(){
         if(this.storageSystemList){
-            return Observable.of(this.storageSystemList);
+            return of(this.storageSystemList);
         }else{
             return this.storageSystems.search({},0).map(res=>{
                 this.storageSystemList = res;

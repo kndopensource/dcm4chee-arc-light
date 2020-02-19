@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewContainerRef} from '@angular/core';
 import {User} from '../../models/user';
 import {ConfirmComponent} from '../../widgets/dialogs/confirm/confirm.component';
-import {MatDialogConfig, MatDialog, MatDialogRef} from '@angular/material';
+import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
 import {AppService} from '../../app.service';
 import {StorageCommitmentService} from './storage-commitment.service';
@@ -84,7 +84,7 @@ export class StorageCommitmentComponent implements OnInit {
         let $this = this;
         $this.cfpLoadingBar.start();
         this.service.search(this.filters, offset)
-            .map(res => j4care.redirectOnAuthResponse(res))
+
             .subscribe((res) => {
                 // res = [{"dicomDeviceName":"dcm4chee-arc","transactionUID":"2.25.258351030884282860047665252905873583068","status":"COMPLETED","studyUID":"1.3.12.2.1107.5.1.4.64109.30000019012807185180500000001","exporterID":"STORESCP","JMSMessageID":"ID:ff791ec7-44e8-11e9-bf40-c47d4614bea4","requested":"2","createdTime":"2019-03-12 18:05:12.696","updatedTime":"2019-03-12 18:05:12.811"},{"dicomDeviceName":"dcm4chee-arc","transactionUID":"2.25.128928679253241687386682286235669207139","status":"COMPLETED","studyUID":"1.3.12.2.1107.5.1.4.64109.30000019012807185180500000001","exporterID":"STORESCP","JMSMessageID":"ID:025cb6b9-44e9-11e9-bf40-c47d4614bea4","requested":"2","createdTime":"2019-03-12 18:05:17.117","updatedTime":"2019-03-12 18:05:17.17"}];
                 if (res && res.length > 0){
@@ -105,11 +105,7 @@ export class StorageCommitmentComponent implements OnInit {
                 }else{
                     $this.cfpLoadingBar.complete();
                     $this.matches = [];
-                    $this.mainservice.setMessage({
-                        'title': 'Info',
-                        'text': 'No tasks found!',
-                        'status': 'info'
-                    });
+                    this.mainservice.showMsg($localize `:@@no_tasks_found:No tasks found!`)
                 }
             }, (err) => {
                 $this.cfpLoadingBar.complete();
@@ -134,10 +130,10 @@ export class StorageCommitmentComponent implements OnInit {
                 , hours: any = parseInt(((duration / (1000 * 60 * 60))).toString());
             if (hours === 0){
                 if (minutes === 0){
-                    return seconds.toString() + '.' + milliseconds.toString() + ' sec';
+                    return seconds.toString() + '.' + milliseconds.toString() + $localize `:@@storage-commitment._sec: sec`;
                 }else{
                     seconds = (seconds < 10) ? '0' + seconds : seconds;
-                    return minutes.toString() + ':' + seconds.toString() + '.' + milliseconds.toString() + ' min';
+                    return minutes.toString() + ':' + seconds.toString() + '.' + milliseconds.toString() + $localize `:@@storage-commitment._min: min`;
                 }
             }else{
 
@@ -145,48 +141,48 @@ export class StorageCommitmentComponent implements OnInit {
                 minutes = (minutes < 10) ? '0' + minutes : minutes;
                 seconds = (seconds < 10) ? '0' + seconds : seconds;
 
-                return hours.toString() + ':' + minutes.toString() + ':' + seconds.toString() + '.' + milliseconds.toString() + ' h';
+                return hours.toString() + ':' + minutes.toString() + ':' + seconds.toString() + '.' + milliseconds.toString() + $localize `:@@storage-commitment._h: h`;
             }
         }else{
-            return duration.toString() + ' ms';
+            return duration.toString() + $localize `:@@storage-commitment._ms: ms`;
         }
     }
     flushBefore() {
         let select: any = [
             {
-                title: 'PENDING',
+                title: $localize `:@@PENDING:PENDING`,
                 value: 'PENDING',
-                label: 'PENDING'
+                label: $localize `:@@PENDING:PENDING`
             },
             {
-                title: 'COMPLETED',
+                title: $localize `:@@COMPLETED:COMPLETED`,
                 value: 'COMPLETED',
-                label: 'COMPLETED'
+                label: $localize `:@@COMPLETED:COMPLETED`
             },
             {
-                title: 'WARNING',
+                title: $localize `:@@WARNING:WARNING`,
                 value: 'WARNING',
-                label: 'WARNING'
+                label: $localize `:@@WARNING:WARNING`
             },
             {
-                title: 'FAILED',
+                title: $localize `:@@FAILED:FAILED`,
                 value: 'FAILED',
-                label: 'FAILED'
+                label: $localize `:@@FAILED:FAILED`
             }
         ];
 
         let parameters: any = {
-            content: 'Select before date and status to delete all storage commitments',
+            content: $localize `:@@storage-commitment.select_before_date_and_status_to_delete_all_storage_commitments:Select before date and status to delete all storage commitments`,
             select: select,
             date: {
-                placeholder: 'Updated before',
+                placeholder: $localize `:@@storage-commitment.updated_before:Updated before`,
                 format: 'yy-mm-dd'
             },
             result: {
                 select: 'PENDING',
                 date: undefined
             },
-            saveButton: 'DELETE',
+            saveButton: $localize `:@@DELETE:DELETE`,
             saveButtonClass: 'btn-danger'
         };
         let $this = this;
@@ -195,21 +191,13 @@ export class StorageCommitmentComponent implements OnInit {
                 // console.log("parametersdate",datePipeEn.transform(parameters.result.date,'yyyy-mm-dd'));
                 $this.cfpLoadingBar.start();
                 if (parameters.result.date === undefined){
-                    $this.mainservice.setMessage({
-                        'title': 'Error',
-                        'text': '\'Updated before\'-date was not set',
-                        'status': 'error'
-                    });
+                    $this.mainservice.showError($localize `:@@updated_before_not_set:"Updated before"-date was not set`);
                 }else{
                     this.service.flush(parameters.result.select, parameters.result.date)
-                        .map(res => j4care.redirectOnAuthResponse(res))
+
                         .subscribe((res) => {
                             console.log('resflush', res);
-                            $this.mainservice.setMessage({
-                                'title': 'Info',
-                                'text': res.deleted + ' queues deleted successfully!',
-                                'status': 'info'
-                            });
+                            $this.mainservice.showMsg($localize `:@@queues_deleted:${res.deleted}:@@deleted: queues deleted successfully!`);
                             $this.search(0);
                             $this.cfpLoadingBar.complete();
                         }, (err) => {
@@ -222,9 +210,9 @@ export class StorageCommitmentComponent implements OnInit {
     delete(match){
         let $this = this;
         let parameters: any = {
-            content: 'Are you sure you want to delete this task?',
+            content: $localize `:@@delete_task_question:Are you sure you want to delete this task?`,
             result: 'Ok',
-            saveButton: 'DELETE',
+            saveButton: $localize `:@@DELETE:DELETE`,
             saveButtonClass: 'btn-danger'
         };
         this.confirm(parameters).subscribe(result => {
@@ -236,11 +224,7 @@ export class StorageCommitmentComponent implements OnInit {
                             // match.properties.status = 'CANCELED';
                             $this.cfpLoadingBar.complete();
                             $this.search(0);
-                            $this.mainservice.setMessage({
-                                'title': 'Info',
-                                'text': 'Task deleted successfully!',
-                                'status': 'info'
-                            });
+                            this.mainservice.showMsg($localize `:@@task_deleted:Task deleted successfully!`)
                         },
                         (err) => {
                             $this.cfpLoadingBar.complete();

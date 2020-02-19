@@ -515,6 +515,19 @@ public class QueryBuilder {
             predicates.add(cb.lessThanOrEqualTo(study.get(Study_.size), queryParam.getMaxStudySize()));
         if (queryParam.getExpirationState() != null)
             predicates.add(study.get(Study_.expirationState).in(queryParam.getExpirationState()));
+        String admissionID = keys.getString(Tag.AdmissionID, "*");
+        if (!isUniversalMatching(admissionID)) {
+            Issuer issuer = Issuer.valueOf(keys.getNestedDataset(Tag.IssuerOfAdmissionIDSequence));
+            if (issuer != null)
+                idWithIssuer(predicates,
+                        study,
+                        Study_.admissionID,
+                        Study_.issuerOfAdmissionID,
+                        admissionID,
+                        issuer);
+            else
+                predicates.add(cb.equal(study.get(Study_.admissionID), admissionID));
+        }
         return predicates;
     }
 
@@ -557,6 +570,9 @@ public class QueryBuilder {
         Attributes reqAttrs = keys.getNestedDataset(Tag.RequestAttributesSequence);
         requestAttributes(predicates, q, series, reqAttrs, queryParam);
         code(predicates, series.get(Series_.institutionCode), keys.getNestedDataset(Tag.InstitutionCodeSequence));
+        code(predicates,
+                series.get(Series_.institutionalDepartmentTypeCode),
+                keys.getNestedDataset(Tag.InstitutionalDepartmentTypeCodeSequence));
         if (queryParam.isHideNotRejectedInstances())
             predicates.add(cb.notEqual(series.get(Series_.rejectionState), RejectionState.NONE));
         AttributeFilter attrFilter = queryParam.getAttributeFilter(Entity.Series);
@@ -666,7 +682,7 @@ public class QueryBuilder {
                     mwlItem.get(MWLItem_.scheduledStartDate),
                     mwlItem.get(MWLItem_.scheduledStartTime),
                     Tag.ScheduledProcedureStepStartDate,
-                    Tag.ScheduledProcedureStepStartDate,
+                    Tag.ScheduledProcedureStepStartTime,
                     Tag.ScheduledProcedureStepStartDateAndTime,
                     sps, true);
             personName(predicates, q, mwlItem, MWLItem_.scheduledPerformingPhysicianName,
@@ -680,6 +696,27 @@ public class QueryBuilder {
                 predicates.add(cb.isMember(spsAET, mwlItem.get(MWLItem_.scheduledStationAETs)));
         }
         hideSPSWithStatus(predicates, mwlItem, queryParam);
+        String admissionID = keys.getString(Tag.AdmissionID, "*");
+        if (!isUniversalMatching(admissionID)) {
+            Issuer issuer = Issuer.valueOf(keys.getNestedDataset(Tag.IssuerOfAdmissionIDSequence));
+            if (issuer != null)
+                idWithIssuer(predicates,
+                        mwlItem,
+                        MWLItem_.admissionID,
+                        MWLItem_.issuerOfAdmissionID,
+                        admissionID,
+                        issuer);
+            else
+                predicates.add(cb.equal(mwlItem.get(MWLItem_.admissionID), admissionID));
+        }
+        anyOf(predicates, mwlItem.get(MWLItem_.institutionName),
+                keys.getStrings(Tag.InstitutionName), true);
+        code(predicates, mwlItem.get(MWLItem_.institutionCode), keys.getNestedDataset(Tag.InstitutionCodeSequence));
+        anyOf(predicates, mwlItem.get(MWLItem_.institutionalDepartmentName),
+                keys.getStrings(Tag.InstitutionalDepartmentName), true);
+        code(predicates,
+                mwlItem.get(MWLItem_.institutionalDepartmentTypeCode),
+                keys.getNestedDataset(Tag.InstitutionalDepartmentTypeCodeSequence));
     }
 
     private <T> boolean anyOf(List<Predicate> predicates, Path<T> path, Function<String, T> valueOf,
@@ -957,6 +994,8 @@ public class QueryBuilder {
                 y.add(cb.greaterThan(series.get(Series_.metadataUpdateFailures), 0));
             if (queryParam.isCompressionFailed())
                 y.add(cb.greaterThan(series.get(Series_.compressionFailures), 0));
+            code(y, series.get(Series_.institutionalDepartmentTypeCode),
+                    keys.getNestedDataset(Tag.InstitutionalDepartmentTypeCodeSequence));
         }
         if (!y.isEmpty()) {
             y.add(cb.equal(series.get(Series_.study), study));

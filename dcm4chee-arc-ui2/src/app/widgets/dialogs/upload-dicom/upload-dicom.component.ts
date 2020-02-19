@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 // import {FileUploader} from 'ng2-file-upload';
-import {MatDialogRef} from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import {UploadDicomService} from './upload-dicom.service';
 import * as _ from 'lodash';
 import {AppService} from "../../../app.service";
@@ -103,11 +103,7 @@ export class UploadDicomComponent implements OnInit{
                         show:false
                     }*/
                     if(file.type && file.type != "application/dicom"){
-                        $this.mainservice.setMessage({
-                            'title': 'Error',
-                            'text': `Filetype "${file.type}" not allowed!`,
-                            'status': 'error'
-                        });
+                        $this.mainservice.showError($localize `:@@filetype_not_allowed:Filetype "${file.type}:@@filetype:" not allowed!`);
                         $this.fileList = [];
                         event = null;
                         $this.file = null;

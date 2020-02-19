@@ -8,6 +8,8 @@ import {Device} from "../../models/device";
 import {Aet} from "../../models/aet";
 import {j4care} from "../../helpers/j4care.service";
 import {TableSchemaElement} from "../../models/dicom-table-schema-element";
+import {map} from "rxjs/operators";
+import { loadTranslations } from '@angular/localize';
 
 
 @Injectable()
@@ -25,24 +27,24 @@ export class WebAppsListService {
     }
 
     getServiceClasses = () => {
-        return this.$http.get("./assets/schema/webApplication.schema.json").map(schema=>{
+        return this.$http.get("./assets/schema/webApplication.schema.json").pipe(map(schema=>{
           return (<any[]>_.get(schema,"properties.dcmWebServiceClass.items.enum")).map(serviceClass=>{
               return new SelectDropdown(serviceClass,serviceClass);
           });
-        });
+        }));
     };
 
-    getDevices = () => this.devicesService.getDevices().map(devices=>{
+    getDevices = () => this.devicesService.getDevices().pipe(map((devices:any)=>{
         return devices.map((device:Device)=>{
             return new SelectDropdown(device.dicomDeviceName,device.dicomDeviceName,device.dicomDeviceDescription);
         })
-    });
+    }));
 
-    getAes = () => this.aeListService.getAes().map(aes=>{
+    getAes = () => this.aeListService.getAes().pipe(map((aes:any)=>{
         return aes.map((aet:Aet)=>{
             return new SelectDropdown(aet.dicomAETitle,aet.dicomAETitle,aet.dicomDescription);
         })
-    });
+    }));
 
     getFilterSchema = (devices, aets, webServiceClasses):FilterSchema => [
         {
@@ -50,57 +52,57 @@ export class WebAppsListService {
             filterKey:"dicomDeviceName",
             options:devices,
             showStar:true,
-            description:"Device Name",
-            placeholder:"Device Name"
+            description:$localize `:@@web-apps-list.device_name:Device Name`,
+            placeholder:$localize `:@@web-apps-list.device_name:Device Name`
         },{
             tag:"input",
             type:"text",
             filterKey:"dicomDescription",
-            description:"Device Description",
-            placeholder:"Device Description"
+            description:$localize `:@@web-apps-list.device_description:Device Description`,
+            placeholder:$localize `:@@web-apps-list.device_description:Device Description`
         },{
             tag:"input",
             type:"text",
             filterKey:"dcmWebAppName",
-            description:"Web Application Name",
-            placeholder:"Web Application Name"
+            description:$localize `:@@web-apps-list.web_application_name:Web Application Name`,
+            placeholder:$localize `:@@web-apps-list.web_application_name:Web Application Name`
         },{
             tag:"input",
             type:"text",
             filterKey:"dcmWebServicePath",
-            description:"Web Service Path",
-            placeholder:"Web Service Path"
+            description:$localize `:@@web-apps-list.web_service_path:Web Service Path`,
+            placeholder:$localize `:@@web-apps-list.web_service_path:Web Service Path`
         },{
             tag:"select",
             filterKey:"dcmWebServiceClass",
             options:webServiceClasses,
             showStar:true,
-            description:"Web Service Class",
-            placeholder:"Web Service Class"
+            description:$localize `:@@web-apps-list.web_service_class:Web Service Class`,
+            placeholder:$localize `:@@web-apps-list.web_service_class:Web Service Class`
         },{
             tag:"select",
             filterKey:"dicomAETitle",
             options:aets,
             showStar:true,
-            description:"Application Entity Title",
-            placeholder:"Application Entity Title"
+            description:$localize `:@@web-apps-list.application_entity_title:Application Entity Title`,
+            placeholder:$localize `:@@web-apps-list.application_entity_title:Application Entity Title`
         },{
             tag:"input",
             type:"text",
             filterKey:"dcmKeycloakClientID",
-            description:"Keycloak Client ID",
-            placeholder:"Keycloak Client ID"
+            description:$localize `:@@web-apps-list.keycloak_client_id:Keycloak Client ID`,
+            placeholder:$localize `:@@web-apps-list.keycloak_client_id:Keycloak Client ID`
         },{
             tag:"input",
             type:"text",
             filterKey:"dicomApplicationCluster",
-            description:"Application Cluster",
-            placeholder:"Application Cluster"
+            description:$localize `:@@web-apps-list.application_cluster:Application Cluster`,
+            placeholder:$localize `:@@web-apps-list.application_cluster:Application Cluster`
         },
         {
             tag:"button",
-            text:"SUBMIT",
-            description:"Get Web Apps"
+            text: $localize `:@@SUBMIT:SUBMIT`,
+            description:$localize `:@@web-apps-list.get_web_apps:Get Web Apps`
         }
     ];
 
@@ -112,36 +114,36 @@ export class WebAppsListService {
             }),
             new TableSchemaElement({
                 type:"value",
-                title:"Device",
-                header:"Device",
+                title:$localize `:@@device:Device`,
+                header: $localize `:@@device:Device`,
                 widthWeight:0.6,
                 pathToValue:"dicomDeviceName"
             }),
             new TableSchemaElement({
                 type:"value",
-                title:"Name",
-                header:"Name",
+                title:$localize `:@@dame:Name`,
+                header: $localize `:@@dame:Name`,
                 widthWeight:1,
                 pathToValue:"dcmWebAppName"
             }),
             new TableSchemaElement({
                 type:"value",
-                title:"Description",
-                header:"Description",
+                title:$localize `:@@description:Description`,
+                header: $localize `:@@description:Description`,
                 widthWeight:2,
                 pathToValue:"dicomDescription"
             }),
             new TableSchemaElement({
                 type:"value",
-                title:"Services",
-                header:"Services",
+                title:$localize `:@@services:Services`,
+                header: $localize `:@@services:Services`,
                 widthWeight:2,
                 pathToValue:"dcmWebServiceClass"
             }),
             new TableSchemaElement({
                 type:"value",
-                title:"URLs",
-                header:"URLs",
+                title:$localize `:@@urls:URLs`,
+                header: $localize `:@@urls:URLs`,
                 widthWeight:2,
                 pathToValue:"url"
             })

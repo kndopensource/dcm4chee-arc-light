@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewContainerRef} from '@angular/core';
-import {MatDialog, MatDialogRef, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogRef, MatDialogConfig } from '@angular/material/dialog';
 import {MessagingComponent} from './widgets/messaging/messaging.component';
 import {AppService} from './app.service';
 import {ViewChild} from '@angular/core';
@@ -199,14 +199,14 @@ export class AppComponent implements OnInit {
 
         this.msg.setMsg({
             'title': 'Warning',
-            'text': 'Attribute already exists!',
+            'text': $localize `:@@app.attribute_exist:Attribute already exists!`,
             'status': 'warning',
             'timeout': 50000
         });
         setTimeout(() => {
             this.msg.setMsg({
-                'title': 'Info ',
-                'text': 'Info message!',
+                'title': $localize `:@@app.info:Info `,
+                'text': $localize `:@@app.info_message:Info message!`,
                 'status': 'info'
             });
         }, 500);

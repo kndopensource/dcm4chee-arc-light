@@ -14,12 +14,12 @@ export class AeListService {
     getAes(filters?){
       return this.$http.get(
           '../aes'
-      ).map(res => j4care.redirectOnAuthResponse(res));
+      )
     }
     getAets(){
        return this.$http.get(
             '../aets'
-        ).map(res => j4care.redirectOnAuthResponse(res));
+        )
     }
     getDevices(){
         return this.devicesService.getDevices();
@@ -28,7 +28,7 @@ export class AeListService {
         return  this.$http.post(
             `../aets/${callingAet}/dimse/${externalAet}${j4care.getUrlParams(data)}`,
             {}
-        ).map(res => j4care.redirectOnAuthResponse(res));
+        )
     }
     generateEchoResponseText(response){
         if (_.hasIn(response, 'errorMessage') && response.errorMessage != ''){
@@ -41,12 +41,13 @@ export class AeListService {
             return {
                 title:"Info",
                 status:"info",
-                text:'Echo successfully accomplished!<br>- Connection time: ' +
-                response.connectionTime +
-                ' ms<br/>- Echo time: ' +
-                response.echoTime +
-                ' ms<br/>- Release time: ' +
-                response.releaseTime + ' ms'
+                text: $localize `:@@echo_accomplished:Echo successfully accomplished!<br>- Connection time: ${
+                    response.connectionTime
+                    }:@@connection_time: ms<br/>- Echo time: ${
+                    response.echoTime
+                    }:@@echo_time: ms<br/>- Release time: ${
+                    response.releaseTime
+                    } ms`
             }
         }
     }
@@ -57,14 +58,14 @@ export class AeListService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomDeviceName",
-                description:"Device name",
-                placeholder:"Device name"
+                description:$localize `:@@ae-list.device_name:Device name`,
+                placeholder:$localize `:@@ae-list.device_name:Device name`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomAETitle",
-                description:"AE Title",
-                placeholder:"AE Title"
+                description:$localize `:@@ae-list.ae_title:AE Title`,
+                placeholder:$localize `:@@ae-list.ae_title:AE Title`
             },{
                 tag:"input",
                 type:"text",
@@ -75,26 +76,26 @@ export class AeListService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomAssociationInitiator",
-                description:"Association Initiator",
-                placeholder:"Association Initiator"
+                description:$localize `:@@ae-list.association_initiator:Association Initiator`,
+                placeholder:$localize `:@@ae-list.association_initiator:Association Initiator`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomAssociationAcceptor",
-                description:"Association Acceptor",
-                placeholder:"Association Acceptor"
+                description:$localize `:@@ae-list.association_acceptor:Association Acceptor`,
+                placeholder:$localize `:@@ae-list.association_acceptor:Association Acceptor`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomApplicationCluster",
-                description:"Application Cluster",
-                placeholder:"Application Cluster"
+                description:$localize `:@@ae-list.application_cluster:Application Cluster`,
+                placeholder:$localize `:@@ae-list.application_cluster:Application Cluster`
             },
             {
                 tag: "button",
                 id: "submit",
-                text: "SUBMIT",
-                description: "Query AE List"
+                text: $localize `:@@SUBMIT:SUBMIT`,
+                description: $localize `:@@ae-list.query_ae_list:Query AE List`
             }
         ],2)
     }
