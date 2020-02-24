@@ -66,15 +66,21 @@ export class UploadFilesComponent implements OnInit {
     };
     imageType = [
         {
-            title:"Screenshots",
+            title: $localize `:@@screenshots:Screenshots`,
             description:$localize `:@@upload-files.secondary_capture_image_storage:Secondary Capture Image Storage`,
             value:"1.2.840.10008.5.1.4.1.1.7",
             modality:"OT"
         },
         {
-            title:"Photographs",
+            title: $localize `:@@photographs:Photographs`,
             description:$localize `:@@upload-files.vl_photographic_image_storage:VL Photographic Image Storage`,
             value:"1.2.840.10008.5.1.4.1.1.77.1.4",
+            modality:"XC"
+        },
+        {
+            title: $localize `:@@animated_gif:Animated gif`,
+            description:$localize `:@@upload-files.gif_with_multi_frames_in_it:Gif with multi frames in it`,
+            value:"1.2.840.10008.5.1.4.1.1.77.1.4.1",
             modality:"XC"
         }
     ];
@@ -103,7 +109,7 @@ export class UploadFilesComponent implements OnInit {
 
     fileChange(event){
         this.fileList = event.target.files;
-        if(this.fileList[0] && this.fileList[0].type === "image/jpeg"){
+        if(this.fileList[0] && (this.fileList[0].type === "image/jpeg" || this.fileList[0].type === "image/png" || this.fileList[0].type === "image/gif" || this.fileList[0].type === "image/tiff")){
             this.isImage = true;
         }
 
@@ -232,7 +238,7 @@ export class UploadFilesComponent implements OnInit {
                 }
                 // transfareSyntax = ';transfer-syntax=' + transfareSyntax;
             }
-            if (this.fileList[0].type === "image/jpeg") {
+            if (this.fileList[0].type === "image/jpeg" || this.fileList[0].type === "image/png" || this.fileList[0].type === "image/gif"|| this.fileList[0].type === "image/tiff") {
                 this._dicomObject.attrs["00080008"] = {
                     "vr": "CS",
                     "Value": [
@@ -365,35 +371,40 @@ export class UploadFilesComponent implements OnInit {
             if (this.fileList) {
                 seriesInstanceUID = j4care.generateOIDFromUUID();
                 _.forEach(this.fileList, (file, i) => {
-                    let transfareSyntax;
                     switch (file.type) {
                         case "image/jpeg":
-                            transfareSyntax = "1.2.840.10008.1.2.4.50";
                             $this.modality = $this.selectedSopClass.modality;
                             descriptionPart = "Image";
                             break;
+                        case "image/png":
+                            $this.modality = $this.selectedSopClass.modality;
+                            descriptionPart = "Image";
+                            break;
+                        case "image/tiff":
+                            $this.modality = $this.selectedSopClass.modality;
+                            descriptionPart = "Image";
+                            break;
+                        case "image/gif":
+                            $this.modality = $this.selectedSopClass.modality;
+                            descriptionPart = "Gif";
+                            break;
                         case "video/mpeg":
-                            transfareSyntax = "";
                             descriptionPart = "Video";
                             $this.modality = "XC";
                             break;
                         case "video/mp4":
-                            transfareSyntax = "";
                             descriptionPart = "Video";
                             $this.modality = "XC";
                             break;
                         case "video/quicktime":
-                            transfareSyntax = "";
                             descriptionPart = "Video";
                             $this.modality = "XC";
                             break;
                         case "application/pdf":
-                            transfareSyntax = "";
                             descriptionPart = "PDF";
                             $this.modality = "DOC";
                             break;
                     }
-                    if (transfareSyntax || transfareSyntax === "") {
 
                         let xmlHttpRequest = new XMLHttpRequest();
                         let url = this.studyService.getDicomURL("study",this.selectedWebApp);
@@ -661,15 +672,6 @@ export class UploadFilesComponent implements OnInit {
 /*                        },err=>{
                             console.log("errwebApp",err);
                         });*/
-                    } else {
-                        $this.mainservice.setMessage({
-                            'title': 'Error',
-                            'text': `File type "${file.type}" not allowed!`,
-                            'status': 'error'
-                        });
-                        $this.fileList = [];
-                        $this.file = null;
-                    }
                 });
             }
         });
