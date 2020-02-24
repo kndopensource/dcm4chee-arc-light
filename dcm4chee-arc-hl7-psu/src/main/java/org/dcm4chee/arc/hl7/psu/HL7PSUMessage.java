@@ -123,7 +123,8 @@ class HL7PSUMessage {
     void setPV1Segment() {
         pv1 = new HL7Segment(52);
         pv1.setField(0, "PV1");
-        pv1.setField(2, "U");
+        //pv1.setField(2, "U");
+        pv1.setField(2, "O"); //changed for Connectathon test EBIW_40_RAD-132_Scrutiny test
         hl7Message.add(pv1);
     }
 
