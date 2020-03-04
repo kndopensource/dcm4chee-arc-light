@@ -23,7 +23,7 @@
                     (modelChange)="results.rejectedBefore = $event"
                     [datePickerMode]="true"
                     dateFormat="YYYY-MM-DD"
-                    i18n-placeholder
+                    i18n-placeholder="@@placeholder.delete_all_instances_before"
                     placeholder="Delete all instances before this date"
             ></range-picker>
         </div>
@@ -35,7 +35,7 @@
         </div>
         <div class="dialogbuttons">
             <button type="submit" class="btn-danger btn vex-dialog-button vex-first" (click)="dialogRef.close(results)" [disabled]="!results.reject">Delete all</button>
-            <button class="cancle" type="button" (click)="dialogRef.close(null)">CANCEL</button>
+            <button class="cancle" type="button" (click)="dialogRef.close(null)" i18n="@@CANCEL">CANCEL</button>
         </div>
     </div>
 </div>

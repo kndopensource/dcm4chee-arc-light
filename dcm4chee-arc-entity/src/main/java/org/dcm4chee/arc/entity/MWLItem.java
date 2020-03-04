@@ -41,6 +41,7 @@
 package org.dcm4chee.arc.entity;
 
 import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Sequence;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.soundex.FuzzyStr;
 import org.dcm4che3.util.DateUtils;
@@ -98,6 +99,7 @@ import java.util.*;
         uniqueConstraints = @UniqueConstraint(columnNames = { "study_iuid", "sps_id" }),
         indexes = {
                 @Index(columnList = "updated_time"),
+                @Index(columnList = "local_aet"),
                 @Index(columnList = "sps_id"),
                 @Index(columnList = "req_proc_id"),
                 @Index(columnList = "study_iuid"),
@@ -136,6 +138,10 @@ public class MWLItem {
     @Basic(optional = false)
     @Column(name = "updated_time")
     private Date updatedTime;
+
+    @Basic(optional = false)
+    @Column(name = "local_aet", updatable = false)
+    private String localAET;
 
     @Basic(optional = false)
     @Column(name = "sps_id", updatable = false)
@@ -344,6 +350,14 @@ public class MWLItem {
         updatedTime = new Date();
     }
 
+    public String getLocalAET() {
+        return localAET;
+    }
+
+    public void setLocalAET(String localAET) {
+        this.localAET = localAET;
+    }
+
     public AttributesBlob getAttributesBlob() {
         return attributesBlob;
     }
@@ -415,14 +429,15 @@ public class MWLItem {
             Tag.ScheduledProcedureStepID
     };
 
-    public Attributes getRequestAttributesSequenceItem() {
+    public Attributes addItemToRequestAttributesSequence(Sequence seq) {
         Attributes attrs = getAttributes();
         Attributes spsItem = attrs.getNestedDataset(Tag.ScheduledProcedureStepSequence);
-        return toRequestAttributesSequenceItem(attrs, spsItem);
+        return addItemToRequestAttributesSequence(seq, attrs, spsItem);
     }
 
-    public static Attributes toRequestAttributesSequenceItem(Attributes mwlItemAttrs, Attributes spsItem) {
+    public static Attributes addItemToRequestAttributesSequence(Sequence seq, Attributes mwlItemAttrs, Attributes spsItem) {
         Attributes item = new Attributes(REQUEST_ATTR.length + SPS_REQUEST_ATTR.length);
+        seq.add(item);
         item.addSelected(mwlItemAttrs, REQUEST_ATTR);
         item.addSelected(spsItem, SPS_REQUEST_ATTR);
         return item;

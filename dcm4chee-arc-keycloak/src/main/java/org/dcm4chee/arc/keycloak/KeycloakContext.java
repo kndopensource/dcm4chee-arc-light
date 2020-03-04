@@ -41,8 +41,6 @@ package org.dcm4chee.arc.keycloak;
 import org.keycloak.KeycloakSecurityContext;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * @author Vrinda Nayak <vrinda.nayak@j4care.com>
@@ -76,9 +74,11 @@ public class KeycloakContext {
         return ksc != null ? ksc.getToken().getExpiration() : 0;
     }
 
-    public Set<String> getUserRoles() {
-        return ksc != null
-                ? ksc.getToken().getRealmAccess().getRoles()
-                : Collections.emptySet();
+    public boolean isSecured() {
+        return ksc != null;
+    }
+
+    public boolean isUserInRole(String role) {
+        return ksc != null && ksc.getToken().getRealmAccess().isUserInRole(role);
     }
 }

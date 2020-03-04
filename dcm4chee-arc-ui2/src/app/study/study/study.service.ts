@@ -1121,7 +1121,7 @@ export class StudyService {
                             }
                         ]
                     },
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 35
                 }),
                 new TableSchemaElement({
@@ -1630,7 +1630,7 @@ export class StudyService {
                             }
                         ]
                     },
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 35
                 }),
                 new TableSchemaElement({
@@ -1650,7 +1650,7 @@ export class StudyService {
                             title: $localize `:@@study.toggle_attributes:Toggle Attributes`
                         }
                     ],
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 40
                 }),new TableSchemaElement({
                     type: "actions",
@@ -1754,7 +1754,7 @@ export class StudyService {
                 }),
                 new TableSchemaElement({
                     type: "value",
-                    header: $localize `:@@mobalities:Modalities`,
+                    header: $localize `:@@modalities:Modalities`,
                     pathToValue: "[00080061].Value",
                     headerDescription: $localize `:@@study.modalities_in_study:Modalities in Study`,
                     widthWeight: 0.5,
@@ -1934,7 +1934,7 @@ export class StudyService {
                             }
                         ]
                     },
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 35
                 }),
                 new TableSchemaElement({
@@ -1953,7 +1953,7 @@ export class StudyService {
                             title: $localize `:@@study.show_attributes:Show attributes`
                         }
                     ],
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 40
                 }),new TableSchemaElement({
                     type: "actions",
@@ -2205,7 +2205,7 @@ export class StudyService {
                             }
                         ]
                     },
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 35
                 }), new TableSchemaElement({
                     type: "actions",
@@ -2225,7 +2225,7 @@ export class StudyService {
                             title: $localize `:@@study.show_attributes:Show attributes`
                         }
                     ],
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 40
                 }), new TableSchemaElement({
                     type: "actions",
@@ -2245,7 +2245,7 @@ export class StudyService {
                             title: $localize `:@@study.show_attributes_from_file:Show attributes from file`
                         }
                     ],
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 40
                 }),
                 new TableSchemaElement({
@@ -2377,7 +2377,7 @@ export class StudyService {
                             }
                         ]
                     },
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 35
                 }), new TableSchemaElement({
                     type: "actions",
@@ -2396,7 +2396,7 @@ export class StudyService {
                             title: $localize `:@@study.show_attributes:Show attributes`
                         }
                     ],
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 40
                 }),
                 new TableSchemaElement({
@@ -2435,7 +2435,7 @@ export class StudyService {
                 new TableSchemaElement({
                     type: "value",
                     header: $localize `:@@study.sp_physicians_name:SP Physician's Name`,
-                    pathToValue: "00400100.Value[0].00400006.Value[0]",
+                    pathToValue: "00400100.Value[0].00400006.Value[0].Alphabetic",
                     headerDescription: $localize `:@@study.scheduled_performing_physicians_name:Scheduled Performing Physician's Name`,
                     widthWeight: 2,
                     calculatedWidth: "20%"
@@ -2547,7 +2547,7 @@ export class StudyService {
                             }
                         ]
                     },
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 35
                 }), */
                 new TableSchemaElement({
@@ -2567,7 +2567,7 @@ export class StudyService {
                             title: $localize `:@@study.show_attributes:Show attributes`
                         }
                     ],
-                    headerDescription: "Actions",
+                    headerDescription: $localize `:@@actions:Actions`,
                     pxWidth: 40
                 }),
                 new TableSchemaElement({
@@ -2779,7 +2779,7 @@ export class StudyService {
                                     action: "select"
                                 }, e);
                             },
-                            title: "Select",
+                            title: $localize `:@@select:Select`,
                             showIf: (e, config) => {
                                 return !e.selected;
                             }
@@ -2798,7 +2798,7 @@ export class StudyService {
                                     action: "select"
                                 }, e);
                             },
-                            title: "Unselect",
+                            title: $localize `:@@unselect:Unselect`,
                             showIf: (e, config) => {
                                 return e.selected;
                             }

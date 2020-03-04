@@ -1283,4 +1283,22 @@ export class j4care {
         }
         return `${preMessage}${msg != "" ? ':':''}${msg}`;
     }
+
+    static extractLanguageDateFromString(ldapLanguageString:string){
+        try{
+            const regex = /([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)/;
+            let m;
+            if ((m = regex.exec(ldapLanguageString)) !== null) {
+                return {
+                    code:m[1],
+                    name:m[2],
+                    nativeName:m[3],
+                    flag:m[4]
+                }
+            }
+        }catch (e) {
+            return undefined;
+        }
+        return undefined;
+    }
 }

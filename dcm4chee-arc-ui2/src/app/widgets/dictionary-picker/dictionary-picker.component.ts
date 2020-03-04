@@ -5,6 +5,7 @@ declare var DCM4CHE: any;
 import * as _ from 'lodash';
 import {SearchPipe} from "../../pipes/search.pipe";
 import {WindowRefService} from "../../helpers/window-ref.service";
+import {Globalvar} from "../../constants/globalvar";
 
 @Component({
   selector: 'dictionary-picker',

@@ -355,12 +355,28 @@ export class DeviceConfiguratorService{
     }
     updateDevice(){
         if (_.hasIn(this.device, 'dicomDeviceName') && this.device.dicomDeviceName != ''){
+            this.saveLanguageDataToLocalStorageOnSave();
             return this.$http.put('../devices/' + this.device.dicomDeviceName, this.device)
                 //.map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;});
         }else{
             return null;
         }
     }
+    saveLanguageDataToLocalStorageOnSave(){
+        console.log("languages",_.get(this.device,"dcmDevice.dcmuiConfig[0].dcmLanguages"));
+        console.log("defaultLanguage",_.get(this.device,"dcmDevice.dcmuiConfig[0].dcmDefaultLanguage"));
+        if(_.hasIn(this.device,"dcmDevice.dcmuiConfig[0].dcmLanguages")){
+            localStorage.setItem('dcmLanguages', _.get(this.device,"dcmDevice.dcmuiConfig[0].dcmLanguages"));
+        }else{
+            localStorage.removeItem('dcmLanguages');
+        }
+        if(_.hasIn(this.device,"dcmDevice.dcmuiConfig[0].dcmDefaultLanguage")){
+            localStorage.setItem('dcmDefaultLanguage', _.get(this.device,"dcmDevice.dcmuiConfig[0].dcmDefaultLanguage"));
+        }else{
+            localStorage.removeItem('dcmDefaultLanguage');
+        }
+    }
+
     createDevice(){
         if (_.hasIn(this.device, 'dicomDeviceName') && this.device.dicomDeviceName != ''){
             return this.$http.post('../devices/' + this.device.dicomDeviceName, this.device)
@@ -637,19 +653,46 @@ export class DeviceConfiguratorService{
                                 show: (this.defaultOpenBlock === 'attr')
                             });
                         }else{
-                            form.push(
-                                new InputText({
-                                    key: i,
-                                    label: m.title,
-                                    description: m.description,
-                                    type: 'string',
-                                    value: value,
-                                    order: (5 + newOrderSuffix),
-                                    validation: validation,
-                                    format: m.format,
-                                    show: (this.defaultOpenBlock === 'attr')
-                                })
-                            );
+                            if(_.hasIn(m, "format")  && m.format === 'dcmDefaultLanguage'){
+                                console.log("default")
+                                let options = [];
+                                if(_.hasIn(device,"dcmLanguages")){
+                                    device.dcmLanguages.forEach(language=>{
+                                        let langObj = j4care.extractLanguageDateFromString(language);
+                                        options.push({
+                                            label: `${langObj.code} - ${langObj.name} - ${langObj.nativeName}`,
+                                            value: language,
+                                            active: language === value
+                                        })
+                                    })
+                                }
+                                form.push(
+                                    new DropdownList({
+                                        key: i,
+                                        label: m.title,
+                                        description: m.description,
+                                        options: options,
+                                        order: (5 + newOrderSuffix),
+                                        validation: validation,
+                                        value: value,
+                                        show: (this.defaultOpenBlock === 'attr')
+                                    })
+                                );
+                            }else{
+                                form.push(
+                                    new InputText({
+                                        key: i,
+                                        label: m.title,
+                                        description: m.description,
+                                        type: 'string',
+                                        value: value,
+                                        order: (5 + newOrderSuffix),
+                                        validation: validation,
+                                        format: m.format,
+                                        show: (this.defaultOpenBlock === 'attr')
+                                    })
+                                );
+                            }
                         }
                     }
                 }
