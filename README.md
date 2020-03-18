@@ -39,9 +39,8 @@ Build
     with secured WEB UI and secured RESTful services:
 
         > $mvn install -D db={db2|firebird|h2|mysql|oracle|psql|sqlserver} -D secure=all
-
-        柯尼达医图科技有限公司开发版本
-     mvn install -D db=mysql -D secure=all
+        本地打包
+        > $mvn install -D db=mysql -D secure=all
 Installation
 ------------
 * [Installation](https://github.com/dcm4che/dcm4chee-arc-light/wiki/Installation)
@@ -52,4 +51,3 @@ License
 * [Mozilla Public License Version 1.1](http://www.mozilla.org/MPL/1.1/)
 
 [1]: http://dicom.nema.org/medical/dicom/current/output/chtml/part15/chapter_H.html
-分支版本修改记录
