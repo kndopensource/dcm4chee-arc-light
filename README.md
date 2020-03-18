@@ -40,7 +40,8 @@ Build
 
         > $mvn install -D db={db2|firebird|h2|mysql|oracle|psql|sqlserver} -D secure=all
 
-
+        柯尼达医图科技有限公司开发版本  
+     mvn install -D db=mysql -D secure=all
 Installation
 ------------
 * [Installation](https://github.com/dcm4che/dcm4chee-arc-light/wiki/Installation)
