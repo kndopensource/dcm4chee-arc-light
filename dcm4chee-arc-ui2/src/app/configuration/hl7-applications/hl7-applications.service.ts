@@ -21,8 +21,8 @@ export class Hl7ApplicationsService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomDeviceName",
-                description:$localize `:@@hl7-applications.device_name:Device name`,
-                placeholder:$localize `:@@hl7-applications.device_name:Device name`
+                description:$localize `:@@device_name:Device name`,
+                placeholder:$localize `:@@device_name:Device name`
             },{
                 tag:"input",
                 type:"text",
@@ -33,14 +33,14 @@ export class Hl7ApplicationsService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomApplicationCluster",
-                description:$localize `:@@hl7-applications.application_cluster:Application Cluster`,
-                placeholder:$localize `:@@hl7-applications.application_cluster:Application Cluster`
+                description:$localize `:@@application_cluster:Application Cluster`,
+                placeholder:$localize `:@@application_cluster:Application Cluster`
             },
             {
                 tag: "button",
                 id: "submit",
                 text: $localize `:@@SUBMIT:SUBMIT`,
-                description: $localize `:@@hl7-applications.query_devices:Query Devices`
+                description: $localize `:@@query_devices:Query Devices`
             }
         ],2)
     }

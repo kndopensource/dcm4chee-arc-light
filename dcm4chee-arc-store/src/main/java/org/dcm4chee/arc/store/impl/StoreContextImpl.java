@@ -374,8 +374,7 @@ class StoreContextImpl implements StoreContext {
     }
 
     @Override
-    public boolean isExportReoccurredInstances(ExportPriorsRule rule) {
-        ExportReoccurredInstances exportReoccurredInstances = rule.getExportReoccurredInstances();
+    public boolean match(ExportReoccurredInstances exportReoccurredInstances) {
         return exportReoccurredInstances == ExportReoccurredInstances.ALWAYS
                 || (exportReoccurredInstances == ExportReoccurredInstances.NEVER && previousInstance == null)
                 || !locations.isEmpty();

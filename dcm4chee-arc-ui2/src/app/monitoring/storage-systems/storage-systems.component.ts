@@ -2,7 +2,7 @@ import {Component, OnInit, ViewContainerRef} from '@angular/core';
 import {User} from '../../models/user';
 import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {AppService} from '../../app.service';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {ConfirmComponent} from '../../widgets/dialogs/confirm/confirm.component';
 import {StorageSystemsService} from './storage-systems.service';
 import {WindowRefService} from "../../helpers/window-ref.service";
@@ -249,10 +249,10 @@ export class StorageSystemsComponent implements OnInit {
         ];
 
         let parameters: any = {
-            content: $localize `:@@storage-systems.select_before_date_and_status_to_delete_all_storage_commitments:Select before date and status to delete all storage commitments`,
+            content: $localize `:@@select_before_date_and_status_to_delete_all_storage_commitments:Select before date and status to delete all storage commitments`,
             select: select,
             date: {
-                placeholder: $localize `:@@storage-systems.updated_before:Updated before`,
+                placeholder: $localize `:@@updated_before:Updated before`,
                 format: 'yy-mm-dd'
             },
             result: {

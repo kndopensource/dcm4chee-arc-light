@@ -51,6 +51,7 @@ import org.dcm4che3.util.ByteUtils;
 import org.dcm4che3.util.StringUtils;
 import org.dcm4chee.arc.conf.ArchiveDeviceExtension;
 import org.dcm4chee.arc.event.SoftwareConfiguration;
+import org.dcm4chee.arc.validation.constraints.ValidValueOf;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,8 @@ import javax.ws.rs.core.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -102,21 +105,8 @@ public class ConfigurationRS {
     private String register;
 
     @QueryParam("dcmWebServiceClass")
-    @Pattern(regexp = "WADO_URI|" +
-            "WADO_RS|" +
-            "STOW_RS|" +
-            "QIDO_RS|" +
-            "UPS_RS|" +
-            "MWL_RS|" +
-            "DCM4CHEE_ARC|" +
-            "DCM4CHEE_ARC_AET|" +
-            "DCM4CHEE_ARC_AET_DIFF|" +
-            "PAM|" +
-            "MOVE|" +
-            "MOVE_MATCHING|" +
-            "REJECT|" +
-            "ELASTICSEARCH")
-    private String dcmWebServiceClass;
+    @ValidValueOf(type = WebServiceClasses.class, methodParameterType = List.class)
+    private List<String> dcmWebServiceClass;
 
     private ConfigurationDelegate configDelegate = new ConfigurationDelegate() {
         @Override
@@ -647,7 +637,7 @@ public class ConfigurationRS {
                     webappInfo.setServicePath(firstValueOf(value));
                     break;
                 case "dcmWebServiceClass":
-                    webappInfo.setServiceClasses(toServiceClasses(value));
+                    webappInfo.setServiceClasses(new WebServiceClasses(value).list);
                     break;
                 case "dicomAETitle":
                     webappInfo.setAETitle(firstValueOf(value));
@@ -661,12 +651,6 @@ public class ConfigurationRS {
             }
         });
         return webappInfo;
-    }
-
-    private static WebApplication.ServiceClass[] toServiceClasses(List<String> values) {
-        return values.stream()
-                .map(WebApplication.ServiceClass::valueOf)
-                .toArray(WebApplication.ServiceClass[]::new);
     }
 
     private static HL7ApplicationInfo toHL7ApplicationInfo(UriInfo info) {
@@ -712,5 +696,16 @@ public class ConfigurationRS {
         StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+
+    public static class WebServiceClasses {
+        final List<WebApplication.ServiceClass> list;
+
+        public WebServiceClasses(List<String> values) {
+            this.list = values.stream().
+                    flatMap(s -> Stream.of(StringUtils.split(s, ',')))
+                    .map(WebApplication.ServiceClass::valueOf)
+                    .collect(Collectors.toList());
+        }
     }
 }

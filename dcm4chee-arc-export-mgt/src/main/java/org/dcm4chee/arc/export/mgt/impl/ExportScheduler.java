@@ -1,5 +1,7 @@
 package org.dcm4chee.arc.export.mgt.impl;
 
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.conf.api.IDeviceCache;
 import org.dcm4chee.arc.Scheduler;
 import org.dcm4chee.arc.conf.*;
 import org.dcm4chee.arc.export.mgt.ExportManager;
@@ -12,10 +14,9 @@ import javax.ejb.EJBException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -28,6 +29,9 @@ public class ExportScheduler extends Scheduler {
 
     @Inject
     private ExportManager ejb;
+
+    @Inject
+    private IDeviceCache deviceCache;
 
     protected ExportScheduler() {
         super(Mode.scheduleWithFixedDelay);
@@ -70,62 +74,74 @@ public class ExportScheduler extends Scheduler {
         Calendar now = Calendar.getInstance();
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
         ArchiveDeviceExtension arcDev = arcAE.getArchiveDeviceExtension();
-        for (Map.Entry<String, ExportRule> entry : arcAE.findExportRules(
-                session.getRemoteHostName(),
-                session.getCallingAET(),
-                session.getLocalHostName(),
-                session.getCalledAET(),
-                ctx.getAttributes(), now)
-                .entrySet()) {
-            String exporterID = entry.getKey();
-            ExportRule rule = entry.getValue();
-            switch(rule.getExportReoccurredInstances()) {
-                case NEVER:
-                    if (ctx.getPreviousInstance() != null) {
-                        continue;
-                    }
-                case REPLACE:
-                    if (ctx.getLocations().isEmpty()) {
-                        continue;
-                    }
-            }
-            ExporterDescriptor desc = arcDev.getExporterDescriptor(exporterID);
+        arcAE.exportRules()
+                .filter(rule -> rule.match(ctx::match, now,
+                                        session.getRemoteHostName(),
+                                        session.getCallingAET(),
+                                        session.getLocalHostName(),
+                                        session.getCalledAET(),
+                                        ctx.getAttributes()))
+                .flatMap(rule -> Stream.of(rule.getExporterIDs())
+                        .map(exporterID1 -> new Object[]{exporterID1, rule}))
+                .collect(Collectors.toMap(a -> (String) a[0], a -> (ExportRule) a[1],
+                        (r1, r2) -> r1.getEntity().compareTo(r2.getEntity()) < 0 ? r1 : r2))
+                .forEach((exporterID, rule) -> {
+            ExporterDescriptor desc = getExporterDesc(rule, exporterID, arcDev);
             if (desc == null) {
                 LOG.warn("{}: No Exporter configured with ID:{} - cannot schedule Export Task triggered by {}",
                         session, exporterID, rule);
-                continue;
+                return;
             }
             Date scheduledTime = scheduledTime(now, rule.getExportDelay(), desc.getSchedules());
+            String exporterDeviceName = exporterDeviceName(rule);
             switch (rule.getEntity()) {
                 case Study:
-                    createOrUpdateStudyExportTask(session, exporterID,
-                            ctx.getStudyInstanceUID(),
-                            scheduledTime);
+                    createOrUpdateStudyExportTask(session, exporterDeviceName, exporterID,
+                            ctx.getStudyInstanceUID(), scheduledTime);
                     if (rule.isExportPreviousEntity() && ctx.isPreviousDifferentStudy())
-                        createOrUpdateStudyExportTask(session, exporterID,
+                        createOrUpdateStudyExportTask(session, exporterDeviceName, exporterID,
                                 ctx.getPreviousInstance().getSeries().getStudy().getStudyInstanceUID(),
                                 scheduledTime);
                     break;
                 case Series:
-                    createOrUpdateSeriesExportTask(session, exporterID,
+                    createOrUpdateSeriesExportTask(session, exporterDeviceName, exporterID,
                             ctx.getStudyInstanceUID(),
                             ctx.getSeriesInstanceUID(),
                             scheduledTime);
                     if (rule.isExportPreviousEntity() && ctx.isPreviousDifferentSeries())
-                        createOrUpdateSeriesExportTask(session, exporterID,
+                        createOrUpdateSeriesExportTask(session, exporterDeviceName, exporterID,
                                 ctx.getPreviousInstance().getSeries().getStudy().getStudyInstanceUID(),
                                 ctx.getPreviousInstance().getSeries().getSeriesInstanceUID(),
                                 scheduledTime);
                     break;
                 case Instance:
-                    createOrUpdateInstanceExportTask(session, exporterID,
+                    createOrUpdateInstanceExportTask(session, exporterDeviceName, exporterID,
                             ctx.getStudyInstanceUID(),
                             ctx.getSeriesInstanceUID(),
                             ctx.getSopInstanceUID(),
                             scheduledTime);
                     break;
             }
+        });
+    }
+
+    private String exporterDeviceName(ExportRule rule) {
+        return rule.getExporterDeviceName() == null || rule.getExporterDeviceName().equals(device.getDeviceName())
+                ? device.getDeviceName() : rule.getExporterDeviceName();
+    }
+
+    private ExporterDescriptor getExporterDesc(ExportRule rule, String exporterID, ArchiveDeviceExtension arcDev) {
+        if (rule.getExporterDeviceName() == null || rule.getExporterDeviceName().equals(device.getDeviceName()))
+            return arcDev.getExporterDescriptor(exporterID);
+
+        try {
+            return deviceCache.findDevice(rule.getExporterDeviceName())
+                    .getDeviceExtensionNotNull(ArchiveDeviceExtension.class)
+                    .getExporterDescriptor(exporterID);
+        } catch (IllegalStateException | ConfigurationException e) {
+            LOG.info(e.getMessage());
         }
+        return null;
     }
 
     private Date scheduledTime(Calendar cal, Duration exportDelay, ScheduleExpression[] schedules) {
@@ -137,14 +153,14 @@ public class ExportScheduler extends Scheduler {
         return cal.getTime();
     }
 
-    private boolean createOrUpdateStudyExportTask(StoreSession session, String exporterID,
+    private boolean createOrUpdateStudyExportTask(StoreSession session, String exporterDeviceName, String exporterID,
             String studyIUID, Date scheduledTime) {
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
         ArchiveDeviceExtension arcDev = arcAE.getArchiveDeviceExtension();
         int retries = arcDev.getStoreUpdateDBMaxRetries();
         for (;;) {
             try {
-                ejb.createOrUpdateStudyExportTask(exporterID, studyIUID, scheduledTime);
+                ejb.createOrUpdateStudyExportTask(exporterDeviceName, exporterID, studyIUID, scheduledTime);
                 return true;
             } catch (EJBException e) {
                 if (retries-- > 0) {
@@ -162,14 +178,14 @@ public class ExportScheduler extends Scheduler {
         }
     }
 
-    private boolean createOrUpdateSeriesExportTask(StoreSession session, String exporterID,
+    private boolean createOrUpdateSeriesExportTask(StoreSession session, String exporterDeviceName, String exporterID,
             String studyIUID, String seriesIUID, Date scheduledTime) {
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
         ArchiveDeviceExtension arcDev = arcAE.getArchiveDeviceExtension();
         int retries = arcDev.getStoreUpdateDBMaxRetries();
         for (;;) {
             try {
-                ejb.createOrUpdateSeriesExportTask(exporterID, studyIUID, seriesIUID, scheduledTime);
+                ejb.createOrUpdateSeriesExportTask(exporterDeviceName, exporterID, studyIUID, seriesIUID, scheduledTime);
                 return true;
             } catch (EJBException e) {
                 if (retries-- > 0) {
@@ -187,15 +203,16 @@ public class ExportScheduler extends Scheduler {
         }
     }
 
-    private boolean createOrUpdateInstanceExportTask(StoreSession session, String exporterID,
+    private boolean createOrUpdateInstanceExportTask(StoreSession session, String exporterDeviceName, String exporterID,
             String studyIUID, String seriesIUID, String sopIUID, Date scheduledTime) {
-        ejb.createOrUpdateInstanceExportTask(exporterID, studyIUID, seriesIUID, sopIUID, scheduledTime);
+        ejb.createOrUpdateInstanceExportTask(exporterDeviceName, exporterID, studyIUID, seriesIUID, sopIUID, scheduledTime);
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
         ArchiveDeviceExtension arcDev = arcAE.getArchiveDeviceExtension();
         int retries = arcDev.getStoreUpdateDBMaxRetries();
         for (;;) {
             try {
-                ejb.createOrUpdateInstanceExportTask(exporterID, studyIUID, seriesIUID, sopIUID, scheduledTime);
+                ejb.createOrUpdateInstanceExportTask(
+                        exporterDeviceName, exporterID, studyIUID, seriesIUID, sopIUID, scheduledTime);
                 return true;
             } catch (EJBException e) {
                 if (retries-- > 0) {

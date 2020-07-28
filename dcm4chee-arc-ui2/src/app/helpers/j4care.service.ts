@@ -1,20 +1,26 @@
 import {Injectable} from '@angular/core';
-import {Subscriber} from "rxjs/Subscriber";
-import {Observable} from "rxjs/Observable";
+import {Subscriber, Observable} from "rxjs";
 declare var DCM4CHE: any;
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {DatePipe} from "@angular/common";
 import {WindowRefService} from "./window-ref.service";
 import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {ConfirmComponent} from "../widgets/dialogs/confirm/confirm.component";
 import {Router} from "@angular/router";
-import {J4careDateTime, J4careDateTimeMode, RangeObject, RangeUnit, StudyDateMode} from "../interfaces";
+import {
+    J4careDateTime,
+    J4careDateTimeMode, LanguageConfig,
+    LanguageProfile,
+    RangeObject,
+    RangeUnit,
+    StudyDateMode
+} from "../interfaces";
 import {TableSchemaElement} from "../models/dicom-table-schema-element";
 import {DicomNetworkConnection} from "../interfaces";
 import {DcmWebApp} from "../models/dcm-web-app";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import * as uuid from  'uuid/v4';
-import { loadTranslations } from '@angular/localize';
+import {User} from "../models/user";
 declare const bigInt:Function;
 
 @Injectable()
@@ -307,6 +313,38 @@ export class j4care {
             console.error("error parsing data!",e);
             return null;
         }
+    }
+    static createDateFromDuration(durationObject){
+        let today = new Date();
+        let newDate = new Date();
+        Object.keys(durationObject).forEach(key => {
+            if(durationObject[key]){
+                switch (key){
+                    case 'Week':
+                        newDate.setDate(today.getDate()-(7*durationObject[key]));
+                        break;
+                    case 'FullYear':
+                        newDate.setFullYear(today.getFullYear()-durationObject[key]);
+                        break;
+                    case 'Date':
+                        newDate.setDate(today.getDate()-durationObject[key]);
+                        break;
+                    case 'Hours':
+                        newDate.setHours(today.getHours()-durationObject[key]);
+                        break;
+                    case 'Minutes':
+                        newDate.setMinutes(today.getMinutes()-durationObject[key]);
+                        break;
+                    case 'Month':
+                        newDate.setMonth(today.getMonth()-durationObject[key]);
+                        break;
+                    case 'Seconds':
+                        newDate.setSeconds(today.getSeconds()-durationObject[key]);
+                        break;
+                }
+            }
+        });
+        return newDate;
     }
     static getSingleDateTimeValueFromInt(value){
         if(value)
@@ -1119,8 +1157,11 @@ export class j4care {
     /*
     * Return the whole url from passed DcmWebApp
     * */
-    static getUrlFromDcmWebApplication(dcmWebApp:DcmWebApp):string{
+    static getUrlFromDcmWebApplication(dcmWebApp:DcmWebApp, withoutServicePath?:boolean):string{
         try{
+            if(withoutServicePath){
+                return `${this.getBaseUrlFromDicomNetworkConnection(dcmWebApp.dicomNetworkConnectionReference || dcmWebApp.dicomNetworkConnection) || ''}`;
+            }
             return `${this.getBaseUrlFromDicomNetworkConnection(dcmWebApp.dicomNetworkConnectionReference || dcmWebApp.dicomNetworkConnection) || ''}${dcmWebApp.dcmWebServicePath}`;
         }catch (e) {
             this.log("Error on getting Url from DcmWebApplication",e);
@@ -1284,7 +1325,7 @@ export class j4care {
         return `${preMessage}${msg != "" ? ':':''}${msg}`;
     }
 
-    static extractLanguageDateFromString(ldapLanguageString:string){
+    static extractLanguageDataFromString(ldapLanguageString:string){
         try{
             const regex = /([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)/;
             let m;
@@ -1300,5 +1341,33 @@ export class j4care {
             return undefined;
         }
         return undefined;
+    }
+
+    static getDefaultLanguageFromProfile(languageConfig:LanguageConfig,user:User){
+        try{
+            let validProfiles:LanguageProfile[] = languageConfig.dcmuiLanguageProfileObjects.filter((profile:LanguageProfile)=>{
+                if(_.hasIn(profile, "dcmuiLanguageProfileUsername") && profile.dcmuiLanguageProfileUsername === user.user){
+                    return true;
+                }
+                if(_.hasIn(profile, "dcmuiLanguageProfileRole")){
+                    let valid = false;
+                    profile.dcmuiLanguageProfileRole.forEach(role=>{
+                        if(user.roles.indexOf(role) > -1){
+                            valid = true;
+                        }
+                    });
+                    return valid;
+                }
+                return false;
+            });
+            if(validProfiles && validProfiles.length > 0){
+                return validProfiles[0].dcmDefaultLanguage;
+            }
+        }catch (e) {
+            this.log("GetLanguageProfile in catch",e);
+            if (_.hasIn(languageConfig,"dcmLanguages[0]")){
+                return languageConfig.dcmLanguages[0];
+            }
+        }
     }
 }

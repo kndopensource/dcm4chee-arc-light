@@ -54,6 +54,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.*;
+import java.nio.file.attribute.FileAttribute;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -68,6 +69,13 @@ public class FileSystemStorage extends AbstractStorage {
     private final AttributesFormat pathFormat;
     private final Path checkMountFilePath;
     private final OpenOption[] openOptions;
+    private final CreateDirectories createDirectories;
+    private final int retryCreateDirectories;
+
+    @FunctionalInterface
+    private interface CreateDirectories {
+        Path apply(Path dir, FileAttribute<?>... attrs) throws IOException;
+    }
 
     public FileSystemStorage(StorageDescriptor descriptor, MetricsService metricsService) {
         super(descriptor, metricsService);
@@ -79,6 +87,41 @@ public class FileSystemStorage extends AbstractStorage {
         openOptions = fileOpenOption != null
                 ? new OpenOption[]{ StandardOpenOption.CREATE_NEW, StandardOpenOption.valueOf(fileOpenOption) }
                 : new OpenOption[]{ StandardOpenOption.CREATE_NEW };
+        createDirectories = Boolean.parseBoolean(descriptor.getProperty("altCreateDirectories", null))
+            ? FileSystemStorage::altCreateDirectories
+            : Files::createDirectories;
+        retryCreateDirectories = Integer.parseInt(descriptor.getProperty("retryCreateDirectories", "0"));
+    }
+
+    @Override
+    protected Logger log() {
+        return LOG;
+    }
+
+    private static Path altCreateDirectories(Path path, FileAttribute<?>... fileAttributes)
+            throws IOException {
+        try {
+            return Files.createDirectory(path, fileAttributes);
+        } catch (FileAlreadyExistsException e) {
+            return path;
+        } catch (NoSuchFileException e) {
+            createParentDirectories(path, fileAttributes);
+            return Files.createDirectory(path, fileAttributes);
+        }
+    }
+
+    private static void createParentDirectories(Path path, FileAttribute<?>... fileAttributes)
+            throws IOException {
+        Path parent = path.getParent();
+        if (parent == null)
+            throw new FileSystemException(path.toString(), null,
+                    "Unable to determine if root directory exists");
+        try {
+            Files.createDirectory(parent, fileAttributes);
+        } catch (NoSuchFileException e) {
+            createParentDirectories(parent, fileAttributes);
+            Files.createDirectory(parent, fileAttributes);
+        }
     }
 
     private URI ensureTrailingSlash(URI uri) {
@@ -110,8 +153,21 @@ public class FileSystemStorage extends AbstractStorage {
 
     private FileStore getFileStore() throws IOException {
         Path dir = Paths.get(rootURI);
-        Files.createDirectories(dir);
+        createDirectories(dir);
         return Files.getFileStore(dir);
+    }
+
+    private Path createDirectories(Path path) throws IOException {
+        int retries = retryCreateDirectories;
+        for (;;) {
+            try {
+                return createDirectories.apply(path);
+            } catch (NoSuchFileException e) {
+                if (--retries < 0)
+                    throw e;
+                LOG.info("Failed to create directories {} - retry:\n", path, e);
+            }
+        }
     }
 
     @Override
@@ -123,7 +179,7 @@ public class FileSystemStorage extends AbstractStorage {
     protected OutputStream openOutputStreamA(WriteContext ctx) throws IOException {
         Path path = Paths.get(rootURI.resolve(pathFormat.format(ctx.getAttributes())));
         Path dir = path.getParent();
-        Files.createDirectories(dir);
+        createDirectories(dir);
         OutputStream stream = null;
         while (stream == null)
             try {

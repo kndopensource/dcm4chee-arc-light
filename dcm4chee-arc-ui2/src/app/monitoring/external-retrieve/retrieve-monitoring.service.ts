@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {AppService} from "../../app.service";
 import {DevicesService} from "../../configuration/devices/devices.service";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {j4care} from "../../helpers/j4care.service";
 import {HttpHeaders} from "@angular/common/http";
 
@@ -43,7 +43,7 @@ export class RetrieveMonitoringService {
             ;
     }
     reschedule(pk, data){
-        return this.$http.post(`../monitor/retrieve/${pk}/reschedule`, data);
+        return this.$http.post(`../monitor/retrieve/${pk}/reschedule${j4care.param(data)}`, {});
     }
     rescheduleAll(filter){
         let urlParam = this.mainservice.param(filter);
@@ -79,7 +79,7 @@ export class RetrieveMonitoringService {
                 text:$localize `:@@SCHEDULED:SCHEDULED`
             },
             {
-                value:$localize `:@@in_process:IN PROCESS`,
+                value:$localize `IN PROCESS`,
                 text:$localize `:@@in_process:IN PROCESS`
             },
             {
@@ -198,7 +198,7 @@ export class RetrieveMonitoringService {
                         filterKey:"status",
                         showStar:true,
                         description:$localize `:@@status_of_tasks_to_filter_by:Status of tasks to filter by`,
-                        placeholder:$localize `:@@Status:Status`
+                        placeholder:$localize `:@@status:Status`
                     }
                 ]
             ],[
@@ -252,7 +252,7 @@ export class RetrieveMonitoringService {
                         tag:"button",
                         id:"count",
                         text:countText,
-                        description:$localize `:@@querie_only_the_count:QUERIE ONLY THE COUNT`
+                        description:$localize `:@@query_only_the_count:QUERY ONLY THE COUNT`
                     },
                     {
                         tag:"button",

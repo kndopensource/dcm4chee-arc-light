@@ -1,7 +1,7 @@
 import {Injectable, OnInit, OnDestroy} from '@angular/core';
 import {Observable, Subject, Subscription, of} from 'rxjs';
 import {User} from './models/user';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {WindowRefService} from "./helpers/window-ref.service";
 import {DatePipe} from "@angular/common";
 import {J4careHttpService} from "./helpers/j4care-http.service";
@@ -121,21 +121,21 @@ export class AppService implements OnInit, OnDestroy{
     }
     showError(msg:string){
         this.setMessageSource.next({
-            "title":$localize `:@@msg.error:Error`,
+            "title":$localize `:@@error:Error`,
             "text":msg,
             "status":"error"
         })
     }
     showMsg(msg:string){
         this.setMessageSource.next({
-            "title":$localize `:@@msg.info:Info`,
+            "title":$localize `:@@info:Info`,
             "text":msg,
             "status":"info"
         })
     }
     showWarning(msg:string){
         this.setMessageSource.next({
-            "title":$localize `:@@msg.warning:Warning`,
+            "title":$localize `:@@warning:Warning`,
             "text":msg,
             "status":"warning"
         })
@@ -259,7 +259,7 @@ export class AppService implements OnInit, OnDestroy{
                         this.setGlobal(global);
                     }catch(e){
                         console.warn("Permission not found!",e);
-                        this.showError($localize `:@@app.permission_not_found:Permission not found!`);
+                        this.showError($localize `:@@permission_not_found:Permission not found!`);
                     }
                     return res;
                 }));

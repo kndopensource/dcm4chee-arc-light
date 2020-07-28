@@ -97,6 +97,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static org.dcm4che3.net.TransferCapability.Role.SCP;
+import static org.dcm4che3.net.TransferCapability.Role.SCU;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -186,6 +187,18 @@ public class RetrieveServiceImpl implements RetrieveService {
             String localAET, String studyUID, String seriesUID, String objectUID, String destAET)
             throws ConfigurationException {
         RetrieveContext ctx = newRetrieveContext(localAET, studyUID, seriesUID, objectUID);
+        ctx.setDestinationAETitle(destAET);
+        ctx.setDestinationAE(aeCache.findApplicationEntity(destAET));
+        return ctx;
+    }
+
+    @Override
+    public RetrieveContext newRetrieveContextSTORE(
+            String localAET, String studyUID, String seriesUID, Sequence refSopSeq, String destAET)
+            throws ConfigurationException {
+        RetrieveContext ctx = newRetrieveContext(localAET, refSopSeq);
+        ctx.setStudyInstanceUIDs(studyUID);
+        ctx.setSeriesInstanceUIDs(seriesUID);
         ctx.setDestinationAETitle(destAET);
         ctx.setDestinationAE(aeCache.findApplicationEntity(destAET));
         return ctx;
@@ -593,15 +606,16 @@ public class RetrieveServiceImpl implements RetrieveService {
     @Override
     public boolean restrictRetrieveAccordingTransferCapabilities(RetrieveContext ctx) {
         ArchiveAEExtension arcAE = ctx.getArchiveAEExtension();
-        if (ctx.getDestinationAE().getTransferCapabilitiesWithRole(SCP).isEmpty()) {
-            return true;
-        }
+        ApplicationEntity destAE = ctx.getDestinationAE();
+        boolean noDestinationRestriction = destAE.getTransferCapabilitiesWithRole(SCP).isEmpty();
         Collection<InstanceLocations> matches = ctx.getMatches();
         Iterator<InstanceLocations> iter = matches.iterator();
         boolean restrictRetrieveSilently = arcAE.restrictRetrieveSilently();
         while (iter.hasNext()) {
             InstanceLocations match = iter.next();
-            if (ctx.getDestinationAE().getTransferCapabilityFor(match.getSopClassUID(), SCP) == null) {
+            if (!(ctx.getLocalApplicationEntity().hasTransferCapabilityFor(match.getSopClassUID(), SCU)
+                    && (noDestinationRestriction
+                    || destAE.hasTransferCapabilityFor(match.getSopClassUID(), SCP)))) {
                 iter.remove();
                 if (restrictRetrieveSilently) {
                     ctx.decrementNumberOfMatches();
@@ -648,8 +662,32 @@ public class RetrieveServiceImpl implements RetrieveService {
     }
 
     @Override
+    public ArchiveAttributeCoercion getArchiveAttributeCoercion(RetrieveContext ctx, InstanceLocations inst) {
+        if (ctx.isUpdateSeriesMetadata()) {
+            return null;
+        }
+        ArchiveAEExtension aeExt = ctx.getArchiveAEExtension();
+        ArchiveAttributeCoercion rule = aeExt.findAttributeCoercion(
+                Dimse.C_STORE_RQ,
+                TransferCapability.Role.SCP,
+                inst.getSopClassUID(),
+                ctx.getDestinationHostName(),
+                ctx.getLocalAETitle(),
+                ctx.getRequestorHostName(),
+                ctx.getDestinationAETitle(),
+                inst.getAttributes());
+        return rule;
+    }
+
+    @Override
+    public AttributesCoercion getAttributesCoercion(RetrieveContext ctx, InstanceLocations inst,
+            ArchiveAttributeCoercion rule) {
+        return uidRemap(inst, coercion(ctx, inst, rule));
+    }
+
+    @Override
     public AttributesCoercion getAttributesCoercion(RetrieveContext ctx, InstanceLocations inst) {
-        return uidRemap(inst, coercion(ctx, inst));
+        return getAttributesCoercion(ctx, inst, getArchiveAttributeCoercion(ctx, inst));
     }
 
     @Override
@@ -780,21 +818,11 @@ public class RetrieveServiceImpl implements RetrieveService {
         return uidMap != null ? new RemapUIDsAttributesCoercion(uidMap.getUIDMap(), next) : next;
     }
 
-    private AttributesCoercion coercion(RetrieveContext ctx, InstanceLocations inst) {
+    private AttributesCoercion coercion(RetrieveContext ctx, InstanceLocations inst, ArchiveAttributeCoercion rule) {
         Attributes instAttributes = inst.getAttributes();
         if (ctx.isUpdateSeriesMetadata())
             return new MergeAttributesCoercion(instAttributes, new SeriesMetadataAttributeCoercion(ctx, inst));
 
-        ArchiveAEExtension aeExt = ctx.getArchiveAEExtension();
-        ArchiveAttributeCoercion rule = aeExt.findAttributeCoercion(
-                Dimse.C_STORE_RQ,
-                TransferCapability.Role.SCP,
-                inst.getSopClassUID(),
-                ctx.getDestinationHostName(),
-                ctx.getLocalAETitle(),
-                ctx.getRequestorHostName(),
-                ctx.getDestinationAETitle(),
-                inst.getAttributes());
         if (rule == null)
             return new MergeAttributesCoercion(instAttributes, AttributesCoercion.NONE);
 

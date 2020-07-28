@@ -45,12 +45,14 @@ import org.dcm4che3.data.Attributes;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.function.Predicate;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  * @since Aug 2018
  */
 public class ExportPriorsRule {
+    public static final ExportPriorsRule[] EMPTY = {};
 
     private String commonName;
 
@@ -121,18 +123,20 @@ public class ExportPriorsRule {
         this.entitySelectors = entitySelectors;
     }
 
-    public boolean match(String sendingHost, String sendingAET,
-            String receivingHost, String receivingAET, Attributes attrs, Calendar cal) {
-        return ScheduleExpression.emptyOrAnyContains(cal, schedules)
-                && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
-    }
-
     public ExportReoccurredInstances getExportReoccurredInstances() {
         return exportReoccurredInstances;
     }
 
     public void setExportReoccurredInstances(ExportReoccurredInstances exportReoccurredInstances) {
         this.exportReoccurredInstances = exportReoccurredInstances;
+    }
+
+    public boolean match(Predicate<ExportReoccurredInstances> predicate, Calendar now,
+            String sendingHost, String sendingAET, String receivingHost, String receivingAET,
+            Attributes attrs) {
+        return predicate.test(exportReoccurredInstances)
+                && ScheduleExpression.emptyOrAnyContains(now, schedules)
+                && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
     }
 
     @Override

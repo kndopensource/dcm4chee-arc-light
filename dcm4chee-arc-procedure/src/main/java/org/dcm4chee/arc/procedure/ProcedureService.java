@@ -73,6 +73,8 @@ public interface ProcedureService {
 
     void updateMWLStatus(ProcedureContext ctx);
 
+    void updateMWLStatus(ProcedureContext ctx, SPSStatus from);
+
     int updateMatchingSPS(SPSStatus spsStatus, Attributes queryKeys, QueryParam queryParam, int mwlFetchSize);
 
     MWLItem findMWLItem(ProcedureContext ctx);

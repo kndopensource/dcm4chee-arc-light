@@ -45,13 +45,15 @@ import org.dcm4che3.data.*;
 import org.dcm4che3.util.UIDUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @author Vrinda Nayak <vrinda.nayak@j4care.com>
  * @since Jan 2020
  */
 public class UPSOnHL7 {
-    private String commonName;
+    public static final UPSOnHL7[] EMPTY = {};
+    private String upsOnHL7ID;
     private HL7Conditions conditions = new HL7Conditions();
     private ScheduleExpression[] schedules = {};
     private String procedureStepLabel;
@@ -61,6 +63,7 @@ public class UPSOnHL7 {
     private Duration startDateTimeDelay;
     private Duration completionDateTimeDelay;
     private String instanceUIDBasedOnName;
+    private String destinationAE;
     private Code scheduledWorkitemCode;
     private Code scheduledStationName;
     private Code scheduledStationClass;
@@ -73,16 +76,16 @@ public class UPSOnHL7 {
 
     public UPSOnHL7() {}
 
-    public UPSOnHL7(String commonName) {
-        this.commonName = commonName;
+    public UPSOnHL7(String upsOnHL7ID) {
+        this.upsOnHL7ID = upsOnHL7ID;
     }
 
-    public String getCommonName() {
-        return commonName;
+    public String getUPSOnHL7ID() {
+        return upsOnHL7ID;
     }
 
-    public void setCommonName(String commonName) {
-        this.commonName = commonName;
+    public void setUPSOnHL7ID(String UPSOnHL7ID) {
+        this.upsOnHL7ID = UPSOnHL7ID;
     }
 
     public HL7Conditions getConditions() {
@@ -110,7 +113,9 @@ public class UPSOnHL7 {
     }
 
     public String getProcedureStepLabel(HL7Fields hl7Fields) {
-        return procedureStepLabel != null ? hl7Fields.get(procedureStepLabel, null) : null;
+        return Objects.requireNonNull(hl7Fields.get(procedureStepLabel, null),
+                "Missing value for Procedure Step Label at " + procedureStepLabel
+                        + " configured in UPSOnHL7[cn=" + upsOnHL7ID + "]");
     }
 
     public String getWorklistLabel() {
@@ -169,6 +174,14 @@ public class UPSOnHL7 {
         return instanceUIDBasedOnName != null
                 ? UIDUtils.createNameBasedUID(hl7Fields.get(instanceUIDBasedOnName, "*").getBytes(StandardCharsets.UTF_8))
                 : UIDUtils.createUID();
+    }
+
+    public String getDestinationAE() {
+        return destinationAE;
+    }
+
+    public void setDestinationAE(String destinationAE) {
+        this.destinationAE = destinationAE;
     }
 
     public Code getScheduledWorkitemCode() {
@@ -264,14 +277,10 @@ public class UPSOnHL7 {
         this.xsltStylesheetURI = xsltStylesheetURI;
     }
 
-    public boolean match(String hostName, HL7Fields hl7Fields) {
-        return conditions.match(hostName, hl7Fields);
-    }
-
     @Override
     public String toString() {
         return "UPSOnHL7{" +
-                "commonName='" + commonName + '\'' +
+                "commonName='" + upsOnHL7ID + '\'' +
                 '}';
     }
 }

@@ -3,14 +3,14 @@ import {QueuesService} from './queues.service';
 import {AppService} from '../../app.service';
 import {ConfirmComponent} from '../../widgets/dialogs/confirm/confirm.component';
 import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {WindowRefService} from "../../helpers/window-ref.service";
 import {HttpErrorHandler} from "../../helpers/http-error-handler";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {LoadingBarService} from "@ngx-loading-bar/core";
 import {ActivatedRoute} from "@angular/router";
 import {j4care} from "../../helpers/j4care.service";
-import {ReplaySubject} from "rxjs/ReplaySubject";
+import {ReplaySubject} from "rxjs";
 import {DevicesService} from "../../configuration/devices/devices.service";
 import {KeycloakService} from "../../helpers/keycloak-service/keycloak.service";
 import {Globalvar} from "../../constants/globalvar";
@@ -32,13 +32,13 @@ export class QueuesComponent implements OnInit, OnDestroy{
     allActionsOptions = [
         {
             value:"cancel",
-            label:$localize `:@@queues.cancel_all_matching_tasks:Cancel all matching tasks`
+            label:$localize `:@@cancel_all_matching_tasks:Cancel all matching tasks`
         },{
             value:"reschedule",
-            label:$localize `:@@queues.reschedule_all_matching_tasks:Reschedule all matching tasks`
+            label:$localize `:@@reschedule_all_matching_tasks:Reschedule all matching tasks`
         },{
             value:"delete",
-            label:$localize `:@@queues.delete_all_matching_tasks:Delete all matching tasks`
+            label:$localize `:@@delete_all_matching_tasks:Delete all matching tasks`
         }
     ];
     allActionsActive = [];
@@ -58,8 +58,8 @@ export class QueuesComponent implements OnInit, OnDestroy{
     ];
     timer = {
         started:false,
-        startText:$localize `:@@queues.start_auto_refresh:Start Auto Refresh`,
-        stopText:$localize `:@@queues.stop_auto_refresh:Stop Auto Refresh`
+        startText:$localize `:@@start_auto_refresh:Start Auto Refresh`,
+        stopText:$localize `:@@stop_auto_refresh:Stop Auto Refresh`
     };
     filterObject = {
         status:undefined,
@@ -117,7 +117,7 @@ export class QueuesComponent implements OnInit, OnDestroy{
     }
     statusChange(){
 /*        this.allActionsActive = this.allActionsOptions.filter((o)=>{
-            if(this.filterObject.status == "SCHEDULED" || this.filterObject.status == $localize `:@@queues.in_process:IN PROCESS`){
+            if(this.filterObject.status == "SCHEDULED" || this.filterObject.status == $localize `:@@in_process:IN PROCESS`){
                 return o.value != 'reschedule';
             }else{
                 if(this.filterObject.status === '*')

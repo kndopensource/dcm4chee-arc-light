@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {AppService} from "../../../app.service";
 import {J4careHttpService} from "../../../helpers/j4care-http.service";
 import {StudiesService} from "../../../studies/studies.service";
@@ -441,7 +441,7 @@ export class UploadFilesComponent implements OnInit {
                                         ]
                                     };
                                 }
-                                studyObject["00200013"] = { //"00200013":$localize `:@@upload-files.instance_number:Instance Number`
+                                studyObject["00200013"] = { //"00200013":$localize `:@@instance_number:Instance Number`
                                     "vr": "IS",
                                     "Value": [
                                         i + 1
@@ -454,7 +454,7 @@ export class UploadFilesComponent implements OnInit {
                                             _.get(studyObject, "00201209.Value[0]")*1 + 1
                                         ]
                                     };
-                                    studyObject["00200013"] = { //"00200013":$localize `:@@upload-files.instance_number:Instance Number`
+                                    studyObject["00200013"] = { //"00200013":$localize `:@@instance_number:Instance Number`
                                         "vr": "IS",
                                         "Value": [
                                             _.get(studyObject, "00201209.Value[0]")*1 + i*1 + 1
@@ -467,7 +467,7 @@ export class UploadFilesComponent implements OnInit {
                                             this.seriesNumber || 0
                                         ]
                                     };
-                                    studyObject["00200013"] = { //"00200013":$localize `:@@upload-files.instance_number:Instance Number`
+                                    studyObject["00200013"] = { //"00200013":$localize `:@@instance_number:Instance Number`
                                         "vr": "IS",
                                         "Value": [
                                             i + 1
@@ -644,13 +644,13 @@ export class UploadFilesComponent implements OnInit {
                                         if (xmlHttpRequest.status === 200) {
                                             $this.percentComplete[file.name]['showLoader'] = false;
                                             $this.percentComplete[file.name]['showTicker'] = true;
-                                            console.log($localize `:@@upload-files.in_response:in response`, JSON.parse(xmlHttpRequest.response));
+                                            console.log(`in response`, JSON.parse(xmlHttpRequest.response));
                                         } else {
                                             $this.percentComplete[file.name]['showLoader'] = false;
-                                            console.log($localize `:@@upload-files.in_respons_error:in respons error`, xmlHttpRequest.status);
+                                            console.log(`in response error`, xmlHttpRequest.status);
                                             console.log('statusText', xmlHttpRequest.statusText);
                                             $this.percentComplete[file.name]['value'] = 0;
-                                            $this.percentComplete[file.name]['status'] = xmlHttpRequest.status + $localize `:@@upload-files._: ` + xmlHttpRequest.statusText;
+                                            $this.percentComplete[file.name]['status'] = xmlHttpRequest.status + ` ` + xmlHttpRequest.statusText;
                                         }
                                     }
                                     // $this.percentComplete[file.name]['showLoader'] = true;

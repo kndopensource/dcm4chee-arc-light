@@ -42,6 +42,8 @@
 package org.dcm4chee.arc.ups.impl;
 
 import org.dcm4che3.data.*;
+import org.dcm4che3.dcmr.ProcedureDiscontinuationReasons;
+import org.dcm4che3.dcmr.ScopeOfAccumlation;
 import org.dcm4che3.hl7.HL7Charset;
 import org.dcm4che3.io.SAXTransformer;
 import org.dcm4che3.io.TemplatesCache;
@@ -88,7 +90,7 @@ import java.util.stream.Collectors;
 @Stateless
 public class UPSServiceEJB {
 
-    private static Logger LOG = LoggerFactory.getLogger(UPSServiceEJB.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UPSServiceEJB.class);
 
     @PersistenceContext(unitName = "dcm4chee-arc")
     EntityManager em;
@@ -327,6 +329,8 @@ public class UPSServiceEJB {
             throws DicomServiceException {
         UPS ups = findUPS(ctx);
         Attributes attrs = ups.getAttributes();
+        if (ctx.getMergeAttributes() != null)
+            attrs.addAll(ctx.getMergeAttributes());
         switch (upsState) {
             case IN_PROGRESS:
                 switch (ups.getProcedureStepState()) {
@@ -714,12 +718,7 @@ public class UPSServiceEJB {
                 attrs.getNestedDataset(Tag.ProcedureStepDiscontinuationReasonCodeSequence);
         if (reasonCode == null || reasonCode.isEmpty()) {
             attrs.newSequence(Tag.ProcedureStepDiscontinuationReasonCodeSequence, 1)
-                    .add(new Code(
-                            "110513",
-                            "DCM",
-                            null,
-                            "Discontinued for unspecified reason")
-                            .toItem());
+                    .add(ProcedureDiscontinuationReasons.DiscontinuedForUnspecifiedReason.toItem());
         }
     }
 
@@ -728,7 +727,8 @@ public class UPSServiceEJB {
         String iuid = rule.getInstanceUID(ctx.getAttributes());
         try {
             UPS ups = findUPS(iuid);
-            switch (rule.getIncludeInputInformation()) {
+            UPSOnStore.IncludeInputInformation includeInputInformation = rule.getIncludeInputInformation();
+            switch (includeInputInformation) {
                 case APPEND:
                     if (ups.getProcedureStepState() == UPSState.SCHEDULED) break;
                 case SINGLE:
@@ -736,20 +736,16 @@ public class UPSServiceEJB {
                     LOG.info("{}: {} already exists", ctx.getStoreSession(), ups);
                     return null;
                 default:
-                    try {
-                        do {
-                            ups = findUPS(iuid = UIDUtils.createNameBasedUID(iuid.getBytes()));
-                        } while (rule.getIncludeInputInformation()
-                                == UPSOnStore.IncludeInputInformation.SINGLE_OR_CREATE
-                                || ups.getProcedureStepState() != UPSState.SCHEDULED);
-                    } catch (NoResultException e) {
-                        return createOnStore(iuid, ctx, now, rule);
+                    while (includeInputInformation == UPSOnStore.IncludeInputInformation.SINGLE_OR_CREATE
+                        || ups.getProcedureStepState() != UPSState.SCHEDULED) {
+                        ups = findUPS(iuid = UIDUtils.createNameBasedUID(iuid.getBytes()));
                     }
             }
             LOG.info("{}: update existing {}", ctx.getStoreSession(), ups);
-            updateIncludeInputInformation(ups.getAttributes().getSequence(Tag.InputInformationSequence), ctx);
-            ups.setAttributes(ups.getAttributes(),
-                    ctx.getStoreSession().getArchiveDeviceExtension().getAttributeFilter(Entity.UPS));
+            Attributes attrs = ups.getAttributes();
+            attrs.setDate(Tag.ScheduledProcedureStepStartDateTime, VR.DT, add(now, rule.getStartDateTimeDelay()));
+            updateIncludeInputInformation(attrs.getSequence(Tag.InputInformationSequence), ctx);
+            ups.setAttributes(attrs, ctx.getStoreSession().getArchiveDeviceExtension().getAttributeFilter(Entity.UPS));
             return ups;
         } catch (NoResultException e) {
             return createOnStore(iuid, ctx, now, rule);
@@ -806,6 +802,9 @@ public class UPSServiceEJB {
                 attrs.setNull(Tag.ReferencedRequestSequence, VR.SQ);
             }
         }
+        if (rule.getDestinationAE() != null && !attrs.contains(Tag.OutputDestinationSequence)) {
+            attrs.newSequence(Tag.OutputDestinationSequence, 1).add(outputStorage(rule.getDestinationAE()));
+        }
         attrs.setString(Tag.ProcedureStepState, VR.CS, "SCHEDULED");
         if (!attrs.contains(Tag.ScheduledProcedureStepPriority)) {
             attrs.setString(Tag.ScheduledProcedureStepPriority, VR.CS, rule.getUPSPriority().toString());
@@ -820,7 +819,44 @@ public class UPSServiceEJB {
                 && !attrs.contains(Tag.InputInformationSequence)) {
             updateIncludeInputInformation(attrs.newSequence(Tag.InputInformationSequence, 1), storeCtx);
         }
+        addScheduledProcessingParameter(attrs, ScopeOfAccumlation.CODE,
+                toScopeOfAccumlation(rule.getScopeOfAccumulation()));
         return attrs;
+    }
+
+    private static void addScheduledProcessingParameter(Attributes attrs, Code conceptName, Code code) {
+        if (code != null)
+            attrs.ensureSequence(Tag.ScheduledProcessingParametersSequence, 2)
+                    .add(toContentItem(conceptName, code));
+    }
+
+    private static Attributes toContentItem(Code conceptName, Code code) {
+        Attributes item = new Attributes(3);
+        item.setString(Tag.ValueType, VR.CS, "CODE");
+        item.newSequence(Tag.ConceptNameCodeSequence, 1).add(conceptName.toItem());
+        item.newSequence(Tag.ConceptCodeSequence, 1).add(code.toItem());
+        return item;
+    }
+
+    private static Code toScopeOfAccumlation(Entity scopeOfAccumulation) {
+        if (scopeOfAccumulation != null)
+            switch (scopeOfAccumulation) {
+                case Study:
+                    return ScopeOfAccumlation.Study;
+                case Series:
+                    return ScopeOfAccumlation.Series;
+                case MPPS:
+                    return ScopeOfAccumlation.PerformedProcedureStep;
+            }
+        return null;
+    }
+
+    private static Attributes outputStorage(String destinationAE) {
+        Attributes dicomStorage = new Attributes(1);
+        dicomStorage.setString(Tag.DestinationAE, VR.AE, destinationAE);
+        Attributes outputDestination = new Attributes(1);
+        outputDestination.newSequence(Tag.DICOMStorageSequence, 1).add(dicomStorage);
+        return outputDestination;
     }
 
     private static Attributes referencedRequest(StoreContext storeCtx, UPSOnStore rule) {
@@ -884,6 +920,10 @@ public class UPSServiceEJB {
             setCode(attrs, Tag.ScheduledStationGeographicLocationCodeSequence, upsOnHL7.getScheduledStationLocation());
         if (!attrs.contains(Tag.InputReadinessState))
             attrs.setString(Tag.InputReadinessState, VR.CS, upsOnHL7.getInputReadinessState().name());
+        if (upsOnHL7.getDestinationAE() != null && !attrs.contains(Tag.OutputDestinationSequence)) {
+            attrs.newSequence(Tag.OutputDestinationSequence, 1)
+                    .add(outputStorage(upsOnHL7.getDestinationAE()));
+        }
         attrs.setString(Tag.ProcedureStepState, VR.CS, "SCHEDULED");
         if (!attrs.contains(Tag.ScheduledProcedureStepPriority))
             attrs.setString(Tag.ScheduledProcedureStepPriority, VR.CS, upsOnHL7.getUPSPriority().name());

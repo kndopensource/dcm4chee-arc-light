@@ -2,13 +2,11 @@ import {Component, OnInit, ViewContainerRef} from '@angular/core';
 import {DiffMonitorService} from "./diff-monitor.service";
 import {AppService} from "../../app.service";
 import {ActivatedRoute} from "@angular/router";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {LoadingBarService} from "@ngx-loading-bar/core";
 import {AeListService} from "../../configuration/ae-list/ae-list.service";
-import {Observable} from "rxjs/Observable";
 import {j4care} from "../../helpers/j4care.service";
 import {HttpErrorHandler} from "../../helpers/http-error-handler";
-import {WindowRefService} from "../../helpers/window-ref.service";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {ConfirmComponent} from "../../widgets/dialogs/confirm/confirm.component";
 import { MatDialogConfig, MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -16,7 +14,7 @@ import {Globalvar} from "../../constants/globalvar";
 import {PermissionService} from "../../helpers/permissions/permission.service";
 import {DevicesService} from "../../configuration/devices/devices.service";
 import {KeycloakService} from "../../helpers/keycloak-service/keycloak.service";
-import {forkJoin} from "rxjs/internal/observable/forkJoin";
+import {forkJoin} from "rxjs";
 import {map} from "rxjs/operators";
 
 @Component({
@@ -43,8 +41,8 @@ export class DiffMonitorComponent implements OnInit {
     interval = 10;
     timer = {
         started:false,
-        startText:$localize `:@@diff-monitor.start_auto_refresh:Start Auto Refresh`,
-        stopText:$localize `:@@diff-monitor.stop_auto_refresh:Stop Auto Refresh`
+        startText:$localize `:@@start_auto_refresh:Start Auto Refresh`,
+        stopText:$localize `:@@stop_auto_refresh:Stop Auto Refresh`
     };
     Object = Object;
     filterTreeHeight = 3;
@@ -54,13 +52,13 @@ export class DiffMonitorComponent implements OnInit {
     allActionsOptions = [
         {
             value:"cancel",
-            label:$localize `:@@diff-monitor.cancel_all_matching_tasks:Cancel all matching tasks`
+            label:$localize `:@@cancel_all_matching_tasks:Cancel all matching tasks`
         },{
             value:"reschedule",
-            label:$localize `:@@diff-monitor.reschedule_all_matching_tasks:Reschedule all matching tasks`
+            label:$localize `:@@reschedule_all_matching_tasks:Reschedule all matching tasks`
         },{
             value:"delete",
-            label:$localize `:@@diff-monitor.delete_all_matching_tasks:Delete all matching tasks`
+            label:$localize `:@@delete_all_matching_tasks:Delete all matching tasks`
         }
     ];
     constructor(
@@ -170,7 +168,7 @@ export class DiffMonitorComponent implements OnInit {
                 switch (this.allAction){
                     case "cancel":
                         this.service.cancelAll(this.filterObject).subscribe((res)=>{
-                            this.mainservice.showMsg($localize `:@@task_deleted:${res.count} tasks deleted successfully!`);
+                            this.mainservice.showMsg($localize `:@@task_deleted_param:${res.count} tasks deleted successfully!`);
                             this.cfpLoadingBar.complete();
                         }, (err) => {
                             this.cfpLoadingBar.complete();
@@ -190,7 +188,7 @@ export class DiffMonitorComponent implements OnInit {
                                     delete filter["limit"];
                                     delete filter["offset"];
                                     this.service.rescheduleAll(filter).subscribe((res)=>{
-                                        this.mainservice.showMsg($localize `:@@tasks_rescheduled:${res.count}:@@count: tasks rescheduled successfully!`);
+                                        this.mainservice.showMsg($localize `:@@tasks_rescheduled_param:${res.count}:@@count: tasks rescheduled successfully!`);
                                         this.cfpLoadingBar.complete();
                                     }, (err) => {
                                         this.cfpLoadingBar.complete();
@@ -297,7 +295,7 @@ export class DiffMonitorComponent implements OnInit {
     }
     deleteAllTasks(filter){
         this.service.deleteAll(filter).subscribe((res)=>{
-            this.mainservice.showMsg($localize `:@@tasks_deleted:${res.deleted} tasks deleted successfully!`);
+            this.mainservice.showMsg($localize `:@@task_deleted:${res.deleted} tasks deleted successfully!`);
             this.cfpLoadingBar.complete();
             let filters = Object.assign({},this.filterObject);
             this.getDiffTasks(filters);
@@ -327,7 +325,7 @@ export class DiffMonitorComponent implements OnInit {
                                                 (res) => {
                                                     this.getDiffTasks(this.filterObject['offset'] || 0);
                                                     this.cfpLoadingBar.complete();
-                                                    this.mainservice.showMsg($localize `:@@diff-monitor.task_rescheduled:Task rescheduled successfully!`);
+                                                    this.mainservice.showMsg($localize `:@@task_rescheduled:Task rescheduled successfully!`);
                                                 },
                                                 (err) => {
                                                     this.cfpLoadingBar.complete();
@@ -434,7 +432,7 @@ export class DiffMonitorComponent implements OnInit {
     downloadCsv(){
         this.confirm({
             content:$localize `:@@use_semicolon_delimiter:Do you want to use semicolon as delimiter?`,
-            cancelButton:$localize `:@@No:No`,
+            cancelButton:$localize `:@@no:No`,
             saveButton:$localize `:@@Yes:Yes`,
             result:$localize `:@@yes:yes`
         }).subscribe((ok)=>{

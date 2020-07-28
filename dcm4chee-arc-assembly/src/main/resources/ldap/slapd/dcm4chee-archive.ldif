@@ -288,7 +288,7 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.57 NAME 'dcmDeleterThreshold'
   EQUALITY caseExactIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.58 NAME 'dcmDeleteStudyBatchSize'
-  DESC 'number of studies to delete from the Storage System, if the usable space fall below configured Usable Space, before checking the usable space again; 10 if absent'
+  DESC 'Number of Studies to delete from the Storage System, if the usable space fall below configured Usable Space, before checking the usable space again; 10 if absent'
   EQUALITY integerMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
   SINGLE-VALUE )
@@ -428,7 +428,7 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.85 NAME 'hl7ScheduleProcedureTemplat
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
   SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.86 NAME 'dcmHideSPSWithStatusFromMWL'
-  DESC 'Scheduled Procedure Step Status codes of MWL items which shall not be returned by the MWL SCP. Enumerated values: SCHEDULED, ARRIVED, READY, STARTED, DEPARTED, CANCELLED, DISCONTINUED, COMPLETED'
+  DESC 'Scheduled Procedure Step Status codes of MWL items which shall not be returned by the MWL SCP. Enumerated values: SCHEDULED, ARRIVED, READY, STARTED, DEPARTED, CANCELED, DISCONTINUED, COMPLETED'
   EQUALITY caseExactIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.87 NAME 'hl7LogFilePattern'
@@ -689,7 +689,7 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.138 NAME 'hl7OrderScheduledStationDe
    SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
    SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.139 NAME 'dcmSPSStatus'
-  DESC 'Scheduled Procedure Step Status code. Enumerated values: SCHEDULED, ARRIVED, READY, STARTED, DEPARTED, CANCELLED, DISCONTINUED, COMPLETED'
+  DESC 'Scheduled Procedure Step Status code. Enumerated values: SCHEDULED, ARRIVED, READY, STARTED, DEPARTED, CANCELED, DISCONTINUED, COMPLETED'
   EQUALITY caseExactIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
   SINGLE-VALUE )
@@ -766,7 +766,7 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.154 NAME 'dcmAcceptConflictingPatien
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
   SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.155 NAME 'dcmAuditRecordRepositoryURL'
-  DESC 'Access URL of Audit Record Repository. E.g. http://kibana:5601'
+  DESC 'NO LONGER USED - MAY BE DECLARED OBSOLETE IN FUTURE VERSION'
   EQUALITY caseExactIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
   SINGLE-VALUE )
@@ -1553,37 +1553,44 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.323 NAME 'dcmUPSScheduledWorkitemCod
   DESC 'Item of Scheduled Workitem Code Sequence (0040,4018) in created UPS in format (CV, CSD, "CM").'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.324 NAME 'dcmUPSScheduledStationNameCode'
   DESC 'Item of Scheduled Station Name Code Sequence (0040,4025) in created UPS in format (CV, CSD, "CM").'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.325 NAME 'dcmUPSScheduledStationClassCode'
   DESC 'Item of Scheduled Station Class Code Sequence (0040,4026) in created UPS in format (CV, CSD, "CM").'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.326 NAME 'dcmUPSScheduledStationLocationCode'
   DESC 'Item of Scheduled Station Geographic Location Code Sequence (0040,4027) in created UPS in format (CV, CSD, "CM").'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.327 NAME 'dcmUPSScheduledHumanPerformerCode'
   DESC 'Item of Human Performer Code Sequence (0040,4009) in Item of Scheduled Human Performers Sequence (0040,4034) in created UPS in format (CV, CSD, "CM").'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.328 NAME 'dcmUPSScheduledHumanPerformerName'
   DESC 'Value of Human Performer Name (0040,4037) in Item of Scheduled Human Performers Sequence (0040,4034) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.329 NAME 'dcmUPSScheduledHumanPerformerOrganization'
   DESC 'Value of Human Performer Organization (0040,4036) in Item of Scheduled Human Performers Sequence (0040,4034) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.330 NAME 'dcmUPSStartDateTimeDelay'
   DESC 'Delay of Scheduled Procedure Step Start DateTime (0040,4005) in created UPS from receive time in format PnDTnHnMn.nS. No delay if absent.'
   EQUALITY caseExactIA5Match
@@ -1598,32 +1605,38 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.332 NAME 'dcmAdmissionID'
   DESC 'Value of Admission ID (0038,0010) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.333 NAME 'dcmAccessionNumber'
   DESC 'Value of Accession Number (0008,0050) in Item of Referenced Request Sequence (0040,A370) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.334 NAME 'dcmRequestedProcedureID'
   DESC 'Value of Requested Procedure ID (0040,1001) in Item of Referenced Request Sequence (0040,A370) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.335 NAME 'dcmRequestedProcedureDescription'
   DESC 'Value of Requested Procedure Description (0032,1060) in Item of Referenced Request Sequence (0040,A370) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.336 NAME 'dcmRequestingPhysician'
   DESC 'Value of Requesting Physician (0032,1032) in Item of Referenced Request Sequence (0040,A370) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.337 NAME 'dcmRequestingService'
   DESC 'Value of Requesting Service (0032,1033) in Item of Referenced Request Sequence (0040,A370) in created UPS. {attributeID} will be replaced by the value of that attribute in the received dataset.'
   EQUALITY caseExactMatch
   SUBSTR caseExactSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.338 NAME 'dcmRestrictRetrieveSilently'
   DESC 'Indicates if the set of requested objects to retrieve shall be silently (=without counting not transferred object as failures) restricted according the Transfer Capabilities of the Retrieve Destination. Otherwise the number of requested objects for which no Transfer Capability is configured for the Retrieve Destination and therefore are not retrieved is counted as failures. Only effective, if the Retrieve Destination has configured at least one Transfer Capability with SCP role; false if absent.'
   EQUALITY booleanMatch
@@ -1707,7 +1720,7 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.353 NAME 'dcmMWLFetchSize'
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
   SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.354 NAME 'dcmDeleteMWLDelay'
-  DESC 'Delay in ISO-8601 duration format PnDTnHnMn.nS for deleting MWL items. Status specific delays can be specified by prefix SCHEDULED:, ARRIVED:, READY:, STARTED:, DEPARTED:, CANCELLED:, DISCONTINUED:, COMPLETED:. If absent, MWL Items will not get deleted.'
+  DESC 'Delay in ISO-8601 duration format PnDTnHnMn.nS for deleting MWL items. Status specific delays can be specified by prefix SCHEDULED:, ARRIVED:, READY:, STARTED:, DEPARTED:, CANCELED:, DISCONTINUED:, COMPLETED:. If absent, MWL Items will not get deleted.'
   EQUALITY caseExactIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.355 NAME 'dcmRecordAttributeModification'
@@ -1716,7 +1729,127 @@ olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.355 NAME 'dcmRecordAttributeModifica
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
   SINGLE-VALUE )
 olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.356 NAME 'dcmMWLStatusOnIdle'
-  DESC 'Change Status of idle Scheduled Procedure Steps to specified value. Enumerated value: CANCELLED, DISCONTINUED, COMPLETED.'
+  DESC 'Change Status of idle Scheduled Procedure Steps to specified value. Enumerated value: CANCELED, DISCONTINUED, COMPLETED.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.357 NAME 'dcmUPSProcessingPollingInterval'
+  DESC 'Polling Interval for Workitems ready for processing in ISO-8601 duration format PnDTnHnMnS. If absent, Workitems will not get processed.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.358 NAME 'dcmUPSProcessingFetchSize'
+  DESC 'Limit result set of DB query for Workitems ready for processing; 100 if absent'
+  EQUALITY integerMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.359 NAME 'dcmMaxThreads'
+  DESC 'Maximal number of threads used for processing of Workitems matching this rule. 1 if absent.'
+  EQUALITY integerMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.360 NAME 'dcmFallbackWadoURIWebAppName'
+  DESC 'Name of external Web Application to redirect WADO URI requests if the requested Object is not available by this archive.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.361 NAME 'dcmFallbackWadoURIHttpStatusCode'
+  DESC 'HTTP Status code of Redirect Response configured by dcmFallbackWadoURIWebAppName. 303 (See Other) if absent.'
+  EQUALITY integerMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.362 NAME 'hl7ReferredMergedPatientPolicy'
+  DESC 'Specifies policy on incoming HL7 messages referring an already merged Patient. Enumerated values: REJECT, IGNORE, IGNORE_DUPLICATE_MERGE. If absent, REJECT will be applied.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.363 NAME 'dcmRetrieveTaskWarningOnNoMatch'
+  DESC 'Indicates if the result status of Retrieve Tasks shall be set to WARNING if none of the requested objects was found on the C-MOVE SCP; false if absent.'
+  EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.364 NAME 'dcmRetrieveTaskWarningOnWarnings'
+  DESC 'Indicates if the result status of Retrieve Tasks shall be set to WARNING if there are Warning Sub-Operations, even if the retrieve of all objects was successful; false if absent.'
+  EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.365 NAME 'dcmCStoreSCUOfCMoveSCP'
+  DESC 'Indicates to identify received C-STORE RQs as caused by a forwarded C-MOVE RQs by the Calling AET in the A-Associate-RQ in format <Calling AET>=<C-MOVE-SCP>. Typically <Calling AET> and <C-MOVE-SCP> are equal. If no value is configured for a particular C-MOVE SCP, attribute (0000,1030) Move Originator Application Entity Title in the C-STORE RQ is used to find the corresponding forwarded C-MOVE RQ to forward the received C-STORE RQ to the original Move Destination.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.366 NAME 'dcmDeleteStudyChunkSize'
+  DESC 'Number of Instances deleted in one DB transaction on permanent deletion of Studies; 100 if absent.'
+  EQUALITY integerMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.367 NAME 'dcmUPSPerformedWorkitemCode'
+  DESC 'Item of Performed Workitem Code Sequence (0040,4019) in processed UPS in format (CV, CSD, "CM").'
+  EQUALITY caseExactMatch
+  SUBSTR caseExactSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.368 NAME 'dcmUPSPerformedStationNameCode'
+  DESC 'Item of Performed Station Name Code Sequence (0040,4028) in processed UPS in format (CV, CSD, "CM").'
+  EQUALITY caseExactMatch
+  SUBSTR caseExactSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.369 NAME 'dcmUPSOnStoreID'
+  DESC 'ID of UPS on Store Rule'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.370 NAME 'hl7UPSOnHL7ID'
+  DESC 'ID of UPS on HL7 Rule'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.371 NAME 'dcmUPSProcessingRuleID'
+  DESC 'ID of UPS Processing Rule'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.372 NAME 'dcmDestinationAE'
+   DESC 'Title of a DICOM Application Entity to which Instances will be stored'
+   EQUALITY caseExactIA5Match
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+   SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.373 NAME 'dcmUPSRescheduleDiscontinuationReasonCode'
+  DESC 'Specifies Discontinuation Reason Code in format (CV, CSD, "CM") to reschedule the canceled UPS.'
+  EQUALITY caseExactMatch
+  SUBSTR caseExactSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.374 NAME 'dcmUPSIgnoreDiscontinuationReasonCode'
+  DESC 'Specifies Discontinuation Reason Code in format (CV, CSD, "CM") to ignore and change UPS State to COMPLETED.'
+  EQUALITY caseExactMatch
+  SUBSTR caseExactSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.375 NAME 'hl7PatientArrivalMessageType'
+  DESC 'Message Type of HL7 messages which triggers the change the status of Scheduled Procedure Steps associated with the Patient from SCHEDULED to ARRIVED. Enumerated values: ADT^A10. If absent, the status of Scheduled Procedure Steps will not be affected by HL7 ADT messages.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.376 NAME 'dcmExportAsSourceAE'
+  DESC 'Mask the Archive Application Entity (AE) title by the title of the Application Entity (AE) from which a Series was received on establishing the Association to the Destination Application Entity (AE); false if absent.'
+  EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.377 NAME 'dcmProxyUpstreamURL'
+  DESC 'URL for the upstream endpoint that shall be proxied.'
+  EQUALITY caseExactMatch
+  SUBSTR caseExactSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  SINGLE-VALUE )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.378 NAME 'dcmCharsetNameMapping'
+  DESC 'Customize mapping of value of DICOM Specific Character Set (0008,0005) to named charset in format <value>=<charset name>. E.g.: "ISO_IR 100=windows-1252".'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.379 NAME 'hl7CharsetNameMapping'
+  DESC 'Add mapping of value of HL7 MSH-18 to named charset in format <value>=<charset name>. E.g.: "Windows-1252=windows-1252". Typically you will also have to specify the HL7 DICOM Character Set of the Archive HL7 Application to use for received HL7 messages with such Character Set.'
+  EQUALITY caseExactIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+olcAttributeTypes: ( 1.2.40.0.13.1.15.110.3.380 NAME 'dcmUPSTemplateID'
+  DESC 'ID of UPS Template'
   EQUALITY caseExactIA5Match
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
   SINGLE-VALUE )
@@ -1733,6 +1866,8 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.4 NAME 'dcmArchiveDevice'
     dcmReturnRetrieveAET $
     dcmMultipleStoreAssociations $
     dcmDefaultCharacterSet $
+    dcmCharsetNameMapping $
+    hl7CharsetNameMapping $
     dcmUPSWorklistLabel $
     dcmUPSEventSCU $
     dcmUPSEventSCUKeepAlive $
@@ -1795,10 +1930,15 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.4 NAME 'dcmArchiveDevice'
     dcmFallbackCMoveSCPLevel $
     dcmFallbackCMoveSCPRetries $
     dcmFallbackCMoveSCPStudyOlderThan $
+    dcmFallbackWadoURIWebAppName $
+    dcmFallbackWadoURIHttpStatusCode $
     dcmExternalRetrieveAEDestination $
     dcmXDSiImagingDocumentSourceAETitle $
     dcmAltCMoveSCP $
+    dcmCStoreSCUOfCMoveSCP $
     dcmDiffStudiesIncludefieldAll $
+    dcmUPSProcessingPollingInterval $
+    dcmUPSProcessingFetchSize $
     dcmExportTaskPollingInterval $
     dcmExportTaskFetchSize $
     dcmRetrieveTaskPollingInterval $
@@ -1808,6 +1948,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.4 NAME 'dcmArchiveDevice'
     dcmFailedToDeletePollingInterval $
     dcmFailedToDeleteFetchSize $
     dcmDeleteStudyBatchSize $
+    dcmDeleteStudyChunkSize $
     dcmDeletePatientOnDeleteLastStudy $
     dcmDeleteRejectedPollingInterval $
     dcmDeleteRejectedFetchSize $
@@ -1865,6 +2006,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.4 NAME 'dcmArchiveDevice'
     dcmAllowDeletePatient $
     dcmRemapRetrieveURL $
     dcmAuditRecordRepositoryURL $
+    dcmProxyUpstreamURL $
     dcmElasticSearchURL $
     dcmAudit2JsonFhirTemplateURI $
     dcmAudit2XmlFhirTemplateURI $
@@ -1917,6 +2059,8 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.4 NAME 'dcmArchiveDevice'
     dcmRestrictRetrieveSilently $
     dcmStowRetiredTransferSyntax $
     dcmStowExcludeAPPMarkers $
+    dcmRetrieveTaskWarningOnNoMatch $
+    dcmRetrieveTaskWarningOnWarnings $
     dcmStowQuicktime2MP4 $
     dcmSchedulerMinStartDelay $
     hl7ADTReceivingApplication $
@@ -1940,8 +2084,10 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.4 NAME 'dcmArchiveDevice'
     hl7UseNullValue $
     hl7OrderMissingStudyIUIDPolicy $
     hl7ImportReportMissingStudyIUIDPolicy $
+    hl7ReferredMergedPatientPolicy $
     hl7DicomCharacterSet $
-    hl7VeterinaryUsePatientName ))
+    hl7VeterinaryUsePatientName $
+    hl7PatientArrivalMessageType ))
 olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.5 NAME 'dcmArchiveNetworkAE'
   DESC 'DICOM Archive Network AE related information'
   SUP top AUXILIARY
@@ -1998,6 +2144,8 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.5 NAME 'dcmArchiveNetworkAE'
     dcmFallbackCMoveSCPLevel $
     dcmFallbackCMoveSCPRetries $
     dcmFallbackCMoveSCPStudyOlderThan $
+    dcmFallbackWadoURIWebAppName $
+    dcmFallbackWadoURIHttpStatusCode $
     dcmExternalRetrieveAEDestination $
     dcmAltCMoveSCP $
     dcmDiffStudiesIncludefieldAll $
@@ -2031,6 +2179,8 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.5 NAME 'dcmArchiveNetworkAE'
     dcmRestrictRetrieveSilently $
     dcmStowRetiredTransferSyntax $
     dcmStowExcludeAPPMarkers $
+    dcmRetrieveTaskWarningOnNoMatch $
+    dcmRetrieveTaskWarningOnWarnings $
     dcmStowQuicktime2MP4 $
     hl7PSUDelay $
     hl7PSUCondition $
@@ -2075,8 +2225,10 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.11 NAME 'dcmArchiveHL7Application'
     hl7UseNullValue $
     hl7OrderMissingStudyIUIDPolicy $
     hl7ImportReportMissingStudyIUIDPolicy $
+    hl7ReferredMergedPatientPolicy $
     hl7DicomCharacterSet $
     hl7VeterinaryUsePatientName $
+    hl7PatientArrivalMessageType $
     dicomAETitle ) )
 olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.12 NAME 'dcmStorage'
   DESC 'Storage Descriptor'
@@ -2086,6 +2238,8 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.12 NAME 'dcmStorage'
     dcmURI )
   MAY (
     dcmDigestAlgorithm $
+    dcmMaxRetries $
+    dcmRetryDelay $
     dcmRetrieveAET $
     dcmInstanceAvailability $
     dcmStorageClusterID $
@@ -2132,6 +2286,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.14 NAME 'dcmQueue'
     dcmPurgeQueueMessageFailedDelay $
     dcmPurgeQueueMessageWarningDelay $
     dcmPurgeQueueMessageCanceledDelay $
+    dcmSchedule $
     dcmMaxQueueSize ) )
 olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.15 NAME 'dcmExporter'
   DESC 'Exporter Descriptor'
@@ -2144,6 +2299,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.15 NAME 'dcmExporter'
     dcmExportPriority $
     dicomDescription $
     dicomAETitle $
+    dcmExportAsSourceAE $
     dcmDeleteStudyFromStorageID $
     dcmRejectForDataRetentionExpiry $
     dcmStgCmtSCP $
@@ -2161,6 +2317,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.16 NAME 'dcmExportRule'
     dcmEntity $
     dcmExporterID )
   MAY (
+    dicomDeviceName $
     dcmExportReoccurredInstances $
     dcmExportPreviousEntity $
     dcmProperty $
@@ -2403,7 +2560,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.37 NAME 'dcmUPSOnStore'
   DESC 'UPS on Store'
   SUP top STRUCTURAL
   MUST (
-    cn $
+    dcmUPSOnStoreID $
     dcmUPSLabel )
   MAY (
     dcmUPSPriority $
@@ -2415,6 +2572,8 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.37 NAME 'dcmUPSOnStore'
     dcmUPSIncludeInputInformation $
     dcmUPSIncludeStudyInstanceUID $
     dcmUPSIncludeReferencedRequest $
+    dcmDestinationAE $
+    dcmEntity $
     dcmUPSScheduledWorkitemCode $
     dcmUPSScheduledStationNameCode $
     dcmUPSScheduledStationClassCode $
@@ -2435,10 +2594,10 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.37 NAME 'dcmUPSOnStore'
     dcmProperty $
     dcmSchedule ) )
 olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.38 NAME 'hl7UPSOnHL7'
-  DESC 'UPS on Store'
+  DESC 'UPS on HL7'
   SUP top STRUCTURAL
   MUST (
-    cn $
+    hl7UPSOnHL7ID $
     dcmURI $
     dcmUPSLabel )
   MAY (
@@ -2448,6 +2607,7 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.38 NAME 'hl7UPSOnHL7'
     dcmUPSCompletionDateTimeDelay $
     dcmUPSWorklistLabel $
     dcmUPSInstanceUIDBasedOnName $
+    dcmDestinationAE $
     dcmUPSScheduledWorkitemCode $
     dcmUPSScheduledStationNameCode $
     dcmUPSScheduledStationClassCode $
@@ -2468,3 +2628,53 @@ olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.39 NAME 'dcmMWLIdleTimeout'
     dcmDuration )
   MAY (
     dcmAETitle ) )
+olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.40 NAME 'dcmUPSProcessingRule'
+  DESC 'UPS Processing Rule'
+  SUP top STRUCTURAL
+  MUST (
+    dcmUPSProcessingRuleID $
+    dcmURI $
+    dicomAETitle )
+  MAY (
+    dcmUPSPriority $
+    dcmUPSInputReadinessState $
+    dcmUPSLabel $
+    dcmUPSWorklistLabel $
+    dcmUPSScheduledWorkitemCode $
+    dcmUPSScheduledStationNameCode $
+    dcmUPSScheduledStationClassCode $
+    dcmUPSScheduledStationLocationCode $
+    dcmUPSPerformedWorkitemCode $
+    dcmUPSPerformedStationNameCode $
+    dcmUPSRescheduleDiscontinuationReasonCode $
+    dcmUPSIgnoreDiscontinuationReasonCode $
+    dcmMaxThreads $
+    dcmMaxRetries $
+    dcmRetryDelay $
+    dcmMaxRetryDelay $
+    dcmRetryDelayMultiplier $
+    dcmProperty $
+    dcmSchedule ) )
+olcObjectClasses: ( 1.2.40.0.13.1.15.110.4.41 NAME 'dcmUPSTemplate'
+  DESC 'UPS on Store'
+  SUP top STRUCTURAL
+  MUST (
+    dcmUPSTemplateID $
+    dcmUPSLabel )
+  MAY (
+    dicomDescription $
+    dcmUPSPriority $
+    dcmUPSInputReadinessState $
+    dcmUPSStartDateTimeDelay $
+    dcmUPSCompletionDateTimeDelay $
+    dcmUPSWorklistLabel $
+    dcmUPSIncludeStudyInstanceUID $
+    dcmDestinationAE $
+    dcmEntity $
+    dcmUPSScheduledWorkitemCode $
+    dcmUPSScheduledStationNameCode $
+    dcmUPSScheduledStationClassCode $
+    dcmUPSScheduledStationLocationCode $
+    dcmUPSScheduledHumanPerformerCode $
+    dcmUPSScheduledHumanPerformerName $
+    dcmUPSScheduledHumanPerformerOrganization ) )

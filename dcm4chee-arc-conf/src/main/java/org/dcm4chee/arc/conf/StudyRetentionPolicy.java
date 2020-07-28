@@ -55,6 +55,7 @@ import java.time.format.DateTimeFormatter;
  * @since June 2016
  */
 public class StudyRetentionPolicy {
+    public static final StudyRetentionPolicy[] EMPTY = {};
     private static final Logger LOG = LoggerFactory.getLogger(StudyRetentionPolicy.class);
 
     private String commonName;
@@ -114,11 +115,6 @@ public class StudyRetentionPolicy {
         this.expireSeriesIndividually = expireSeriesIndividually;
     }
 
-    public boolean match(String sendingHost, String sendingAET,
-            String receivingHost, String receivingAET, Attributes attrs) {
-        return conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
-    }
-
     public boolean isStartRetentionPeriodOnStudyDate() {
         return startRetentionPeriodOnStudyDate;
     }
@@ -166,6 +162,11 @@ public class StudyRetentionPolicy {
 
     public boolean protectStudy() {
         return revokeExpiration && freezeExpirationDate;
+    }
+
+    public boolean match(String sendingHost, String sendingAET, String receivingHost, String receivingAET,
+            Attributes attrs) {
+        return conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
     }
 
     @Override

@@ -65,7 +65,7 @@ import java.io.IOException;
  */
 @ApplicationScoped
 public class IANSCUImpl implements IANSCU {
-    private static final Logger LOG = LoggerFactory.getLogger(IANScheduler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IANSCUImpl.class);
 
     @Inject
     private Device device;
@@ -97,6 +97,15 @@ public class IANSCUImpl implements IANSCU {
                 LOG.info("{}: Failed to release association to {}", as, remoteAET);
             }
         }
+    }
+
+    @Override
+    public DimseRSP sendIANRQ(String localAET, String remoteAET, String sopInstanceUID, Attributes ian)
+            throws Exception {
+        return sendIANRQ(device.getApplicationEntity(localAET, true),
+                aeCache.findApplicationEntity(remoteAET),
+                sopInstanceUID,
+                ian);
     }
 
     @Override

@@ -43,7 +43,9 @@ package org.dcm4chee.arc.impl;
 import org.dcm4che3.conf.api.ConfigurationException;
 import org.dcm4che3.conf.api.ConfigurationNotFoundException;
 import org.dcm4che3.conf.api.DicomConfiguration;
+import org.dcm4che3.data.SpecificCharacterSet;
 import org.dcm4che3.data.UID;
+import org.dcm4che3.hl7.HL7Charset;
 import org.dcm4che3.imageio.codec.ImageReaderFactory;
 import org.dcm4che3.imageio.codec.ImageWriterFactory;
 import org.dcm4che3.io.TemplatesCache;
@@ -107,6 +109,8 @@ public class ArchiveDeviceProducer {
             device = findDevice();
             initImageReaderFactory();
             initImageWriterFactory();
+            initDICOMCharsetNameMappings();
+            initHL7CharsetNameMappings();
             extractVendorData();
         } catch (ConfigurationException e) {
             throw new RuntimeException(e);
@@ -152,6 +156,8 @@ public class ArchiveDeviceProducer {
         device.reconfigure(findDevice());
         initImageReaderFactory();
         initImageWriterFactory();
+        initDICOMCharsetNameMappings();
+        initHL7CharsetNameMappings();
         extractVendorData();
     }
 
@@ -184,6 +190,22 @@ public class ArchiveDeviceProducer {
         else
             ImageWriterFactory.resetDefault();
         ImageWriterFactory.getImageWriter(ImageWriterFactory.getImageWriterParam(UID.JPEGLSLossless));
+    }
+
+    private void initDICOMCharsetNameMappings() {
+        ArchiveDeviceExtension ext = device.getDeviceExtension(ArchiveDeviceExtension.class);
+        if (ext != null) {
+            SpecificCharacterSet.resetCharsetNameMappings();
+            ext.getDicomCharsetNameMappings().forEach(SpecificCharacterSet::setCharsetNameMapping);
+        }
+    }
+
+    private void initHL7CharsetNameMappings() {
+        ArchiveDeviceExtension ext = device.getDeviceExtension(ArchiveDeviceExtension.class);
+        if (ext != null) {
+            HL7Charset.resetCharsetNameMappings();
+            ext.getHL7CharsetNameMappings().forEach(HL7Charset::setCharsetNameMapping);
+        }
     }
 
     private static void addJBossDirURLSystemProperties() {

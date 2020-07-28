@@ -84,7 +84,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Inet4Address;
 import java.net.Socket;
 import java.util.*;
 import java.util.function.Function;
@@ -449,6 +448,7 @@ class StoreServiceImpl implements StoreService {
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
         ArchiveDeviceExtension arcDev = arcAE.getArchiveDeviceExtension();
         coerceAttrs = new Attributes(coerceAttrs);
+        Attributes.unifyCharacterSets(attrs, coerceAttrs);
         coerceAttrs.updateSelected(session.getStudyUpdatePolicy(), attrs, null,
                 arcDev.getAttributeFilter(Entity.Study).getSelection(false));
         attrs.update(updatePolicy, coerceAttrs, ctx.getCoercedAttributes());
@@ -731,17 +731,23 @@ class StoreServiceImpl implements StoreService {
             return null;
 
         StoreSession session = storeContext.getStoreSession();
-        ArchiveCompressionRule rule = session.getArchiveAEExtension().findCompressionRule(
-                session.getRemoteHostName(),
-                session.getCallingAET(),
-                session.getLocalHostName(),
-                session.getCalledAET(),
-                storeContext.getAttributes());
-        if (rule != null && imageDescriptor.isMultiframeWithEmbeddedOverlays()) {
+
+        Optional<ArchiveCompressionRule> matchingRule = session.getArchiveAEExtension()
+                .compressionRules()
+                .filter(rule -> rule.match(
+                                session.getRemoteHostName(),
+                                session.getCallingAET(),
+                                session.getLocalHostName(),
+                                session.getCalledAET(),
+                                storeContext.getAttributes()))
+                .findFirst();
+        if (matchingRule.isPresent()) {
+            if (!imageDescriptor.isMultiframeWithEmbeddedOverlays()) {
+                return matchingRule.get();
+            }
             LOG.info("Compression of multi-frame image with embedded overlays not supported");
-            return null;
         }
-        return rule;
+        return null;
     }
 
     @Override

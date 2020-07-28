@@ -71,6 +71,7 @@ public class ProcedureContextImpl implements ProcedureContext {
     private Attributes attributes;
     private String eventActionCode;
     private Exception exception;
+    private String outcomeMsg;
     private String spsID;
     private SPSStatus spsStatus;
     private Association as;
@@ -78,6 +79,8 @@ public class ProcedureContextImpl implements ProcedureContext {
     private Attributes.UpdatePolicy attributeUpdatePolicy = Attributes.UpdatePolicy.OVERWRITE;
     private ArchiveHL7ApplicationExtension arcHL7App;
     private ArchiveAEExtension arcAE;
+    private String mppsUID;
+    private String status;
 
     ProcedureContextImpl(HttpServletRequest httpRequest, Association as, Socket socket,
                          UnparsedHL7Message hl7msg) {
@@ -156,6 +159,16 @@ public class ProcedureContextImpl implements ProcedureContext {
     }
 
     @Override
+    public String getOutcomeMsg() {
+        return outcomeMsg;
+    }
+
+    @Override
+    public  void setOutcomeMsg(String outcomeMsg) {
+        this.outcomeMsg = outcomeMsg;
+    }
+
+    @Override
     public void setStudyInstanceUID(String studyUID) {
         this.studyInstanceUID = studyUID;
     }
@@ -183,6 +196,7 @@ public class ProcedureContextImpl implements ProcedureContext {
     @Override
     public void setSpsStatus(SPSStatus spsStatus) {
         this.spsStatus = spsStatus;
+        setStatus(spsStatus.name());
     }
 
     @Override
@@ -223,6 +237,26 @@ public class ProcedureContextImpl implements ProcedureContext {
     @Override
     public void setArchiveHL7AppExtension(ArchiveHL7ApplicationExtension arcHL7App) {
         this.arcHL7App = arcHL7App;
+    }
+
+    @Override
+    public String getMppsUID() {
+        return mppsUID;
+    }
+
+    @Override
+    public void setMppsUID(String mppsUID) {
+        this.mppsUID = mppsUID;
+    }
+
+    @Override
+    public String getStatus() {
+        return status;
+    }
+
+    @Override
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

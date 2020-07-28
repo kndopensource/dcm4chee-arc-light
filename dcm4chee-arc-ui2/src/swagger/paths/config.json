@@ -721,7 +721,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../../assets/schema/attributeFilter.schema.json"
+                "$ref": "../schemas.json#/attributeFilter"
               }
             }
           }
@@ -811,6 +811,31 @@
             "application/json": {
               "schema": {
                 "$ref": "../schemas.json#/exporters"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal Server Error."
+        }
+      }
+    }
+  },
+  "upstpls": {
+    "get": {
+      "tags": [
+        "CONFIG-RS"
+      ],
+      "summary": "List UPS Templates",
+      "operationId": "listUPSTemplates",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "description": "UPS Template",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../schemas.json#/upstpls"
               }
             }
           }

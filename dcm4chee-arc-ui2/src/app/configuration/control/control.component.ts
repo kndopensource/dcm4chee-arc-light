@@ -1,14 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+
+
 import {ControlService} from './control.service';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {LoadingBarService} from "@ngx-loading-bar/core";
 import {AppService} from "../../app.service";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
-import {WindowRefService} from "../../helpers/window-ref.service";
-import "rxjs/add/observable/forkJoin";
-import {Observable} from "rxjs/Observable";
 import {DevicesService} from "../devices/devices.service";
 import {HttpErrorHandler} from "../../helpers/http-error-handler";
 import {KeycloakService} from "../../helpers/keycloak-service/keycloak.service";
@@ -81,7 +78,7 @@ export class ControlComponent implements OnInit{
         this.cfpLoadingBar.start();
         this.service.stopArchive(object.dcmuiDeviceURL).subscribe((res) => {
             this.fetchStatus();
-            this.appservices.showMsg($localize`:@@control.archive_stoped:Archive ${object.dcmuiDeviceURLName}:@@dcmuiDeviceURLName: stoped successfully`);
+            this.appservices.showMsg($localize`:@@control.archive_stopped:Archive ${object.dcmuiDeviceURLName}:@@dcmuiDeviceURLName: stopped successfully`);
             this.cfpLoadingBar.complete();
         },(err)=>{
             this.cfpLoadingBar.complete();

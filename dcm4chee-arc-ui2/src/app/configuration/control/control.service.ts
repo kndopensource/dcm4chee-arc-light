@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {j4care} from "../../helpers/j4care.service";
 import {AppService} from "../../app.service";
-import * as _ from 'lodash'
+import * as _ from 'lodash-es'
 
 @Injectable()
 export class ControlService {
@@ -33,14 +33,14 @@ export class ControlService {
                 calculatedWidth:"20%"
             },
             {
-                title:$localize `:@@control.device_name:Device name`,
+                title:$localize `:@@device_name:Device name`,
                 code:"dcmuiDeviceURLName",
                 description:$localize `:@@control.archive_device_name:Archive device name`,
                 widthWeight:1,
                 calculatedWidth:"20%"
             },
             {
-                title:$localize `:@@control.device_description:Device description`,
+                title:$localize `:@@device_description:Device description`,
                 code:"dicomDescription",
                 description:$localize `:@@control.archive_device_description:Archive device description`,
                 widthWeight:3,
@@ -54,20 +54,20 @@ export class ControlService {
                 calculatedWidth:"20%"
             },
             {
-                title:$localize `:@@control.model_name:Model name`,
+                title:$localize `:@@model_name:Model name`,
                 code:"dicomManufacturerModelName",
-                description:$localize `:@@control.manufacturer_model_name:Manufacturer model name`,
+                description:$localize `:@@manufacturer_model_name:Manufacturer model name`,
                 widthWeight:1,
                 calculatedWidth:"20%"
             },
             {
-                title:$localize `:@@control.primary_device_type:Primary device type`,
+                title:$localize `:@@primary_device_type:Primary device type`,
                 code:"dicomPrimaryDeviceType",
                 widthWeight:1,
                 calculatedWidth:"20%"
             },
             {
-                title:$localize `:@@control.software_version:Software version`,
+                title:$localize `:@@software_version:Software version`,
                 code:"dicomSoftwareVersion",
                 widthWeight:1,
                 calculatedWidth:"20%"

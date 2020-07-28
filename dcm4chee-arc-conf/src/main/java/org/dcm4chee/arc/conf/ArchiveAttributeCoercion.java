@@ -48,8 +48,7 @@ import org.dcm4che3.net.TransferCapability;
 import org.dcm4che3.util.AttributesFormat;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -57,6 +56,7 @@ import java.util.Map;
  */
 public class ArchiveAttributeCoercion {
 
+    public static final ArchiveAttributeCoercion[] EMPTY = {};
     private String commonName;
     private int priority;
     private Dimse dimse;
@@ -74,6 +74,7 @@ public class ArchiveAttributeCoercion {
     private boolean trimISO2022CharacterSet;
     private UseCallingAETitleAsCoercion.Type useCallingAETitleAs;
     private int[] nullifyTags = {};
+    private boolean nullifyPixelData;
     private NullifyIssuer nullifyIssuerOfPatientID;
     private MergeAttribute[] mergeAttributes = {};
     private Issuer[] issuerOfPatientIDs = {};
@@ -253,6 +254,12 @@ public class ArchiveAttributeCoercion {
 
     public void setNullifyTags(int[] nullifyTags) {
         this.nullifyTags = nullifyTags;
+        this.nullifyPixelData = nullifyTags != null
+                && IntStream.of(nullifyTags).anyMatch(tag -> tag == Tag.PixelData);
+    }
+
+    public boolean isNullifyPixelData() {
+        return nullifyPixelData;
     }
 
     public NullifyIssuer getNullifyIssuerOfPatientID() {
@@ -302,19 +309,13 @@ public class ArchiveAttributeCoercion {
         this.issuerOfPatientIDFormat = issuerOfPatientIDFormat;
     }
 
-    public boolean match(Dimse dimse, TransferCapability.Role role, String sopClass,
-            String sendingHost, String sendingAET, String receivingHost, String receivingAET, Attributes attrs) {
-        return this.role == role && this.dimse == dimse && isEmptyOrContains(sopClasses, sopClass)
-                && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
-    }
-
-    private static boolean isEmptyOrContains(Object[] a, Object o) {
-        if (a.length == 0)
+    public boolean matchSOPClass(String sopClass) {
+        if (sopClasses.length == 0)
             return true;
 
-        if (o != null)
-            for (Object o1 : a)
-                if (o1.equals(o))
+        if (sopClass != null)
+            for (Object o1 : sopClasses)
+                if (o1.equals(sopClass))
                     return true;
         return false;
     }
@@ -352,6 +353,13 @@ public class ArchiveAttributeCoercion {
     private boolean nullifyIssuerOfPatientID(Attributes attrs) {
         return nullifyIssuerOfPatientID != null
                 && nullifyIssuerOfPatientID.test(Issuer.fromIssuerOfPatientID(attrs), issuerOfPatientIDs);
+    }
+
+    public boolean match(TransferCapability.Role role, Dimse dimse, String sopClass,
+            String sendingHost, String sendingAET, String receivingHost, String receivingAET,
+            Attributes attrs) {
+        return this.role == role && dimse == dimse && matchSOPClass(sopClass)
+                && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
     }
 
     public AttributesCoercion mergeAttributes(final AttributesCoercion next) {

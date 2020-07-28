@@ -51,6 +51,7 @@ import org.dcm4che3.net.Device;
 import org.dcm4che3.net.service.DicomServiceException;
 import org.dcm4che3.net.service.QueryRetrieveLevel2;
 import org.dcm4chee.arc.conf.ArchiveAEExtension;
+import org.dcm4chee.arc.conf.ArchiveAttributeCoercion;
 import org.dcm4chee.arc.conf.ArchiveDeviceExtension;
 import org.dcm4chee.arc.entity.Series;
 import org.dcm4chee.arc.metrics.MetricsService;
@@ -95,6 +96,10 @@ public interface RetrieveService {
             String localAET, String studyUID, String seriesUID, String objectUID, String destAET)
             throws ConfigurationException;
 
+    RetrieveContext newRetrieveContextSTORE(
+            String localAET, String studyUID, String seriesUID, Sequence refSopSeq, String destAET)
+            throws ConfigurationException;
+
     RetrieveContext newRetrieveContextIOCM(
             HttpServletRequestInfo request, String localAET, String studyUID, String... seriesUIDs);
 
@@ -135,6 +140,11 @@ public interface RetrieveService {
     boolean restrictRetrieveAccordingTransferCapabilities(RetrieveContext ctx);
 
     Map<String,Collection<InstanceLocations>> removeNotAccessableMatches(RetrieveContext ctx);
+
+    ArchiveAttributeCoercion getArchiveAttributeCoercion(RetrieveContext ctx, InstanceLocations inst);
+
+    AttributesCoercion getAttributesCoercion(RetrieveContext ctx, InstanceLocations inst,
+            ArchiveAttributeCoercion rule);
 
     AttributesCoercion getAttributesCoercion(RetrieveContext ctx, InstanceLocations inst);
 

@@ -3,9 +3,10 @@ DCM4CHE.TransferSyntax = (function (dictionary) {
   var nameOf = function (uid) {
       if(uid === "all"){
           return dictionary;
+      }else{
+          return dictionary[uid] || uid;
       }
-      return dictionary[uid] || uid;
-  }
+  };
   return {
     nameOf:nameOf
   }

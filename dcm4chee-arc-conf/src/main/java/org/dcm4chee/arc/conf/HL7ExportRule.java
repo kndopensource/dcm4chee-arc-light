@@ -52,6 +52,7 @@ import java.util.Arrays;
  */
 public class HL7ExportRule {
 
+    public static final HL7ExportRule[] EMPTY = {};
     private String commonName;
 
     private HL7Conditions conditions = new HL7Conditions();
@@ -121,6 +122,10 @@ public class HL7ExportRule {
         this.assigningAuthorityOfPatientIDs = assigningAuthorityOfPatientIDs;
     }
 
+    public boolean match(String hostName, HL7Fields hl7Fields) {
+        return conditions.match(hostName, hl7Fields);
+    }
+
     public IDWithIssuer ignoreAssigningAuthorityOfPatientID(IDWithIssuer pid) {
         return ignoreAssigningAuthorityOfPatientID != null
                 && ignoreAssigningAuthorityOfPatientID.test(pid.getIssuer(), assigningAuthorityOfPatientIDs)
@@ -134,10 +139,6 @@ public class HL7ExportRule {
 
     public void setEntitySelectors(EntitySelector[] entitySelectors) {
         this.entitySelectors = entitySelectors;
-    }
-
-    public boolean match(String hostName, HL7Fields hl7Fields) {
-        return conditions.match(hostName, hl7Fields);
     }
 
     @Override

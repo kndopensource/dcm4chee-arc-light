@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewContainerRef} from '@angular/core';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {ConfirmComponent} from '../../widgets/dialogs/confirm/confirm.component';
 import {AppService} from '../../app.service';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
@@ -45,7 +45,7 @@ export class DevicesComponent implements OnInit{
     filterSchema;
     w = 2;
     moreFunctionConfig = {
-        placeholder: $localize `:@@devices.more_functions:More functions`,
+        placeholder: $localize `:@@more_functions:More functions`,
         options:[
             new SelectDropdown("create_exporter",$localize `:@@devices.create_exporter:Create exporter`),
             new SelectDropdown("create_device",$localize `:@@devices.create_device:Create device`)
@@ -177,7 +177,7 @@ export class DevicesComponent implements OnInit{
                 if (result){
                     $this.cfpLoadingBar.start();
                     $this.$http.delete('../devices/' + device.dicomDeviceName).subscribe((res) => {
-                        $this.mainservice.showMsg($localize `:@@device_delected_successfully:Device deleted successfully!`);
+                        $this.mainservice.showMsg($localize `:@@device_deleted_successfully:Device deleted successfully!`);
                         $this.getDevices();
                         $this.cfpLoadingBar.complete();
                     }, (err) => {
@@ -213,7 +213,7 @@ export class DevicesComponent implements OnInit{
                 console.log('devicename', devicename.dicomDeviceName);
                 console.log('indexof', _.indexOf(deviceNameList, parameters.result.input));
                 if (_.indexOf(deviceNameList, parameters.result.input) > -1){
-                    $this.mainservice.showError($localize `:@@devices.name_exist:This name already exists, please chose another one!`);
+                    $this.mainservice.showError($localize `:@@devices.name_exist:This name already exists, please choose another one!`);
                     $this.cfpLoadingBar.complete();
                 }else{
                     $this.$http.get(
@@ -296,7 +296,7 @@ export class DevicesComponent implements OnInit{
                 $this.$http.put('../devices/' + re.device.dicomDeviceName,re.device, headers).subscribe(res => {
                     $this.mainservice.showMsg($localize `:@@devices.exporter_description_appended:The new exporter description appended successfully to the device: ${re.device.dicomDeviceName}:@@dicomDeviceName:`);
                     $this.$http.post('../ctrl/reload', {}, headers).subscribe((res) => {
-                        $this.mainservice.showMsg($localize `:@@devices.archive_reloaded:Archive reloaded successfully!`);
+                        $this.mainservice.showMsg($localize `:@@archive_reloaded_successfully:Archive reloaded successfully!`);
                     });
                 }, (err) => {
                     $this.httpErrorHandler.handleError(err);

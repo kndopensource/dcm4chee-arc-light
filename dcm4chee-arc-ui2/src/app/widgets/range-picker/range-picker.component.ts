@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angula
 import {j4care} from "../../helpers/j4care.service";
 import {RangePickerService} from "./range-picker.service";
 import {Moment} from "moment";
-import * as _ from "lodash";
+import * as _ from "lodash-es";
 
 @Component({
     selector: 'range-picker',
@@ -179,36 +179,7 @@ export class RangePickerComponent implements OnInit {
         this.fromModel = j4care.convertDateToString(this.createDateFromDuration(extractedDurationObject));
     }
     createDateFromDuration(durationObject){
-        let today = new Date();
-        let newDate = new Date();
-        Object.keys(durationObject).forEach(key => {
-            if(durationObject[key]){
-                switch (key){
-                    case 'Week':
-                        newDate.setDate(today.getDate()-(7*durationObject[key]));
-                    break;
-                    case 'FullYear':
-                        newDate.setFullYear(today.getFullYear()-durationObject[key]);
-                    break;
-                    case 'Date':
-                        newDate.setDate(today.getDate()-durationObject[key]);
-                    break;
-                    case 'Hours':
-                        newDate.setHours(today.getHours()-durationObject[key]);
-                    break;
-                    case 'Minutes':
-                        newDate.setMinutes(today.getMinutes()-durationObject[key]);
-                    break;
-                    case 'Month':
-                        newDate.setMonth(today.getMonth()-durationObject[key]);
-                    break;
-                    case 'Seconds':
-                        newDate.setSeconds(today.getSeconds()-durationObject[key]);
-                    break;
-                }
-            }
-        });
-        return newDate;
+        return j4care.createDateFromDuration(durationObject);
     }
     getDateFromValue(value){
         let result = value || (this.onlyTime ? '': j4care.dateToString(new Date()));
@@ -314,6 +285,8 @@ export class RangePickerComponent implements OnInit {
         }
         this.showPicker = false;*/
         // this.filterChanged();
+        // this.singleDateModel =
+        this.mode = "single";
         this.setRange();
     }
     thisMonth(){

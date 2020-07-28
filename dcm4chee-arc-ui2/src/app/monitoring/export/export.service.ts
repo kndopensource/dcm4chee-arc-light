@@ -3,7 +3,7 @@ import {AppService} from '../../app.service';
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {DevicesService} from "../../configuration/devices/devices.service";
 import {WindowRefService} from "../../helpers/window-ref.service";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {j4care} from "../../helpers/j4care.service";
 import {HttpHeaders} from "@angular/common/http";
 
@@ -97,13 +97,36 @@ export class ExportService {
     }
     statusValues(){
         return [
-            "TO SCHEDULE",
-            "SCHEDULED",
-            "IN PROCESS",
-            "COMPLETED",
-            "WARNING",
-            "FAILED",
-            "CANCELED"
+            {
+                value:"TO SCHEDULE",
+                text:$localize `:@@to_schedule:TO SCHEDULE`,
+                key:"to-schedule"
+            },{
+                value:"SCHEDULED",
+                text:$localize `:@@SCHEDULED:SCHEDULED`,
+                key:"scheduled"
+            },{
+                value:"IN PROCESS",
+                text:$localize `:@@in_process:IN PROCESS`,
+                key:"in-process"
+            },{
+                value:"COMPLETED",
+                text:$localize `:@@COMPLETED:COMPLETED`,
+                key:"completed"
+            },{
+                value:"WARNING",
+                text:$localize `:@@WARNING:WARNING`,
+                key:"warning"
+            },{
+                value:"FAILED",
+                text:$localize `:@@FAILED:FAILED`,
+                key:"failed"
+            },
+            {
+                value:"CANCELED",
+                text:$localize `:@@CANCELED:CANCELED`,
+                key:"canceled"
+            }
         ];
     }
     getDialogSchema(exporters, devices, text?){
@@ -118,7 +141,7 @@ export class ExportService {
                 [
                     {
                         tag:"label",
-                        text:$localize `:@@export.exporter_id:Exporter ID`,
+                        text:$localize `:@@exporter_id:Exporter ID`,
                     },
                     {
                         tag:"select",
@@ -129,8 +152,8 @@ export class ExportService {
                             }
                         }),
                         filterKey:"selectedExporter",
-                        description:$localize `:@@export.exporter_id:Exporter ID`,
-                        placeholder:$localize `:@@export.exporter_id:Exporter ID`
+                        description:$localize `:@@exporter_id:Exporter ID`,
+                        placeholder:$localize `:@@exporter_id:Exporter ID`
                     }
                 ],
                 [
@@ -161,13 +184,13 @@ export class ExportService {
                 [
                     {
                         tag:"label",
-                        text:$localize `:@@export.scheduled_time:Scheduled Time`
+                        text:$localize `:@@scheduled_time:Scheduled Time`
                     },
                     {
                         tag:"single-date-time-picker",
                         type:"text",
                         filterKey:"scheduledTime",
-                        description:$localize `:@@export.scheduled_times:Scheduled times`
+                        description:$localize `:@@scheduled_time:Scheduled Time`
                     }
                 ]
             ]
@@ -187,8 +210,8 @@ export class ExportService {
                         }),
                         showStar:true,
                         filterKey:"ExporterID",
-                        description:$localize `:@@export.exporter_id:Exporter ID`,
-                        placeholder:$localize `:@@export.exporter_id:Exporter ID`
+                        description:$localize `:@@exporter_id:Exporter ID`,
+                        placeholder:$localize `:@@exporter_id:Exporter ID`
                     },
                     {
                         tag:"select",
@@ -200,8 +223,8 @@ export class ExportService {
                         }),
                         showStar:true,
                         filterKey:"dicomDeviceName",
-                        description:$localize `:@@export.device_name_to_filter_by:Device Name to filter by`,
-                        placeholder:$localize `:@@export.device_name:Device Name`
+                        description:$localize `:@@device_name_to_filter_by:Device Name to filter by`,
+                        placeholder:$localize `:@@device_name:Device Name`
                     }
                 ],
                 [
@@ -213,7 +236,7 @@ export class ExportService {
                         tag:"input",
                         type:"number",
                         filterKey:"limit",
-                        description:$localize `:@@export.maximal_number_of_tasks_in_returned_list:Maximal number of tasks in returned list`
+                        description:$localize `:@@.maximal_number_of_tasks_in_returned_list:Maximal number of tasks in returned list`
                     }
                 ],
                 [
@@ -221,20 +244,15 @@ export class ExportService {
                         tag:"input",
                         type:"text",
                         filterKey:"batchID",
-                        description:$localize `:@@export.batch_id:Batch ID`,
-                        placeholder:$localize `:@@export.batch_id:Batch ID`
+                        description:$localize `:@@batch_id:Batch ID`,
+                        placeholder:$localize `:@@batch_id:Batch ID`
                     },
                     {
                         tag:"select",
-                        options:this.statusValues().map(status=>{
-                            return {
-                                text:status,
-                                value:status
-                            }
-                        }),
+                        options:this.statusValues(),
                         filterKey:"status",
                         showStar:true,
-                        description:$localize `:@@export.status_of_tasks_to_filter_by:Status of tasks to filter by`,
+                        description:$localize `:@@status_of_tasks_to_filter_by:Status of tasks to filter by`,
                         placeholder:$localize `:@@status:Status`
                     }
                 ]
@@ -243,12 +261,12 @@ export class ExportService {
                     {
                         tag:"range-picker",
                         filterKey:"createdTime",
-                        description:$localize `:@@export.created_date:Created Date`
+                        description:$localize `:@@created_date:Created Date`
                     },
                     {
                         tag:"range-picker",
                         filterKey:"updatedTime",
-                        description:$localize `:@@export.updated_date:Updated Date`
+                        description:$localize `:@@updated_date:Updated Date`
                     }
                 ],
                 [
@@ -280,8 +298,8 @@ export class ExportService {
                         tag:"input",
                         type:"text",
                         filterKey:"StudyInstanceUID",
-                        description:$localize `:@@export.unique_identifier_of_the_study_to_filter_by:Unique Identifier of the Study to filter by`,
-                        placeholder:$localize `:@@export.study_instance_uid:Study Instance UID`
+                        description:$localize `:@@unique_identifier_of_the_study_to_filter_by:Unique Identifier of the Study to filter by`,
+                        placeholder:$localize `:@@study_instance_uid:Study Instance UID`
                     }
                 ],
                 [
@@ -289,13 +307,13 @@ export class ExportService {
                         tag:"button",
                         id:"count",
                         text:countText,
-                        description:$localize `:@@export.querie_only_the_count:QUERIE ONLY THE COUNT`
+                        description:$localize `:@@query_only_the_count:QUERY ONLY THE COUNT`
                     },
                     {
                         tag:"button",
                         id:"submit",
                         text:$localize `:@@SUBMIT:SUBMIT`,
-                        description:$localize `:@@export.maximal_number_of_tasks_in_returned_list:Maximal number of tasks in returned list`
+                        description:$localize `:@@maximal_number_of_tasks_in_returned_list:Maximal number of tasks in returned list`
                     }
                 ]
             ]

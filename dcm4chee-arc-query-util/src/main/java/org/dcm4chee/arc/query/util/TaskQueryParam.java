@@ -79,8 +79,8 @@ public class TaskQueryParam {
         return queueName;
     }
 
-    public void setQueueName(List<String> queueName) {
-        this.queueName = queueName;
+    public void setQueueName(List<String> queueNames) {
+        this.queueName = queueNames;
     }
 
     public String getDeviceName() {

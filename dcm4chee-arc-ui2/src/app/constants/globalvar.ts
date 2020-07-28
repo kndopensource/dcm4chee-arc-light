@@ -4,7 +4,7 @@ import {ContentDescriptionPipe} from "../pipes/content-description.pipe";
 import {TableSchemaElement} from "../models/dicom-table-schema-element";
 declare var DCM4CHE: any;
 const sopObject = DCM4CHE.SOPClass.nameOf("all");
-import * as _ from "lodash";
+import * as _ from "lodash-es";
 
 export const MY_FORMATS = {
     parse: {
@@ -29,7 +29,7 @@ export class Globalvar {
                 'MR': $localize `:@@modalities.magnetic_resonance:Magnetic Resonance`,
                 'MG': $localize `:@@modalities.mammography:Mammography`,
                 'NM': $localize `:@@modalities.nuclear_medicine:Nuclear Medicine`,
-                'OT': $localize `:@@modalities.other:Other`,
+                'OT': $localize `:@@other:Other`,
                 'PT': $localize `:@@modalities.pet:Positron emission tomography (PET)`,
                 'PR': $localize `:@@modalities.presentation_state:Presentation State`,
                 'US': $localize `:@@modalities.ultrasound:Ultrasound`,
@@ -96,21 +96,21 @@ export class Globalvar {
                         'vr': 'CS',
                         'Value': ['F']
                     },
-                    'title': 'Female'
+                    'title': $localize `:@@female:Female`
                 },
                 {
                     obj: {
                         'vr': 'CS',
                         'Value': ['M']
                     },
-                    'title': 'Male'
+                    'title': $localize `:@@male:Male`
                 },
                 {
                     obj: {
                         'vr': 'CS',
                         'Value': ['O']
                     },
-                    'title': 'Other'
+                    'title': $localize `:@@other:Other`
                 }
             ]
         };
@@ -149,37 +149,37 @@ export class Globalvar {
                 value: '-StudyDate,-StudyTime',
                 label: $localize `:@@orderby.study_date_asc:<label class="order_label">Study</label><span class=\"orderbydateasc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: 'StudyDate,StudyTime',
                 label: $localize `:@@orderby.study_date_desc:<label class="order_label">Study</label><span class=\"orderbydatedesc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: 'PatientName,-StudyDate,-StudyTime',
                 label: $localize `:@@orderby.study_alph_asc:<label class="order_label">Study</label><span class=\"glyphicon glyphicon-sort-by-alphabet\"></span><span class=\"orderbydateasc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: '-PatientName,-StudyDate,-StudyTime',
                 label: $localize `:@@orderby.study_name_asc:<label class="order_label">Study</label><span class=\"orderbynamedesc\"></span><span class=\"orderbydateasc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: 'PatientName,StudyDate,StudyTime',
                 label: $localize `:@@orderby.study_alph_desc:<label class="order_label">Study</label><span class=\"glyphicon glyphicon-sort-by-alphabet\"></span><span class=\"orderbydatedesc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: '-PatientName,StudyDate,StudyTime',
                 label: $localize `:@@orderby.study_name_desc:<label class="order_label">Study</label><span class=\"orderbynamedesc\"></span><span class=\"orderbydatedesc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: '-ScheduledProcedureStepSequence.ScheduledProcedureStepStartDate,-ScheduledProcedureStepSequence.ScheduledProcedureStepStartTime',
@@ -245,37 +245,37 @@ export class Globalvar {
                 value: '-StudyDate,-StudyTime',
                 label: $localize `:@@orderby_new.newest_first:<label class="order_label">Newest first</label><span class=\"orderbydateasc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: 'StudyDate,StudyTime',
                 label: $localize `:@@orderby_new.oldest_first:<label class="order_label">Oldest first</label><span class=\"orderbydatedesc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: 'PatientName,-StudyDate,-StudyTime',
                 label: $localize `:@@orderby_new.a_z_new_old:<label class="order_label">A-Z, New to Old</label><span class=\"glyphicon glyphicon-sort-by-alphabet\"></span><span class=\"orderbydateasc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: '-PatientName,-StudyDate,-StudyTime',
                 label: $localize `:@@orderby_new.z_a_new_old:<label class="order_label">Z-A, New to Old</label><span class=\"orderbynamedesc\"></span><span class=\"orderbydateasc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: 'PatientName,StudyDate,StudyTime',
                 label: $localize `:@@orderby_new.a_z_old_new:<label class="order_label">A-Z, Old to New</label><span class=\"glyphicon glyphicon-sort-by-alphabet\"></span><span class=\"orderbydatedesc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: '-PatientName,StudyDate,StudyTime',
                 label: $localize `:@@orderby_new.z_a_old_new:<label class="order_label">Z-A, Old to New</label><span class=\"orderbynamedesc\"></span><span class=\"orderbydatedesc\"></span>`,
                 mode: 'study',
-                title:$localize `:@@globalvar.query_studies:Query Studies`
+                title:$localize `:@@query_studies:Query Studies`
             },
             {
                 value: '-ScheduledProcedureStepSequence.ScheduledProcedureStepStartDate,-ScheduledProcedureStepSequence.ScheduledProcedureStepStartTime',
@@ -434,13 +434,13 @@ export class Globalvar {
         return {
             '00100020': {
                 'create': {
-                    placeholder: $localize `:@@globalvar.to_generate_it_automatically_leave_it_blank:To generate it automatically leave it blank`,
+                    placeholder: $localize `:@@leave_it_blank_to_generate_it_automatically:Leave it blank to generate it automatically!`,
                     action: 'replace'
                 }
             },
             '0020000D': {
                 'create': {
-                    placeholder: $localize `:@@globalvar.to_generate_it_automatically_leave_it_blank:To generate it automatically leave it blank`,
+                    placeholder: $localize `:@@leave_it_blank_to_generate_it_automatically:Leave it blank to generate it automatically!`,
                     action: 'replace'
                 },
                 'edit': {
@@ -713,61 +713,61 @@ export class Globalvar {
             dcmArchiveAETitle:{
                 key:'dicomAETitle',
                 labelKey:'{dicomAETitle}',
-                msg:$localize `:@@dynamic_formater.create_first_aet:Create first an AE Title!`,
+                msg:$localize `:@@dynamic_formatter.create_first_aet:Create first an AE Title!`,
                 pathInDevice:'dicomNetworkAE'
             },
             dcmQueueName:{
                 key:'dcmQueueName',
                 labelKey:'{dicomDescription} ({dcmQueueName})',
-                msg:$localize `:@@dynamic_formater.configure_first_an_queue:Configure first an Queue`,
+                msg:$localize `:@@dynamic_formatter.configure_first_a_queue:Configure first an Queue`,
                 pathInDevice:'dcmDevice.dcmArchiveDevice.dcmQueue'
             },
             dcmExporterID:{
                 key:'dcmExporterID',
                 labelKey:'{dcmExporterID}',
-                msg:$localize `:@@dynamic_formater.exporter:Create first an Exporter!`,
+                msg:$localize `:@@dynamic_formatter.exporter:Create first an Exporter!`,
                 pathInDevice:'dcmDevice.dcmArchiveDevice.dcmExporter'
             },
             dcmStorageID:{
                 key:'dcmStorageID',
                 labelKey:'{dcmStorageID}',
-                msg:$localize `:@@dynamic_formater.storage:Create first an Storage!`,
+                msg:$localize `:@@dynamic_formatter.storage:Create first an Storage!`,
                 pathInDevice:'dcmDevice.dcmArchiveDevice.dcmStorage'
             },
             dcmQueryRetrieveViewID:{
                 key:'dcmQueryRetrieveViewID',
                 labelKey:'{dcmQueryRetrieveViewID}',
-                msg:$localize `:@@dynamic_formater.query_retrieve_view:Create first an Query Retrieve View!`,
+                msg:$localize `:@@dynamic_formatter.query_retrieve_view:Create first an Query Retrieve View!`,
                 pathInDevice:'dcmDevice.dcmArchiveDevice.dcmQueryRetrieveView'
             },
             dcmRejectionNoteCode:{
                 key:'dcmRejectionNoteCode',
                 labelKey:'{dcmRejectionNoteLabel}',
-                msg:$localize `:@@dynamic_formater.rejection_note:Create first an Rejection Note!`,
+                msg:$localize `:@@dynamic_formatter.rejection_note:Create first an Rejection Note!`,
                 pathInDevice:'dcmDevice.dcmArchiveDevice.dcmRejectionNote'
             },
             dcmuiDeviceURLObject:{
                 key:'dcmuiDeviceURLName',
                 labelKey:'{dcmuiDeviceURLName}',
-                msg:$localize `:@@dynamic_formater.ui _device_url:Create first an UI Device URL!`,
+                msg:$localize `:@@dynamic_formatter.ui _device_url:Create first an UI Device URL!`,
                 pathInDevice:'dcmDevice.dcmuiConfig[0].dcmuiDeviceURLObject'
             },
             dcmuiDeviceClusterObject:{
                 key:'dcmuiDeviceClusterName',
                 labelKey:'{dcmuiDeviceClusterName}',
-                msg:$localize `:@@dynamic_formater.ui_device_cluster:Create first an UI Device Cluster!`,
+                msg:$localize `:@@dynamic_formatter.ui_device_cluster:Create first an UI Device Cluster!`,
                 pathInDevice:'dcmDevice.dcmuiConfig["0"].dcmuiDeviceClusterObject'
             },
             dcmuiElasticsearchConfig:{
                 key:'dcmuiElasticsearchURLName',
                 labelKey:'{dcmuiElasticsearchURLName}',
-                msg:$localize `:@@dynamic_formater.ui_elasticsearch_url:Create first an UI Elasticsearch URL!`,
+                msg:$localize `:@@dynamic_formatter.ui_elasticsearch_url:Create first an UI Elasticsearch URL!`,
                 pathInDevice:'dcmDevice.dcmuiConfig[0].dcmuiElasticsearchConfig[0].dcmuiElasticsearchURLObjects'
             },
             dcmKeycloakServer:{
                 key:'dcmKeycloakServerID',
                 labelKey:'{dcmKeycloakServerID}',
-                msg:$localize `:@@dynamic_formater.keycloak_server:Create first an Keycloak Server!`,
+                msg:$localize `:@@dynamic_formatter.keycloak_server:Create first an Keycloak Server!`,
                 pathInDevice:'dcmDevice.dcmArchiveDevice.dcmKeycloakServer'
             }
 /*            dicomDeviceName:{
@@ -907,24 +907,7 @@ export class Globalvar {
     static MWL_FILTER_SCHEMA(hidden?):FilterSchema{
         if(hidden){
             return [
-                {
-                    tag:"input",
-                    type:"text",
-                    filterKey:"ScheduledProcedureStepSequence.ScheduledProcedureStepStatus",
-                    description:$localize `:@@sps_status:SPS Status`,
-                    placeholder:$localize `:@@sps_status:SPS Status`
-                },{
-                    tag:"checkbox",
-                    filterKey:"onlyDefault",
-                    text:$localize `:@@only_default:Only Default`
-                },
-                {
-                    tag:"input",
-                    type:"text",
-                    filterKey:"ScheduledProcedureStepSequence.ScheduledPerformingPhysicianName",
-                    description:$localize `:@@scheduled_performing_physicians_name:Scheduled Performing Physician's Name`,
-                    placeholder:$localize `:@@sp_physicians_name:SP Physician's Name`
-                }
+
             ]
         }else{
             return [
@@ -949,8 +932,8 @@ export class Globalvar {
                     tag:"input",
                     type:"text",
                     filterKey:"IssuerOfPatientID",
-                    description:$localize `:@@issuer_of_patient:Issuer of patient`,
-                    placeholder:$localize `:@@issuer_of_patient:Issuer of patient`
+                    description:$localize `:@@issuer_of_patient:Issuer of Patient`,
+                    placeholder:$localize `:@@issuer_of_patient:Issuer of Patient`
                 },{
                     tag:"input",
                     type:"text",
@@ -987,11 +970,37 @@ export class Globalvar {
                     description:$localize `:@@limit:Limit`,
                     placeholder:$localize `:@@limit_of_mwl:Limit of MWL`
                 },{
+                    tag:"select",
+                    type:"text",
+                    filterKey:"ScheduledProcedureStepSequence.ScheduledProcedureStepStatus",
+                    options:[
+                        new SelectDropdown("STARTED", $localize `:@@STARTED:STARTED`),
+                        new SelectDropdown("ARRIVED", $localize `:@@ARRIVED:ARRIVED`),
+                        new SelectDropdown("READY", $localize `:@@READY:READY`),
+                        new SelectDropdown("DEPARTED", $localize `:@@DEPARTED:DEPARTED`),
+                        new SelectDropdown("SCHEDULED", $localize `:@@SCHEDULED:SCHEDULED`),
+                        new SelectDropdown("COMPLETED", $localize `:@@COMPLETED:COMPLETED`),
+                        new SelectDropdown("CANCELED", $localize `:@@CANCELED:CANCELED`),
+                        new SelectDropdown("DISCONTINUED", $localize `:@@DISCONTINUED:DISCONTINUED`)
+                    ],
+                    showStar:true,
+                    description:$localize `:@@sps_status:SPS Status`,
+                    placeholder:$localize `:@@sps_status:SPS Status`
+                },
+                {
+                    tag:"input",
+                    type:"text",
+                    filterKey:"ScheduledProcedureStepSequence.ScheduledPerformingPhysicianName",
+                    description:$localize `:@@scheduled_performing_physicians_name:Scheduled Performing Physician's Name`,
+                    placeholder:$localize `:@@sp_physicians_name:SP Physician's Name`
+                }
+                ,{
                     tag:"range-picker",
                     type:"text",
                     filterKey:"ScheduledProcedureStepSequence.ScheduledProcedureStepStartDate",
                     description:$localize `:@@sps_start_date:SPS Start Date`,
-                    placeholder:$localize `:@@scheduled_procedure_step_start_date:Scheduled Procedure Step Start Date`
+                    placeholder:$localize `:@@scheduled_procedure_step_start_date:Scheduled Procedure Step Start Date`,
+                    onlyDate:true
                 },{
                     tag:"range-picker-time",
                     type:"text",
@@ -1029,7 +1038,7 @@ export class Globalvar {
                         label:$localize `:@@coding_scheme_designator_00080102:Coding scheme designator (0008,0102)`
                     }
                 ],
-                description:$localize `:@@scheduled_station_name_code_sequence_00404026:Scheduled Station Class Code Sequence (0040,4026)`,
+                description:$localize `:@@scheduled_station_class_code_sequence_00404026:Scheduled Station Class Code Sequence (0040,4026)`,
                 placeholder:$localize `:@@station_class_code:Station Class Code`
             },{
                 tag:"code-selector",
@@ -1042,7 +1051,7 @@ export class Globalvar {
                         label:$localize `:@@coding_scheme_designator_00080102:Coding scheme designator (0008,0102)`
                     }
                 ],
-                description: $localize `:@@scheduled_station_name_code_sequence_00404027:Scheduled Station Geographic Location Code Sequence (0040,4027)`,
+                description: $localize `:@@scheduled_station_geographic_location_code_sequence_00404027:Scheduled Station Geographic Location Code Sequence (0040,4027)`,
                 placeholder: $localize `:@@geographic_location_code:Geographic Location Code`
             },{
                 tag:"code-selector",
@@ -1234,14 +1243,14 @@ export class Globalvar {
                     tag:"input",
                     type:"text",
                     filterKey:"InstitutionName",
-                    description:$localize `:@@institution_name:Institution name`,
-                    placeholder:$localize `:@@institution_name:Institution name`
+                    description:$localize `:@@institution_name:Institution Name`,
+                    placeholder:$localize `:@@institution_name:Institution Name`
                 },{
                     tag:"input",
                     type:"text",
                     filterKey:"StationName",
-                    description:$localize `:@@station_name:Station name`,
-                    placeholder:$localize `:@@station_name:Station name`
+                    description:$localize `:@@station_name:Station Name`,
+                    placeholder:$localize `:@@station_name:Station Name`
                 },{
                     tag:"multi-select",
                     filterKey:"SOPClassesInStudy",
@@ -1255,8 +1264,8 @@ export class Globalvar {
                     tag:"input",
                     type:"text",
                     filterKey:"SeriesDescription",
-                    description:$localize `:@@series_description:Series description`,
-                    placeholder:$localize `:@@series_description:Series description`
+                    description:$localize `:@@series_description:Series Description`,
+                    placeholder:$localize `:@@series_description:Series Description`
                 },
                 {
                     tag:"checkbox",
@@ -1304,7 +1313,7 @@ export class Globalvar {
                     filterKey:"ExpirationState",
                     showStar:true,
                     options:[
-                        new SelectDropdown("UPDATEABLE", $localize `:@@UPDATEABLE:UPDATEABLE`),
+                        new SelectDropdown("UPDATABLE", $localize `:@@UPDATABLE:UPDATABLE`),
                         new SelectDropdown("FROZEN", $localize `:@@FROZEN:FROZEN`),
                         new SelectDropdown("REJECTED", $localize `:@@REJECTED:REJECTED`),
                         new SelectDropdown("EXPORT_SCHEDULED", $localize `:@@EXPORT_SCHEDULED:EXPORT_SCHEDULED`),
@@ -1398,8 +1407,8 @@ export class Globalvar {
                 tag:"input",
                 type:"text",
                 filterKey:"StudyDescription",
-                description:$localize `:@@study_description:Study description`,
-                placeholder:$localize `:@@study_description:Study description`
+                description:$localize `:@@study_description:Study Description`,
+                placeholder:$localize `:@@study_description:Study Description`
             },
             {
                 tag:"modality",
@@ -1452,7 +1461,8 @@ export class Globalvar {
                 tag:"range-picker-limit",
                 type:"text",
                 filterKey:"StudyDate",
-                description:$localize `:@@study_date:Study date`
+                description:$localize `:@@study_date:Study date`,
+                onlyDate:true
             },{
                 tag:"range-picker-time",
                 type:"text",
@@ -1478,14 +1488,14 @@ export class Globalvar {
                     tag:"input",
                     type:"text",
                     filterKey:"InstitutionName",
-                    description:$localize `:@@institution_name:Institution name`,
-                    placeholder:$localize `:@@institution_name:Institution name`
+                    description:$localize `:@@institution_name:Institution Name`,
+                    placeholder:$localize `:@@institution_name:Institution Name`
                 },{
                     tag:"input",
                     type:"text",
                     filterKey:"StationName",
-                    description:$localize `:@@station_name:Station name`,
-                    placeholder:$localize `:@@station_name:Station name`
+                    description:$localize `:@@station_name:Station Name`,
+                    placeholder:$localize `:@@station_name:Station Name`
                 },
                 {
                     tag:"multi-select",
@@ -1513,8 +1523,8 @@ export class Globalvar {
                     tag:"input",
                     type:"text",
                     filterKey:"StudyDescription",
-                    description:$localize `:@@study_description:Study description`,
-                    placeholder:$localize `:@@study_description:Study description`
+                    description:$localize `:@@study_description:Study Description`,
+                    placeholder:$localize `:@@study_description:Study Description`
                 },{
                     tag:"select",
                     options:aets,
@@ -1673,15 +1683,15 @@ export class Globalvar {
                 tag:"select",
                 filterKey:"includefield",
                 options:[
-                    new SelectDropdown("", $localize `:@@dicom:dicom`,$localize `:@@globalvar.search_response_payload_according_dicom_ps_3.18:Search Response Payload according DICOM PS 3.18`),
-                    new SelectDropdown("all", $localize `:@@all:all`, $localize `:@@globalvar.all_available_attributes:all available attributes`)
+                    new SelectDropdown("", $localize `:@@dicom:dicom`,$localize `:@@search_response_payload_according_dicom_ps_3.18:Search Response Payload according DICOM PS 3.18`),
+                    new SelectDropdown("all", $localize `:@@all:all`, $localize `:@@all_available_attributes:all available attributes`)
                 ],
                 description:$localize `:@@include_field:Include field`,
                 placeholder:$localize `:@@include_field:Include field`,
             },
             {
                 tag:"checkbox",
-                filterKey:"diffQueue",
+                filterKey:"queue",
                 text:$localize `:@@queued:Queued`
             },
             {

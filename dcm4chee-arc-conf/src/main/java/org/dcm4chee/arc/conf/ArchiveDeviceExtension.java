@@ -42,6 +42,7 @@ package org.dcm4chee.arc.conf;
 
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Code;
+import org.dcm4che3.data.SpecificCharacterSet;
 import org.dcm4che3.io.BasicBulkDataDescriptor;
 import org.dcm4che3.io.BulkDataDescriptor;
 import org.dcm4che3.net.DeviceExtension;
@@ -68,7 +69,7 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     public static final String AUDIT_UNKNOWN_PATIENT_ID = "<none>";
     public static final String JBOSS_SERVER_TEMP_DIR = "${jboss.server.temp.dir}";
     public static final String DEFAULT_WADO_ZIP_ENTRY_NAME_FORMAT =
-            "DICOM/{0020000D,hash}/{0020000E,hash}/{00080018,hash}";
+            "DICOM/{0020000D,hash}/{0020000E,hash}/{00080018,hash}.dcm";
     public static final String WADO_THUMBNAIL_VIEWPORT = "64,64";
 
     private volatile String defaultCharacterSet;
@@ -92,6 +93,8 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private volatile int deleteUPSFetchSize = 100;
     private volatile Duration deleteUPSCompletedDelay;
     private volatile Duration deleteUPSCanceledDelay;
+    private volatile Duration upsProcessingPollingInterval;
+    private volatile int upsProcessingFetchSize = 100;
     private volatile OverwritePolicy overwritePolicy = OverwritePolicy.NEVER;
     private volatile boolean recordAttributeModification = true;
     private volatile ShowPatientInfo showPatientInfoInSystemLog = ShowPatientInfo.PLAIN_TEXT;
@@ -129,6 +132,8 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private volatile String fallbackCMoveSCPCallingAET;
     private volatile String fallbackCMoveSCPLeadingCFindSCP;
     private volatile int fallbackCMoveSCPRetries;
+    private volatile String fallbackWadoURIWebApplication;
+    private volatile int fallbackWadoURIHttpStatusCode = 303;
     private volatile String externalRetrieveAEDestination;
     private volatile String xdsiImagingDocumentSourceAETitle;
     private volatile String alternativeCMoveSCP;
@@ -136,11 +141,14 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private volatile int exportTaskFetchSize = 100;
     private volatile Duration retrieveTaskPollingInterval;
     private volatile int retrieveTaskFetchSize = 100;
+    private volatile boolean retrieveTaskWarningOnNoMatch;
+    private volatile boolean retrieveTaskWarningOnWarnings;
     private volatile Duration deleteRejectedPollingInterval;
     private volatile int deleteRejectedFetchSize = 100;
     private volatile Duration purgeStoragePollingInterval;
     private volatile int purgeStorageFetchSize = 100;
     private volatile int deleteStudyBatchSize = 10;
+    private volatile int deleteStudyChunkSize = 100;
     private volatile boolean deletePatientOnDeleteLastStudy = false;
     private volatile Duration failedToDeletePollingInterval;
     private volatile int failedToDeleteFetchSize = 100;
@@ -208,7 +216,7 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private volatile String hl7PSUPlacerOrderNumber;
     private volatile HL7PSUMessageType hl7PSUMessageType = HL7PSUMessageType.OMG_O19;
     private volatile Conditions hl7PSUConditions = new Conditions();
-    private volatile String auditRecordRepositoryURL;
+    private volatile String proxyUpstreamURL;
     private volatile String atna2JsonFhirTemplateURI;
     private volatile String atna2XmlFhirTemplateURI;
     private volatile Attributes.UpdatePolicy copyMoveUpdatePolicy = Attributes.UpdatePolicy.PRESERVE;
@@ -255,10 +263,13 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private volatile int patientVerificationMaxRetries;
     private volatile boolean patientVerificationAdjustIssuerOfPatientID;
     private volatile HL7OrderMissingStudyIUIDPolicy hl7OrderMissingStudyIUIDPolicy = HL7OrderMissingStudyIUIDPolicy.GENERATE;
-    private volatile HL7ImportReportMissingStudyIUIDPolicy hl7ImportReportMissingStudyIUIDPolicy
-            = HL7ImportReportMissingStudyIUIDPolicy.GENERATE;
+    private volatile HL7ImportReportMissingStudyIUIDPolicy hl7ImportReportMissingStudyIUIDPolicy =
+            HL7ImportReportMissingStudyIUIDPolicy.GENERATE;
+    private volatile HL7ReferredMergedPatientPolicy hl7ReferredMergedPatientPolicy =
+            HL7ReferredMergedPatientPolicy.REJECT;
     private volatile String hl7DicomCharacterSet;
     private volatile boolean hl7VeterinaryUsePatientName;
+    private volatile String hl7PatientArrivalMessageType;
     private volatile int csvUploadChunkSize = 100;
     private volatile boolean validateUID = true;
     private volatile boolean relationalQueryNegotiationLenient;
@@ -285,8 +296,10 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private final Map<String, PDQServiceDescriptor> pdqServiceDescriptorMap = new HashMap<>();
     private final Map<String, RejectionNote> rejectionNoteMap = new HashMap<>();
     private final Map<String, KeycloakServer> keycloakServerMap = new HashMap<>();
+    private final Map<String, UPSTemplate> upsTemplateMap = new HashMap<>();
     private final List<UPSOnStore> upsOnStoreList = new ArrayList<>();
     private final List<UPSOnHL7> upsOnHL7List = new ArrayList<>();
+    private final List<UPSProcessingRule> upsProcessingRuleList = new ArrayList<>();
     private final List<ExportRule> exportRules = new ArrayList<>();
     private final List<ExportPriorsRule> exportPriorsRules = new ArrayList<>();
     private final List<HL7ExportRule> hl7ExportRules = new ArrayList<>();
@@ -305,6 +318,9 @@ public class ArchiveDeviceExtension extends DeviceExtension {
     private final Map<String,String> xRoadProperties = new HashMap<>();
     private final Map<String,String> impaxReportProperties = new HashMap<>();
     private final Map<String, String> importReportTemplateParams = new HashMap<>();
+    private final Map<String, String> cStoreSCUOfCMoveSCP = new HashMap<>();
+    private final Map<String, String> dicomCharsetNameMappings = new HashMap<>();
+    private final Map<String, String> hl7CharsetNameMappings = new HashMap<>();
 
     private transient FuzzyStr fuzzyStr;
 
@@ -550,6 +566,22 @@ public class ArchiveDeviceExtension extends DeviceExtension {
 
     public void setDeleteUPSCanceledDelay(Duration deleteUPSCanceledDelay) {
         this.deleteUPSCanceledDelay = deleteUPSCanceledDelay;
+    }
+
+    public Duration getUPSProcessingPollingInterval() {
+        return upsProcessingPollingInterval;
+    }
+
+    public void setUPSProcessingPollingInterval(Duration upsProcessingPollingInterval) {
+        this.upsProcessingPollingInterval = upsProcessingPollingInterval;
+    }
+
+    public int getUPSProcessingFetchSize() {
+        return upsProcessingFetchSize;
+    }
+
+    public void setUPSProcessingFetchSize(int upsProcessingFetchSize) {
+        this.upsProcessingFetchSize = upsProcessingFetchSize;
     }
 
     public boolean isPersonNameComponentOrderInsensitiveMatching() {
@@ -812,6 +844,22 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         this.fallbackCMoveSCPRetries = fallbackCMoveSCPRetries;
     }
 
+    public String getFallbackWadoURIWebApplication() {
+        return fallbackWadoURIWebApplication;
+    }
+
+    public void setFallbackWadoURIWebApplication(String fallbackWadoURIWebApplication) {
+        this.fallbackWadoURIWebApplication = fallbackWadoURIWebApplication;
+    }
+
+    public int getFallbackWadoURIHttpStatusCode() {
+        return fallbackWadoURIHttpStatusCode;
+    }
+
+    public void setFallbackWadoURIHttpStatusCode(int fallbackWadoURIHttpStatusCode) {
+        this.fallbackWadoURIHttpStatusCode = fallbackWadoURIHttpStatusCode;
+    }
+
     public String getExternalRetrieveAEDestination() {
         return externalRetrieveAEDestination;
     }
@@ -914,6 +962,14 @@ public class ArchiveDeviceExtension extends DeviceExtension {
 
     public void setDeleteStudyBatchSize(int deleteStudyBatchSize) {
         this.deleteStudyBatchSize = greaterZero(deleteStudyBatchSize, "deleteStudyBatchSize");
+    }
+
+    public int getDeleteStudyChunkSize() {
+        return deleteStudyChunkSize;
+    }
+
+    public void setDeleteStudyChunkSize(int deleteStudyChunkSize) {
+        this.deleteStudyChunkSize = greaterZero(deleteStudyChunkSize, "deleteStudyChunkSize");
     }
 
     public boolean isDeletePatientOnDeleteLastStudy() {
@@ -1788,6 +1844,26 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         return exporterDescriptorMap.values();
     }
 
+    public UPSTemplate removeUPSTemplate(String upsTemplateID) {
+        return upsTemplateMap.remove(upsTemplateID);
+    }
+
+    public void addUPSTemplate(UPSTemplate upsTemplate) {
+        upsTemplateMap.put(upsTemplate.getUPSTemplateID(), upsTemplate);
+    }
+
+    public UPSTemplate getUPSTemplate(String upsTemplateID) {
+        return upsTemplateMap.get(upsTemplateID);
+    }
+
+    public Collection<UPSTemplate> getUPSTemplates() {
+        return upsTemplateMap.values();
+    }
+
+    public void clearUPSTemplates() {
+        upsTemplateMap.clear();
+    }
+
     public void removeUPSOnStore(UPSOnStore rule) {
         upsOnStoreList.remove(rule);
     }
@@ -1818,6 +1894,22 @@ public class ArchiveDeviceExtension extends DeviceExtension {
 
     public Collection<UPSOnHL7> listUPSOnHL7() {
         return upsOnHL7List;
+    }
+
+    public void removeUPSProcessingRule(UPSProcessingRule rule) {
+        upsProcessingRuleList.remove(rule);
+    }
+
+    public void clearUPSProcessingRules() {
+        upsProcessingRuleList.clear();
+    }
+
+    public void addUPSProcessingRule(UPSProcessingRule rule) {
+        upsProcessingRuleList.add(rule);
+    }
+
+    public Collection<UPSProcessingRule> listUPSProcessingRules() {
+        return upsProcessingRuleList;
     }
 
     public void removeExportRule(ExportRule rule) {
@@ -2117,12 +2209,12 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         this.returnRetrieveAETitles = returnRetrieveAETitles;
     }
 
-    public String getAuditRecordRepositoryURL() {
-        return auditRecordRepositoryURL;
+    public String getProxyUpstreamURL() {
+        return proxyUpstreamURL;
     }
 
-    public void setAuditRecordRepositoryURL(String auditRecordRepositoryURL) {
-        this.auditRecordRepositoryURL = auditRecordRepositoryURL;
+    public void setProxyUpstreamURL(String proxyUpstreamURL) {
+        this.proxyUpstreamURL = proxyUpstreamURL;
     }
 
     public String getAudit2JsonFhirTemplateURI() {
@@ -2534,6 +2626,74 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         }
     }
 
+    public Map<String, String> getCStoreSCUOfCMoveSCPs() {
+        return cStoreSCUOfCMoveSCP;
+    }
+
+    public void setCStoreSCUOfCMoveSCP(String storeSCU, String moveSCP) {
+        cStoreSCUOfCMoveSCP.put(storeSCU, moveSCP);
+    }
+
+    public void setCStoreSCUOfCMoveSCPs(String[] ss) {
+        cStoreSCUOfCMoveSCP.clear();
+        for (String s : ss) {
+            int index = s.indexOf('=');
+            if (index < 0)
+                throw new IllegalArgumentException("CStoreSCUofCMoveSCP in incorrect format : " + s);
+            setCStoreSCUOfCMoveSCP(s.substring(0, index), s.substring(index+1));
+        }
+    }
+
+    public Map<String, String> getDicomCharsetNameMappings() {
+        return dicomCharsetNameMappings;
+    }
+
+    public void setDicomCharsetNameMappings(String code, String charsetName) {
+        dicomCharsetNameMappings.put(
+                SpecificCharacterSet.checkSpecificCharacterSet(code),
+                SpecificCharacterSet.checkCharsetName(charsetName));
+    }
+
+    public void setDicomCharsetNameMappings(String[] ss) {
+        HashMap<String, String> prev = new HashMap<>(dicomCharsetNameMappings);
+        dicomCharsetNameMappings.clear();
+        try {
+            for (String s : ss) {
+                int index = s.indexOf('=');
+                if (index < 0)
+                    throw new IllegalArgumentException("DicomCharsetNameMapping in incorrect format : " + s);
+                setDicomCharsetNameMappings(s.substring(0, index), s.substring(index+1));
+            }
+        } catch (IllegalArgumentException e) {
+            dicomCharsetNameMappings.clear();
+            dicomCharsetNameMappings.putAll(prev);
+        }
+    }
+
+    public Map<String, String> getHL7CharsetNameMappings() {
+        return hl7CharsetNameMappings;
+    }
+
+    public void setHL7CharsetNameMappings(String code, String charsetName) {
+        hl7CharsetNameMappings.put(code, SpecificCharacterSet.checkCharsetName(charsetName));
+    }
+
+    public void setHL7CharsetNameMappings(String[] ss) {
+        HashMap<String, String> prev = new HashMap<>(hl7CharsetNameMappings);
+        hl7CharsetNameMappings.clear();
+        try {
+            for (String s : ss) {
+                int index = s.indexOf('=');
+                if (index < 0)
+                    throw new IllegalArgumentException("HL7CharsetNameMapping in incorrect format : " + s);
+                setHL7CharsetNameMappings(s.substring(0, index), s.substring(index+1));
+            }
+        } catch (IllegalArgumentException e) {
+            hl7CharsetNameMappings.clear();
+            hl7CharsetNameMappings.putAll(prev);
+        }
+    }
+
     public HL7OrderMissingStudyIUIDPolicy getHl7OrderMissingStudyIUIDPolicy() {
         return hl7OrderMissingStudyIUIDPolicy;
     }
@@ -2551,6 +2711,14 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         this.hl7ImportReportMissingStudyIUIDPolicy = hl7ImportReportMissingStudyIUIDPolicy;
     }
 
+    public HL7ReferredMergedPatientPolicy getHl7ReferredMergedPatientPolicy() {
+        return hl7ReferredMergedPatientPolicy;
+    }
+
+    public void setHl7ReferredMergedPatientPolicy(HL7ReferredMergedPatientPolicy hl7ReferredMergedPatientPolicy) {
+        this.hl7ReferredMergedPatientPolicy = hl7ReferredMergedPatientPolicy;
+    }
+
     public String getHl7DicomCharacterSet() {
         return hl7DicomCharacterSet;
     }
@@ -2565,6 +2733,14 @@ public class ArchiveDeviceExtension extends DeviceExtension {
 
     public void setHl7VeterinaryUsePatientName(boolean hl7VeterinaryUsePatientName) {
         this.hl7VeterinaryUsePatientName = hl7VeterinaryUsePatientName;
+    }
+
+    public String getHL7PatientArrivalMessageType() {
+        return hl7PatientArrivalMessageType;
+    }
+
+    public void setHL7PatientArrivalMessageType(String hl7PatientArrivalMessageType) {
+        this.hl7PatientArrivalMessageType = hl7PatientArrivalMessageType;
     }
 
     public int getCSVUploadChunkSize() {
@@ -2655,6 +2831,22 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         this.retrieveTaskFetchSize = retrieveTaskFetchSize;
     }
 
+    public boolean isRetrieveTaskWarningOnNoMatch() {
+        return retrieveTaskWarningOnNoMatch;
+    }
+
+    public void setRetrieveTaskWarningOnNoMatch(boolean retrieveTaskWarningOnNoMatch) {
+        this.retrieveTaskWarningOnNoMatch = retrieveTaskWarningOnNoMatch;
+    }
+
+    public boolean isRetrieveTaskWarningOnWarnings() {
+        return retrieveTaskWarningOnWarnings;
+    }
+
+    public void setRetrieveTaskWarningOnWarnings(boolean retrieveTaskWarningOnWarnings) {
+        this.retrieveTaskWarningOnWarnings = retrieveTaskWarningOnWarnings;
+    }
+
     public boolean isStowQuicktime2MP4() {
         return stowQuicktime2MP4;
     }
@@ -2711,6 +2903,8 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         deleteUPSFetchSize = arcdev.deleteUPSFetchSize;
         deleteUPSCompletedDelay = arcdev.deleteUPSCompletedDelay;
         deleteUPSCanceledDelay = arcdev.deleteUPSCanceledDelay;
+        upsProcessingPollingInterval = arcdev.upsProcessingPollingInterval;
+        upsProcessingFetchSize = arcdev.upsProcessingFetchSize;
         overwritePolicy = arcdev.overwritePolicy;
         recordAttributeModification = arcdev.recordAttributeModification;
         showPatientInfoInSystemLog = arcdev.showPatientInfoInSystemLog;
@@ -2753,6 +2947,8 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         fallbackCMoveSCPCallingAET = arcdev.fallbackCMoveSCPCallingAET;
         fallbackCMoveSCPLeadingCFindSCP = arcdev.fallbackCMoveSCPLeadingCFindSCP;
         fallbackCMoveSCPRetries = arcdev.fallbackCMoveSCPRetries;
+        fallbackWadoURIWebApplication = arcdev.fallbackWadoURIWebApplication;
+        fallbackWadoURIHttpStatusCode = arcdev.fallbackWadoURIHttpStatusCode;
         externalRetrieveAEDestination = arcdev.externalRetrieveAEDestination;
         xdsiImagingDocumentSourceAETitle = arcdev.xdsiImagingDocumentSourceAETitle;
         alternativeCMoveSCP = arcdev.alternativeCMoveSCP;
@@ -2760,11 +2956,14 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         exportTaskFetchSize = arcdev.exportTaskFetchSize;
         retrieveTaskPollingInterval = arcdev.retrieveTaskPollingInterval;
         retrieveTaskFetchSize = arcdev.retrieveTaskFetchSize;
+        retrieveTaskWarningOnNoMatch = arcdev.retrieveTaskWarningOnNoMatch;
+        retrieveTaskWarningOnWarnings = arcdev.retrieveTaskWarningOnWarnings;
         deleteRejectedPollingInterval = arcdev.deleteRejectedPollingInterval;
         deleteRejectedFetchSize = arcdev.deleteRejectedFetchSize;
         purgeStoragePollingInterval = arcdev.purgeStoragePollingInterval;
         purgeStorageFetchSize = arcdev.purgeStorageFetchSize;
         deleteStudyBatchSize = arcdev.deleteStudyBatchSize;
+        deleteStudyChunkSize = arcdev.deleteStudyChunkSize;
         deletePatientOnDeleteLastStudy = arcdev.deletePatientOnDeleteLastStudy;
         failedToDeletePollingInterval = arcdev.failedToDeletePollingInterval;
         failedToDeleteFetchSize = arcdev.failedToDeleteFetchSize;
@@ -2828,7 +3027,7 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         hl7PSUMessageType = arcdev.hl7PSUMessageType;
         hl7PSUConditions = arcdev.hl7PSUConditions;
         acceptConflictingPatientID = arcdev.acceptConflictingPatientID;
-        auditRecordRepositoryURL = arcdev.auditRecordRepositoryURL;
+        proxyUpstreamURL = arcdev.proxyUpstreamURL;
         atna2JsonFhirTemplateURI = arcdev.atna2JsonFhirTemplateURI;
         atna2XmlFhirTemplateURI = arcdev.atna2XmlFhirTemplateURI;
         copyMoveUpdatePolicy = arcdev.copyMoveUpdatePolicy;
@@ -2877,8 +3076,10 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         validateUID = arcdev.validateUID;
         hl7OrderMissingStudyIUIDPolicy = arcdev.hl7OrderMissingStudyIUIDPolicy;
         hl7ImportReportMissingStudyIUIDPolicy = arcdev.hl7ImportReportMissingStudyIUIDPolicy;
+        hl7ReferredMergedPatientPolicy = arcdev.hl7ReferredMergedPatientPolicy;
         hl7DicomCharacterSet = arcdev.hl7DicomCharacterSet;
         hl7VeterinaryUsePatientName = arcdev.hl7VeterinaryUsePatientName;
+        hl7PatientArrivalMessageType = arcdev.hl7PatientArrivalMessageType;
         relationalQueryNegotiationLenient = arcdev.relationalQueryNegotiationLenient;
         relationalRetrieveNegotiationLenient = arcdev.relationalRetrieveNegotiationLenient;
         rejectConflictingPatientAttribute = arcdev.rejectConflictingPatientAttribute;
@@ -2909,10 +3110,14 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         pdqServiceDescriptorMap.putAll(arcdev.pdqServiceDescriptorMap);
         exporterDescriptorMap.clear();
         exporterDescriptorMap.putAll(arcdev.exporterDescriptorMap);
+        upsTemplateMap.clear();
+        upsTemplateMap.putAll(arcdev.upsTemplateMap);
         upsOnStoreList.clear();
         upsOnStoreList.addAll(arcdev.upsOnStoreList);
         upsOnHL7List.clear();
         upsOnHL7List.addAll(arcdev.upsOnHL7List);
+        upsProcessingRuleList.clear();
+        upsProcessingRuleList.addAll(arcdev.upsProcessingRuleList);
         exportRules.clear();
         exportRules.addAll(arcdev.exportRules);
         exportPriorsRules.clear();
@@ -2953,5 +3158,11 @@ public class ArchiveDeviceExtension extends DeviceExtension {
         impaxReportProperties.putAll(arcdev.impaxReportProperties);
         importReportTemplateParams.clear();
         importReportTemplateParams.putAll(arcdev.importReportTemplateParams);
+        cStoreSCUOfCMoveSCP.clear();
+        cStoreSCUOfCMoveSCP.putAll(arcdev.cStoreSCUOfCMoveSCP);
+        dicomCharsetNameMappings.clear();
+        dicomCharsetNameMappings.putAll(arcdev.dicomCharsetNameMappings);
+        hl7CharsetNameMappings.clear();
+        hl7CharsetNameMappings.putAll(arcdev.hl7CharsetNameMappings);
     }
 }

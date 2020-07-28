@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {WindowRefService} from "../../helpers/window-ref.service";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {j4care} from "../../helpers/j4care.service";
@@ -128,13 +128,13 @@ export class DevicesService {
                 schema.form_schema[0][0].push([
                     {
                         tag:"label",
-                        text:$localize `:@@devices.scheduled_time:Scheduled Time`
+                        text:$localize `:@@scheduled_time:Scheduled Time`
                     }
                     ,{
                         tag:"range-picker-time",
                         type:"text",
                         filterKey:"scheduledTime",
-                        description:$localize `:@@devices.scheduled_time:Scheduled Time`
+                        description:$localize `:@@scheduled_time:Scheduled Time`
                     }
                 ]);
             }
@@ -174,50 +174,50 @@ export class DevicesService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomDeviceName",
-                description:$localize `:@@devices.device_name:Device name`,
-                placeholder:$localize `:@@devices.device_name:Device name`
+                description:$localize `:@@device_name:Device name`,
+                placeholder:$localize `:@@device_name:Device name`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomDeviceDescription",
-                description:$localize `:@@devices.device_description:Device description`,
-                placeholder:$localize `:@@devices.device_description:Device description`
+                description:$localize `:@@device_description:Device description`,
+                placeholder:$localize `:@@device_description:Device description`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomManufacturer",
-                description:$localize `:@@devices.manufacturer:Manufacturer`,
-                placeholder:$localize `:@@devices.manufacturer:Manufacturer`
+                description:$localize `:@@manufacturer:Manufacturer`,
+                placeholder:$localize `:@@manufacturer:Manufacturer`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomManufacturerModelName",
-                description:$localize `:@@devices.manufacturer_model_name:Manufacturer model name`,
-                placeholder:$localize `:@@devices.manufacturer_model_name:Manufacturer model name`
+                description:$localize `:@@manufacturer_model_name:Manufacturer model name`,
+                placeholder:$localize `:@@manufacturer_model_name:Manufacturer model name`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomSoftwareVersion",
-                description:$localize `:@@devices.software_version:Software version`,
-                placeholder:$localize `:@@devices.software_version:Software version`
+                description:$localize `:@@software_version:Software version`,
+                placeholder:$localize `:@@software_version:Software version`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomStationName",
-                description:$localize `:@@devices.station_name:Station name`,
-                placeholder:$localize `:@@devices.station_name:Station name`
+                description:$localize `:@@station_name:Station Name`,
+                placeholder:$localize `:@@station_name:Station Name`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomPrimaryDeviceType",
-                description:$localize `:@@devices.primary_device_type:Primary device type`,
-                placeholder:$localize `:@@devices.primary_device_type:Primary device type`
+                description:$localize `:@@primary_device_type:Primary device type`,
+                placeholder:$localize `:@@primary_device_type:Primary device type`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomInstitutionName",
-                description:$localize `:@@devices.institution_name:Institution name`,
-                placeholder:$localize `:@@devices.institution_name:Institution name`
+                description:$localize `:@@institution_name:Institution Name`,
+                placeholder:$localize `:@@institution_name:Institution Name`
             },{
                 tag:"input",
                 type:"text",
@@ -239,7 +239,7 @@ export class DevicesService {
                 tag: "button",
                 id: "submit",
                 text: $localize `:@@SUBMIT:SUBMIT`,
-                description: $localize `:@@devices.query_devices:Query Devices`
+                description: $localize `:@@query_devices:Query Devices`
             }
         ],2)
     }

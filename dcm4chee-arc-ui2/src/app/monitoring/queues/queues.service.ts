@@ -120,7 +120,7 @@ export class QueuesService{
             },
             {
                 value:"IN PROCESS",
-                text:$localize `:@@queues.in_process:IN PROCESS`
+                text:$localize `:@@in_process:IN PROCESS`
             },
             {
                 value:"COMPLETED",
@@ -152,7 +152,7 @@ export class QueuesService{
                 }),
                 showStar:true,
                 filterKey:"queueName",
-                description:$localize `:@@queues.queue_name:Queue name`,
+                description:$localize `:@@queue_name:Queue Name`,
                 placeholder:$localize `:@@queue:Queue`
             },{
                 tag:"select",
@@ -179,12 +179,12 @@ export class QueuesService{
                 }),
                 showStar:true,
                 filterKey:"dicomDeviceName",
-                description:$localize `:@@queues.device_name:Device name`,
-                placeholder:$localize `:@@queues.device_name:Device name`
+                description:$localize `:@@device_name:Device name`,
+                placeholder:$localize `:@@device_name:Device name`
             },
             {
                 tag:"label",
-                text:$localize `:@@queues.page_size:Page size`
+                text:$localize `:@@page_size:Page Size`
             },
             {
                 tag:"input",
@@ -195,18 +195,18 @@ export class QueuesService{
             {
                 tag:"range-picker",
                 filterKey:"createdTime",
-                description:$localize `:@@queues.created_date:Created Date`
+                description:$localize `:@@created_date:Created Date`
             },
             {
                 tag:"range-picker",
                 filterKey:"updatedTime",
-                description:$localize `:@@queues.updated_date:Updated Date`
+                description:$localize `:@@updated_date:Updated Date`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"batchID",
-                description:$localize `:@@queues.batch_id:Batch ID`,
-                placeholder:$localize `:@@queues.batch_id:Batch ID`
+                description:$localize `:@@batch_id:Batch ID`,
+                placeholder:$localize `:@@batch_id:Batch ID`
             },{
                 tag:"dummy"
             },
@@ -214,13 +214,13 @@ export class QueuesService{
                 tag:"button",
                 text:countText,
                 id:"count",
-                description:$localize `:@@queues.get_count:Get Count`
+                description:$localize `:@@get_count:Get Count`
             },
             {
                 tag:"button",
                 id:"submit",
                 text:$localize `:@@SUBMIT:SUBMIT`,
-                description:$localize `:@@queues.maximal_number_of_tasks_in_returned_list:Maximal number of tasks in returned list`
+                description:$localize `:@@maximal_number_of_tasks_in_returned_list:Maximal number of tasks in returned list`
             }
         ]
     }

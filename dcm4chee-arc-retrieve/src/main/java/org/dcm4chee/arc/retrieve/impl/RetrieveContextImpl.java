@@ -75,6 +75,7 @@ class RetrieveContextImpl implements RetrieveContext {
     private final RetrieveService retrieveService;
     private final ArchiveAEExtension arcAE;
     private final String localAETitle;
+    private String callingAET;
     private final QueryRetrieveView qrView;
     private QueryRetrieveLevel2 qrLevel;
     private int priority = Priority.NORMAL;
@@ -120,6 +121,7 @@ class RetrieveContextImpl implements RetrieveContext {
         this.retrieveService = retrieveService;
         this.arcAE = arcAE;
         this.localAETitle = localAETitle;
+        this.callingAET = localAETitle;
         this.qrView = qrView;
     }
 
@@ -271,6 +273,16 @@ class RetrieveContextImpl implements RetrieveContext {
     @Override
     public String getLocalAETitle() {
         return localAETitle;
+    }
+
+    @Override
+    public String getCallingAET() {
+        return callingAET;
+    }
+
+    @Override
+    public void setCallingAET(String callingAET) {
+        this.callingAET = Objects.requireNonNull(callingAET);
     }
 
     @Override
@@ -454,6 +466,11 @@ class RetrieveContextImpl implements RetrieveContext {
     @Override
     public void addFailedSOPInstanceUID(String iuid) {
         failedSOPInstanceUIDs.add(iuid);
+    }
+
+    @Override
+    public boolean isFailedSOPInstanceUID(String iuid) {
+        return failedSOPInstanceUIDs.contains(iuid);
     }
 
     @Override

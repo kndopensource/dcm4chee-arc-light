@@ -41,35 +41,30 @@
 
 package org.dcm4chee.arc.validation.constraints;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.dcm4che3.util.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Vrinda Nayak <vrinda.nayak@j4care.com>
  * @since Apr 2019
  */
 public class ValidListValidator implements ConstraintValidator<ValidList, List<String>> {
-   private final static Logger log = LoggerFactory.getLogger(ValidListValidator.class);
-   private String[] allowed;
+   private List<String> allowed;
 
    @Override
    public void initialize(ValidList constraint) {
-      this.allowed = constraint.allowed();
+      this.allowed = Arrays.asList(constraint.allowed());
    }
 
    @Override
    public boolean isValid(List<String> items, ConstraintValidatorContext context) {
-      try {
-         if (!Arrays.asList(allowed).containsAll(items))
-            return false;
-      } catch (Exception e) {
-         log.warn("Unexpected exception: ", e);
-      }
-      return true;
+         return items.stream()
+                 .flatMap(item -> Stream.of(StringUtils.split(item, ',')))
+                 .allMatch(item -> allowed.contains(item));
    }
 }

@@ -127,6 +127,10 @@ public interface RetrieveContext extends Closeable {
 
     String getLocalAETitle();
 
+    String getCallingAET();
+
+    void setCallingAET(String callingAET);
+
     String getRequestorAET();
 
     String getRequestorHostName();
@@ -194,6 +198,8 @@ public interface RetrieveContext extends Closeable {
     void addFailed(int delta);
 
     void addFailedSOPInstanceUID(String iuid);
+
+    boolean isFailedSOPInstanceUID(String iuid);
 
     String[] failedSOPInstanceUIDs();
 
