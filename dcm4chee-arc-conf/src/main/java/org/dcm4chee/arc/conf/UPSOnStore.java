@@ -55,10 +55,11 @@ import java.util.Objects;
  * @since Nov 2019
  */
 public class UPSOnStore {
+    public static final UPSOnStore[] EMPTY = {};
     public enum IncludeInputInformation {
         NO, SINGLE, APPEND, SINGLE_OR_CREATE, APPEND_OR_CREATE;
     }
-    private String commonName;
+    private String upsOnStoreID;
     private ScheduleExpression[] schedules = {};
     private Conditions conditions = new Conditions();
     private UPSPriority upsPriority = UPSPriority.MEDIUM;
@@ -85,6 +86,7 @@ public class UPSOnStore {
     private Code scheduledStationLocation;
     private Code scheduledHumanPerformer;
     private String destinationAE;
+    private Entity scopeOfAccumulation;
     private String xsltStylesheetURI;
     private boolean noKeywords;
     private boolean includeStudyInstanceUID;
@@ -92,16 +94,16 @@ public class UPSOnStore {
 
     public UPSOnStore() {}
 
-    public UPSOnStore(String commonName) {
-        setCommonName(commonName);
+    public UPSOnStore(String upsOnStoreID) {
+        setUPSOnStoreID(upsOnStoreID);
     }
 
-    public String getCommonName() {
-        return commonName;
+    public String getUPSOnStoreID() {
+        return upsOnStoreID;
     }
 
-    public void setCommonName(String commonName) {
-        this.commonName = commonName;
+    public void setUPSOnStoreID(String upsOnStoreID) {
+        this.upsOnStoreID = upsOnStoreID;
     }
 
     public ScheduleExpression[] getSchedules() {
@@ -383,6 +385,14 @@ public class UPSOnStore {
         this.destinationAE = destinationAE;
     }
 
+    public Entity getScopeOfAccumulation() {
+        return scopeOfAccumulation;
+    }
+
+    public void setScopeOfAccumulation(Entity scopeOfAccumulation) {
+        this.scopeOfAccumulation = scopeOfAccumulation;
+    }
+
     public String getXSLTStylesheetURI() {
         return xsltStylesheetURI;
     }
@@ -399,16 +409,17 @@ public class UPSOnStore {
         this.noKeywords = noKeywords;
     }
 
-    public boolean match(String sendingHost, String sendingAET,
-            String receivingHost, String receivingAET, Attributes attrs, Calendar cal) {
-        return ScheduleExpression.emptyOrAnyContains(cal, schedules)
+    public boolean match(Calendar now,
+            String sendingHost, String sendingAET, String receivingHost, String receivingAET,
+            Attributes attrs) {
+        return ScheduleExpression.emptyOrAnyContains(now, schedules)
                 && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
     }
 
     @Override
     public String toString() {
         return "UPSOnStore{" +
-                "commonName='" + commonName + '\'' +
+                "cn='" + upsOnStoreID + '\'' +
                 '}';
     }
 

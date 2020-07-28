@@ -7,7 +7,7 @@ import {FormService} from '../../helpers/form/form.service';
 import {FormElement} from '../../helpers/form/form-element';
 import {Output} from '@angular/core';
 import {OrderByPipe} from '../../pipes/order-by.pipe';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {SearchPipe} from '../../pipes/search.pipe';
 import {AppService} from "../../app.service";
 import {DeviceConfiguratorComponent} from "../../configuration/device-configurator/device-configurator.component";
@@ -78,7 +78,7 @@ export class DynamicFormComponent implements OnInit{
             if (orderValue != parseInt(m.order)){
                 let title = '';
                 if (1 <= m.order && m.order < 3){
-                    title = 'Extensions';
+                    title = $localize `:@@extensions:Extensions`;
                     materialIconName = 'extension';
                     order = 0;
                 }else{

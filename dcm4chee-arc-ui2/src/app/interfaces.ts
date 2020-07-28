@@ -187,7 +187,7 @@ export interface StudyPageConfig {
     title:string;
 }
 
-export type DicomResponseType = 'object'|'count'|'size';
+export type DicomResponseType = 'object'|'count'|'size'|'csv';
 
 export interface DcmNetworkConnection{
     dcmBindAddress?:string;
@@ -296,7 +296,7 @@ export interface DiffAttributeSet {
     type: string;
 }
 
-export type AccessControlIDMode = "update_access_control_id" | "update_access_control_id_to_matching"|"update_access_control_id_to_selections";
+export type AccessControlIDMode = "level_access_control_id" | "update_access_control_id_to_matching"|"update_access_control_id_to_selections";
 
 export interface OptionsTree {
     label?:string;
@@ -319,4 +319,9 @@ export interface LanguageProfile{
     dcmDefaultLanguage:string;
     dcmuiLanguageProfileRole:string[];
     dcmuiLanguageProfileUsername:string;
+}
+
+export interface LocalLanguageObject{
+    language:LanguageObject,
+    username:string
 }

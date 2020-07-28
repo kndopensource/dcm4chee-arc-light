@@ -65,6 +65,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -134,7 +135,8 @@ public class IANSCURS {
         Response.Status rspStatus = Response.Status.BAD_GATEWAY;
         try {
             ApplicationEntity remoteAE = aeCache.findApplicationEntity(externalAET);
-            Attributes ian = queryService.createIAN(ae, studyUID, seriesUID, sopUID);
+            Attributes ian = queryService.createIAN(ae, studyUID, new String[]{ seriesUID }, sopUID,
+                    null, null, null);
             if (ian == null)
                 return errResponse("No matching instances", Response.Status.NOT_FOUND);
 
@@ -147,7 +149,9 @@ public class IANSCURS {
                     .entity(entity(ian, dimseRSP))
                     .build();
         } catch (ConfigurationException e) {
-            return errResponseAsTextPlain(exceptionAsString(e), Response.Status.NOT_FOUND);
+            return errResponse(e.getMessage(), Response.Status.NOT_FOUND);
+        } catch (IOException e) {
+            return errResponse(e.getMessage(), rspStatus);
         } catch (Exception e) {
             return errResponseAsTextPlain(exceptionAsString(e), Response.Status.INTERNAL_SERVER_ERROR);
         }

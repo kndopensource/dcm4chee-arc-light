@@ -156,12 +156,12 @@ public class HL7PSUScheduler extends Scheduler {
 
         StoreSession session = ctx.getStoreSession();
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
-        if (arcAE.hl7PSUOnStudy() && arcAE.match(
-                                        session.getRemoteHostName(),
-                                        session.getCallingAET(),
-                                        session.getLocalHostName(),
-                                        session.getCalledAET(),
-                                        ctx.getAttributes())) {
+        if (arcAE.hl7PSUOnStudy() && arcAE.hl7PSUConditions().match(
+                session.getRemoteHostName(),
+                session.getCallingAET(),
+                session.getLocalHostName(),
+                session.getCalledAET(),
+                ctx.getAttributes())) {
             try {
                 ejb.createOrUpdateHL7PSUTaskForStudy(arcAE, ctx);
             } catch (Exception e) {
@@ -197,8 +197,8 @@ public class HL7PSUScheduler extends Scheduler {
         Sequence perfSeriesSeq = mppsAttrs.getSequence(Tag.PerformedSeriesSequence);
         for (Attributes perfSeries : perfSeriesSeq) {
             String seriesInstanceUID = perfSeries.getString(Tag.SeriesInstanceUID);
-            Attributes ianForSeries = queryService.createIAN(ae, studyInstanceUID, seriesInstanceUID,
-                    null, null, null);
+            Attributes ianForSeries = queryService.createIAN(ae, studyInstanceUID, new String[]{ seriesInstanceUID },
+                    null, null, null, null);
             if (ianForSeries == null)
                 return false;
 

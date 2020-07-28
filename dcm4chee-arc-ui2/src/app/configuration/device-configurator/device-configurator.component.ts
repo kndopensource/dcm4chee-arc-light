@@ -2,7 +2,7 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormElement} from '../../helpers/form/form-element';
 import {DeviceConfiguratorService} from './device-configurator.service';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import { combineLatest} from 'rxjs';
 import {AppService} from '../../app.service';
 import {ControlService} from '../control/control.service';
@@ -15,6 +15,7 @@ import {LoadingBarService} from "@ngx-loading-bar/core";
 import {KeycloakService} from "../../helpers/keycloak-service/keycloak.service";
 import {j4care} from "../../helpers/j4care.service";
 import { loadTranslations } from '@angular/localize';
+import {LocalLanguageObject} from "../../interfaces";
 
 @Component({
   selector: 'app-device-configurator',
@@ -34,6 +35,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
     isNew = false;
     searchBreadcrum = [];
     emptyExtension = false;
+    currentSavedLanguage:LocalLanguageObject;
     constructor(
         private route: ActivatedRoute,
         private router: Router,
@@ -120,7 +122,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
                                     $this.service.pagination = $this.params = [
                                         {
                                             url: '/device/devicelist',
-                                            title: 'devicelist',
+                                            title: $localize `:@@devicelist:devicelist`,
                                             prefixArray:[],
                                             suffixArray:[],
                                             allArray:[],
@@ -135,7 +137,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
                                 $this.controlService.reloadArchive().subscribe((res) => {
                                     console.log('res', res);
                                     // $this.message = 'Reload successful';
-                                    $this.mainservice.showMsg( $localize `:@@device-configurator.reload_successful:Reload successful`);
+                                    $this.mainservice.showMsg( $localize `:@@reload_successful:Reload successful`);
                                         $this.cfpLoadingBar.complete();
                                 }, (err) => {
                                     $this.cfpLoadingBar.complete();
@@ -156,7 +158,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
                 }else{
                     _.assign($this.service.device, deviceClone);
                     console.warn('devicename is missing', this.service.device);
-                    $this.mainservice.showError($localize `:@@device-configurator.device_name_is_missing:Device name is missing!`);
+                    $this.mainservice.showError($localize `:@@device_name_missing:Device name is missing!`);
                 }
             }else{
                 let updateDevice = this.service.updateDevice();
@@ -183,7 +185,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
                                 $this.controlService.reloadArchive().subscribe((res) => {
                                     console.log('res', res);
                                     // $this.message = 'Reload successful';
-                                    $this.mainservice.showMsg($localize `:@@device-configurator.reload_successful:Reload successful`);
+                                    $this.mainservice.showMsg($localize `:@@reload_successful:Reload successful`);
                                     if(this.mainservice.deviceName === this.service.device.dicomDeviceName){
                                         try{
                                             let global = _.cloneDeep(this.mainservice.global);
@@ -283,7 +285,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
         // }
     };
     ngOnInit(){
-
+        this.currentSavedLanguage = <LocalLanguageObject> JSON.parse(localStorage.getItem('current_language'));
         this.initCheck(10);
     }
     initCheck(retries){
@@ -354,8 +356,12 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
                     } else {
                         $this.service.pagination.push(newPaginationObject);
                     }
+                        let deviceSchemaURL = `./assets/schema/device.schema.json`;
+                        if(_.hasIn(this.currentSavedLanguage,"language.code") && this.currentSavedLanguage.language.code && this.currentSavedLanguage.language.code != "en"){
+                            deviceSchemaURL = `./assets/schema/${this.currentSavedLanguage.language.code}/device.schema.json`;
+                        }
                         if (params['device'] == '[new_device]') {
-                            $this.$http.get('./assets/schema/device.schema.json')
+                            $this.$http.get(deviceSchemaURL)
                                 // .map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;})
                                 .subscribe((schema) => {
                                 $this.showform = false;
@@ -375,7 +381,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
 
                             combineLatest(
                                 $this.service.getDevice(params['device']),
-                                $this.$http.get('./assets/schema/device.schema.json')
+                                $this.$http.get(deviceSchemaURL)
                                     // .map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;})
                             ).subscribe(deviceschema => {
                                 $this.service.device = deviceschema[0];
@@ -407,7 +413,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
                 }
             }else {
                 //We assume that the user tryes to go one level deeper than allowed
-                $this.mainservice.showError($localize `:@@device-configur.parent_dont_exist:Parent didn't exist, save first the parent`);
+                $this.mainservice.showError($localize `:@@device-configurator.parent_dont_exist:Parent didn't exist, save first the parent`);
                 $this.router.navigateByUrl($this.service.pagination[$this.service.pagination.length - 1].url);
                 $this.cfpLoadingBar.complete();
             }
@@ -560,7 +566,7 @@ export class DeviceConfiguratorComponent implements OnInit, OnDestroy {
             this.params = this.service.pagination = [
                  {
                      url: '/device/devicelist',
-                     title: 'devicelist',
+                     title: $localize `:@@devicelist:devicelist`,
                      prefixArray:[],
                      suffixArray:[],
                      allArray:[],

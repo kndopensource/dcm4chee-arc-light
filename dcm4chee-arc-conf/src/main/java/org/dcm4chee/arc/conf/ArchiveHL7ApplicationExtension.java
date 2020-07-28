@@ -65,8 +65,10 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
     private Boolean hl7UseNullValue;
     private HL7OrderMissingStudyIUIDPolicy hl7OrderMissingStudyIUIDPolicy;
     private HL7ImportReportMissingStudyIUIDPolicy hl7ImportReportMissingStudyIUIDPolicy;
+    private HL7ReferredMergedPatientPolicy hl7ReferredMergedPatientPolicy;
     private String hl7DicomCharacterSet;
     private Boolean hl7VeterinaryUsePatientName;
+    private String hl7PatientArrivalMessageType;
     private HL7ORUAction[] hl7ORUAction = {};
 
     private final ArrayList<HL7ExportRule> hl7ExportRules = new ArrayList<>();
@@ -98,8 +100,10 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
         hl7UseNullValue = arcapp.hl7UseNullValue;
         hl7OrderMissingStudyIUIDPolicy = arcapp.hl7OrderMissingStudyIUIDPolicy;
         hl7ImportReportMissingStudyIUIDPolicy = arcapp.hl7ImportReportMissingStudyIUIDPolicy;
+        hl7ReferredMergedPatientPolicy = arcapp.hl7ReferredMergedPatientPolicy;
         hl7DicomCharacterSet = arcapp.hl7DicomCharacterSet;
         hl7VeterinaryUsePatientName = arcapp.hl7VeterinaryUsePatientName;
+        hl7PatientArrivalMessageType = arcapp.hl7PatientArrivalMessageType;
         hl7ORUAction = arcapp.hl7ORUAction;
         hl7ExportRules.clear();
         hl7ExportRules.addAll(arcapp.hl7ExportRules);
@@ -256,7 +260,9 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
     }
 
     public Stream<HL7ExportRule> hl7ExportRules() {
-        return Stream.concat(hl7ExportRules.stream(), getArchiveDeviceExtension().getHL7ExportRules().stream());
+        return Utils.concatCopyStream(hl7ExportRules,
+                getArchiveDeviceExtension().getHL7ExportRules(),
+                HL7ExportRule.EMPTY);
     }
 
     public boolean hasHL7ExportRules() {
@@ -280,7 +286,9 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
     }
 
     public Stream<HL7PrefetchRule> hl7PrefetchRules() {
-        return Stream.concat(hl7PrefetchRules.stream(), getArchiveDeviceExtension().getHL7PrefetchRules().stream());
+        return Utils.concatCopyStream(hl7PrefetchRules,
+                getArchiveDeviceExtension().getHL7PrefetchRules(),
+                HL7PrefetchRule.EMPTY);
     }
 
     public boolean hasHL7PrefetchRules() {
@@ -304,7 +312,9 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
     }
 
     public Stream<UPSOnHL7> upsOnHL7Stream() {
-        return Stream.concat(upsOnHL7List.stream(), getArchiveDeviceExtension().listUPSOnHL7().stream());
+        return Utils.concatCopyStream(upsOnHL7List,
+                getArchiveDeviceExtension().listUPSOnHL7(),
+                UPSOnHL7.EMPTY);
     }
 
     public boolean hasUPSOnHL7() {
@@ -328,7 +338,9 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
     }
 
     public Stream<HL7ForwardRule> hl7ForwardRules() {
-        return Stream.concat(hl7ForwardRules.stream(), getArchiveDeviceExtension().getHL7ForwardRules().stream());
+        return Utils.concatCopyStream(hl7ForwardRules,
+                getArchiveDeviceExtension().getHL7ForwardRules(),
+                HL7ForwardRule.EMPTY);
     }
 
     public boolean hasHL7ForwardRules() {
@@ -385,8 +397,9 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
     }
 
     public Stream<HL7StudyRetentionPolicy> hl7StudyRetentionPolicies() {
-        return Stream.concat(hl7StudyRetentionPolicies.stream(),
-                getArchiveDeviceExtension().getHL7StudyRetentionPolicies().stream());
+        return Utils.concatCopyStream(hl7StudyRetentionPolicies,
+                getArchiveDeviceExtension().getHL7StudyRetentionPolicies(),
+                HL7StudyRetentionPolicy.EMPTY);
     }
 
     public boolean hasHL7StudyRetentionPolicies() {
@@ -496,6 +509,20 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
         this.hl7ImportReportMissingStudyIUIDPolicy = hl7ImportReportMissingStudyIUIDPolicy;
     }
 
+    public HL7ReferredMergedPatientPolicy hl7ReferredMergedPatientPolicy() {
+        return hl7ReferredMergedPatientPolicy != null
+                ? hl7ReferredMergedPatientPolicy
+                : getArchiveDeviceExtension().getHl7ReferredMergedPatientPolicy();
+    }
+
+    public HL7ReferredMergedPatientPolicy getHl7ReferredMergedPatientPolicy() {
+        return hl7ReferredMergedPatientPolicy;
+    }
+
+    public void setHl7ReferredMergedPatientPolicy(HL7ReferredMergedPatientPolicy hl7ReferredMergedPatientPolicy) {
+        this.hl7ReferredMergedPatientPolicy = hl7ReferredMergedPatientPolicy;
+    }
+
     public String hl7DicomCharacterSet() {
         return hl7DicomCharacterSet != null
                 ? hl7DicomCharacterSet
@@ -522,6 +549,20 @@ public class ArchiveHL7ApplicationExtension extends HL7ApplicationExtension{
         return hl7VeterinaryUsePatientName != null
                 ? hl7VeterinaryUsePatientName
                 : getArchiveDeviceExtension().isHl7VeterinaryUsePatientName();
+    }
+
+    public String getHL7PatientArrivalMessageType() {
+        return hl7PatientArrivalMessageType;
+    }
+
+    public void setHL7PatientArrivalMessageType(String hl7PatientArrivalMessageType) {
+        this.hl7PatientArrivalMessageType = hl7PatientArrivalMessageType;
+    }
+
+    public String hl7PatientArrivalMessageType() {
+        return hl7PatientArrivalMessageType != null
+                ? hl7PatientArrivalMessageType
+                : getArchiveDeviceExtension().getHL7PatientArrivalMessageType();
     }
 
     public HL7ORUAction[] getHl7ORUAction() {

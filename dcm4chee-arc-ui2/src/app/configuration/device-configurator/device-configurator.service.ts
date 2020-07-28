@@ -1,5 +1,5 @@
 import {Injectable, OnInit} from '@angular/core';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {InputText} from '../../helpers/form/input-text';
 import {RadioButtons} from '../../helpers/form/radio-buttons';
 import {Checkbox} from '../../helpers/form/checkboxes';
@@ -17,6 +17,7 @@ import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {OrderByPipe} from "../../pipes/order-by.pipe";
 import {DevicesService} from "../devices/devices.service";
 import {WebAppsListService} from "../web-apps-list/web-apps-list.service";
+import {LocalLanguageObject} from "../../interfaces";
 
 @Injectable()
 export class DeviceConfiguratorService{
@@ -37,7 +38,7 @@ export class DeviceConfiguratorService{
         this.pagination = [
             {
                 url: '/device/devicelist',
-                title: 'devicelist',
+                title: $localize `:@@devicelist:devicelist`,
                 devicereff: undefined
             }
         ];
@@ -228,7 +229,12 @@ export class DeviceConfiguratorService{
         return this.$http.get('../devices/' + devicename)
     }
     getSchema(schema){
-        return this.$http.get('./assets/schema/' + schema)
+        const currentSavedLanguage = <LocalLanguageObject> JSON.parse(localStorage.getItem('current_language'));
+        let schemaURL = `./assets/schema/` + schema;
+        if(_.hasIn(currentSavedLanguage,"language.code") && currentSavedLanguage.language.code && currentSavedLanguage.language.code != "en"){
+            schemaURL = `./assets/schema/${currentSavedLanguage.language.code}/` + schema;
+        }
+        return this.$http.get(schemaURL)
             //.map(res => {let resjson; try{ let pattern = new RegExp("[^:]*:\/\/[^\/]*\/auth\/"); if(pattern.exec(res.url)){ WindowRefService.nativeWindow.location = "/dcm4chee-arc/ui2/";} resjson = res; }catch (e){ resjson = [];} return resjson;});
     };
     getSchemaFromPath(schema, schemaparam){
@@ -260,7 +266,7 @@ export class DeviceConfiguratorService{
         * */
         if (devicereff){
             if(device){
-                //If the part is already in the device override / call setWith with the child refference otherwise use lodash to append the object
+                //If the part is already in the device override / call setWith with the child refference otherwise use lodash-es to append the object
                 if (_.hasIn(device, devicereff)){
                     this.setWith(_.get(device, devicereff), value);
                 }else{
@@ -269,7 +275,7 @@ export class DeviceConfiguratorService{
                     _.set(device,  devicereff,  newValue);
                 }
             }else{
-                //If the part is already in the device override / call setWith with the child refference otherwise use lodash to append the object
+                //If the part is already in the device override / call setWith with the child refference otherwise use lodash-es to append the object
                 if (_.hasIn(this.device, devicereff)){
                     this.setWith(_.get(this.device, devicereff), value);
                 }else{
@@ -659,7 +665,7 @@ export class DeviceConfiguratorService{
                                 let options = [];
                                 if(_.hasIn(this.device,"dcmDevice.dcmuiConfig[0].dcmuiLanguageConfig[0].dcmLanguages")){
                                     (<string[]>_.get(this.device,"dcmDevice.dcmuiConfig[0].dcmuiLanguageConfig[0].dcmLanguages")).forEach(language=>{
-                                        let langObj = j4care.extractLanguageDateFromString(language);
+                                        let langObj = j4care.extractLanguageDataFromString(language);
                                         options.push({
                                             label: `${langObj.code} - ${langObj.name} - ${langObj.nativeName}`,
                                             value: language,
@@ -730,8 +736,8 @@ export class DeviceConfiguratorService{
                     // if (i === 'dicomInstalled' && _.hasIn(params, 'devicereff') && _.hasIn(params, 'schema')){
                     if(required){
                         options = [
-                            {key: 'True',  value: true},
-                            {key: 'False',  value: false}
+                            {key: $localize `:@@True:True`,  value: true},
+                            {key: $localize `:@@False:False`,  value: false}
                         ];
                         if (value === true || value === false){
                             //true
@@ -744,9 +750,9 @@ export class DeviceConfiguratorService{
                         }
                     }else{
                         options = [
-                            {key: 'True',  value: true},
-                            {key: 'False',  value: false},
-                            {key: 'Unchecked',  value: 'inherent'},
+                            {key: $localize `:@@True:True`,  value: true},
+                            {key: $localize `:@@False:False`,  value: false},
+                            {key: $localize `:@@Unchecked:Unchecked`,  value: 'inherent'},
                         ];
                         if (value === true || value === false){
                             //true
@@ -1057,18 +1063,41 @@ export class DeviceConfiguratorService{
                 }
                 break;
             case 'integer':
-                form.push(
-                    new InputNumber({
-                        key: i,
-                        label: m.title,
-                        description: m.description,
-                        value: parseFloat(value),
-                        type: 'number',
-                        order: (5 + newOrderSuffix),
-                        validation: validation,
-                        show: (this.defaultOpenBlock === 'attr')
-                    })
-                );
+                if(_.hasIn(m, 'enum')){
+                    _.forEach(m.enum, (opt) => {
+                        options.push({
+                            label: opt,
+                            value: opt,
+                            active: (opt === value) ? true : false
+                        });
+                    });
+                    form.push(
+                        new DropdownList({
+                            key: i,
+                            label: m.title,
+                            description: m.description,
+                            options: new OrderByPipe().transform(options,'label'),
+                            order: (5 + newOrderSuffix),
+                            validation: validation,
+                            value: value,
+                            type: 'number',
+                            show: (this.defaultOpenBlock === 'attr')
+                        }),
+                    );
+                }else{
+                    form.push(
+                        new InputNumber({
+                            key: i,
+                            label: m.title,
+                            description: m.description,
+                            value: parseFloat(value),
+                            type: 'number',
+                            order: (5 + newOrderSuffix),
+                            validation: validation,
+                            show: (this.defaultOpenBlock === 'attr')
+                        })
+                    );
+                }
                 break;
             default:
                 if(_.hasIn(device,i) && _.size(value) < 1){

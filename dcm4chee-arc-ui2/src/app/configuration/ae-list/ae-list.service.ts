@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {DevicesService} from "../devices/devices.service";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
 import {j4care} from "../../helpers/j4care.service";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 @Injectable()
 export class AeListService {
 
@@ -58,14 +58,14 @@ export class AeListService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomDeviceName",
-                description:$localize `:@@ae-list.device_name:Device name`,
-                placeholder:$localize `:@@ae-list.device_name:Device name`
+                description:$localize `:@@device_name:Device name`,
+                placeholder:$localize `:@@device_name:Device name`
             },{
                 tag:"input",
                 type:"text",
                 filterKey:"dicomAETitle",
-                description:$localize `:@@ae-list.ae_title:AE Title`,
-                placeholder:$localize `:@@ae-list.ae_title:AE Title`
+                description:$localize `:@@aetitle:AE Title`,
+                placeholder:$localize `:@@aetitle:AE Title`
             },{
                 tag:"input",
                 type:"text",
@@ -88,8 +88,8 @@ export class AeListService {
                 tag:"input",
                 type:"text",
                 filterKey:"dicomApplicationCluster",
-                description:$localize `:@@ae-list.application_cluster:Application Cluster`,
-                placeholder:$localize `:@@ae-list.application_cluster:Application Cluster`
+                description:$localize `:@@application_cluster:Application Cluster`,
+                placeholder:$localize `:@@application_cluster:Application Cluster`
             },
             {
                 tag: "button",

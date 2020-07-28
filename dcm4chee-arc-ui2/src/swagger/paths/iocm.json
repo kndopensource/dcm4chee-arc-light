@@ -1127,7 +1127,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "C-FIND-SCP or C-STORE SCP Failure",
+          "description": "Connection Refused or C-FIND-SCP or C-STORE SCP Failure",
           "content": {
             "application/json": {
               "schema": {
@@ -1187,7 +1187,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "C-FIND-SCP or C-STORE SCP Failure",
+          "description": "Connection Refused or C-FIND-SCP or C-STORE SCP Failure",
           "content": {
             "application/json": {
               "schema": {
@@ -1250,7 +1250,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "C-FIND-SCP or C-STORE SCP Failure",
+          "description": "Connection Refused or C-FIND-SCP or C-STORE SCP Failure",
           "content": {
             "application/json": {
               "schema": {
@@ -1310,7 +1310,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "C-FIND-SCP or C-STORE SCP Failure",
+          "description": "Connection Refused or C-FIND-SCP or C-STORE SCP Failure",
           "content": {
             "application/json": {
               "schema": {
@@ -1373,7 +1373,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "C-FIND-SCP or C-STORE SCP Failure",
+          "description": "Connection Refused or C-FIND-SCP or C-STORE SCP Failure",
           "content": {
             "application/json": {
               "schema": {
@@ -1439,7 +1439,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "C-FIND-SCP or C-STORE SCP Failure",
+          "description": "Connection Refused or C-FIND-SCP or C-STORE SCP Failure",
           "content": {
             "application/json": {
               "schema": {
@@ -1535,7 +1535,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "DICOM Service Exception"
+          "description": "Connection Refused or DICOM Service Exception"
         }
       }
     }
@@ -1602,7 +1602,7 @@
           "description": "Internal Server Error"
         },
         "502": {
-          "description": "DICOM Service Exception"
+          "description": "Connection Refused or DICOM Service Exception"
         }
       }
     }

@@ -36,8 +36,8 @@ export class StorageSystemsService {
             text:$localize `:@@hcp:hcp`,
             value:"hcp"
         },{
-            text:$localize `:@@documentu:documentu`,
-            value:"documentu"
+            text:$localize `:@@documentum:documentum`,
+            value:"documentum"
         }
     ];
     search(filters, offset) {
@@ -106,8 +106,8 @@ export class StorageSystemsService {
                             type:"number",
                             min:1,
                             filterKey:"usableSpaceBelow",
-                            placeholder:$localize `:@@storage-systems.usablespace_below:Usablespace below`,
-                            title:$localize `:@@storage-systems.usablespace_below:Usablespace below`
+                            placeholder:$localize `:@@storage-systems.usablespace_below:UsableSpace below`,
+                            title:$localize `:@@storage-systems.usablespace_below:UsableSpace below`
                         },
                         secondField:{
                             tag:"select",
@@ -119,8 +119,8 @@ export class StorageSystemsService {
                                 {"value":"MB",text:"MB"},
                                 {"value":"BYTE",text:"Byte"},
                             ],
-                            placeholder:$localize `:@@unite:Unite`,
-                            title:$localize `:@@unite:Unite`
+                            placeholder:$localize `:@@unit:Unit`,
+                            title:$localize `:@@unit:Unit`
                         }
                     }
                 ]
@@ -130,14 +130,14 @@ export class StorageSystemsService {
                         tag:"input",
                         type:"text",
                         filterKey:"dcmStorageClusterID",
-                        placeholder:$localize `:@@storage-systems.storage_cluster_id:Storage Cluster ID`,
-                        description:$localize `:@@storage-systems.storage_cluster_id:Storage Cluster ID`
+                        placeholder:$localize `:@@storage_cluster_id:Storage Cluster ID`,
+                        description:$localize `:@@storage_cluster_id:Storage Cluster ID`
                     },
                     {
                         tag:"button",
                         id:"submit",
                         text:$localize `:@@SUBMIT:SUBMIT`,
-                        description:$localize `:@@storage-systems.get_storage_commitments:Get Storage commitments`
+                        description:$localize `:@@get_storage_commitments:Get Storage commitments`
                     }
                 ],[]
             ]

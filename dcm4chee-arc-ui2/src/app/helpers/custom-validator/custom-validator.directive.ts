@@ -1,6 +1,6 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, NG_VALIDATORS, ValidatorFn} from '@angular/forms';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 
 @Directive({
     selector: '[appCustomValidator]',
@@ -20,7 +20,7 @@ export class CustomValidatorDirective{
             })*/
             let check = (control.value === undefined || control.value === null || control.value === '' || (_.size(control.value) < 1) || (_.isArray(control.value) && control.value[0] === ''));
             return check ?
-            {'msg': $localize `:@@field_required:This field is required!`} :
+            {'msg': $localize `:@@this_field_is_required:This field is required!`} :
                 null;
         };
     }
@@ -35,7 +35,7 @@ export class CustomValidatorDirective{
             });
             let check = ((control.value === undefined || control.value === null || control.value === '') && !oneOfOptionsActive);
             return check ?
-            {'msg': $localize `:@@field_required:This field is required!`} :
+            {'msg': $localize `:@@this_field_is_required:This field is required!`} :
                 null;
         };
     }

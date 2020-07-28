@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import {AppService} from '../../../app.service';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {CreateExporterService} from './create-exporter.service';
 import {HttpErrorHandler} from "../../../helpers/http-error-handler";
 import {J4careHttpService} from "../../../helpers/j4care-http.service";
@@ -46,8 +46,8 @@ export class CreateExporterComponent implements OnInit{
         ],
         "properties": {
             "dcmExporterID": {
-                "title": $localize `:@@create-exporter.exporter_id:Exporter ID`,
-                "description": $localize `:@@create-exporter.exporter_id:Exporter ID`,
+                "title": $localize `:@@exporter_id:Exporter ID`,
+                "description": $localize `:@@exporter_id:Exporter ID`,
                 "type": "string"
             },
             "dcmURI": {
@@ -56,7 +56,7 @@ export class CreateExporterComponent implements OnInit{
                 "type": "string"
             },
             "dcmQueueName": {
-                "title": $localize `:@@create-exporter.queue_name:Queue Name`,
+                "title": $localize `:@@queue_name:Queue Name`,
                 "description": $localize `:@@create-exporter.jms_queue_name:JMS Queue Name`,
                 "type": "string",
                 "enum" : [
@@ -77,7 +77,7 @@ export class CreateExporterComponent implements OnInit{
             },
             "dcmInstanceAvailability": {
                 "title": $localize `:@@create-exporter.instance_availability:Instance Availability`,
-                "description": $localize `:@@create-exporter.instance_availability.:Instance Availability.`,
+                "description": $localize `:@@create-exporter.instance_availability:Instance Availability`,
                 "type": "string",
                 "default": "ONLINE",
                 "enum": [

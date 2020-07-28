@@ -9,7 +9,7 @@ import {
     Output, ViewContainerRef
 } from '@angular/core';
 import {j4care} from "../j4care.service";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {AppService} from "../../app.service";
 import {DeviceConfiguratorService} from "../../configuration/device-configurator/device-configurator.service";
 import {DevicesService} from "../../configuration/devices/devices.service";
@@ -212,7 +212,7 @@ export class FilterGeneratorComponent implements OnInit, OnDestroy, AfterContent
     saveFilterTemplate(){
         if(!this.appService.deviceName){
             this.confirm({
-                content: $localize `:@@device_name_not_found:Archive device name not found, reload the page and try again!`
+                content: $localize `:@@archive_device_name_not_found:Archive device name not found, reload the page and try again!`
             }).subscribe((ok)=>{});
         }else{
             console.log("device name",this.appService.deviceName);

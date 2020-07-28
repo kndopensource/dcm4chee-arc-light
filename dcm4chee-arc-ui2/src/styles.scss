@@ -639,6 +639,25 @@ p-calendar{
     background-position: center center;
     float: left;
   }
+  &.calendar_step_black{
+    background-image: url("assets/img/calendar_step.png");
+    background-repeat:no-repeat;
+    height:26px;
+    width:30px;
+    background-position: center center;
+    float: left;
+    &:hover{
+      background-image: url("assets/img/calendar_step_white.png");
+    }
+  }
+  &.calendar_step_white{
+    background-image: url("assets/img/calendar_step_white.png");
+    background-repeat:no-repeat;
+    height:26px;
+    width:30px;
+    background-position: center center;
+    float: left;
+  }
   &.pdf_icon{
     background-image: url("assets/img/pdf_icon.png");
     background-repeat:no-repeat;
@@ -656,6 +675,28 @@ p-calendar{
     float: left;
     &:hover{
       background-image: url("assets/img/csv_icon.png");
+    }
+  }
+  &.hand_shake_black{
+    background-image: url("assets/img/hand_shake_black.png");
+    background-repeat:no-repeat;
+    height:100%;
+    width:25px;
+    background-position: center center;
+    //float: left;
+    &:hover{
+      background-image: url("assets/img/hand_shake_white.png");
+    }
+  }
+  &.ticker_export_black{
+    background-image: url("assets/img/ticker_export_black.png");
+    background-repeat:no-repeat;
+    height:100%;
+    width:25px;
+    background-position: center center;
+    //float: left;
+    &:hover{
+      background-image: url("assets/img/ticker_export_white.png");
     }
   }
 }
@@ -2107,6 +2148,18 @@ mat-form-field{
   .dropdown_parent{
     select.dropdown{
       position: static !important;
+    }
+    mat-select{
+      .mat-select-trigger{
+        border: 1px solid #ccc;
+        .mat-select-value{
+          line-height: 30px;
+          height: 30px;
+        }
+        .mat-select-value-text{
+          padding-left: 7px;
+        }
+      }
     }
   }
 }

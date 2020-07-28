@@ -407,6 +407,7 @@ public class StoreServiceEJB {
             for (Attributes seriesRef : studyRef.getSequence(Tag.ReferencedSeriesSequence)) {
                 String seriesUID = seriesRef.getString(Tag.SeriesInstanceUID);
                 series = findSeries(studyUID, seriesUID);
+                restoreInstances(session, series, studyUID, purgeInstanceRecordsDelay, null);
                 List<String> sopIUIDsOfSeries = null;
                 if (!acceptRejectionBeforeStorage) {
                     if (series == null)
@@ -442,7 +443,6 @@ public class StoreServiceEJB {
                     }
                 }
                 if (series != null) {
-                    restoreInstances(session, series, studyUID, purgeInstanceRecordsDelay, null);
                     RejectionState rejectionState = hasNotRejectedInstances(series)
                             ? RejectionState.PARTIAL : RejectionState.COMPLETE;
                     series.setRejectionState(rejectionState);
@@ -886,6 +886,7 @@ public class StoreServiceEJB {
         AttributeFilter filter = arcDev.getAttributeFilter(Entity.Patient);
         Attributes attrs = pat.getAttributes();
         UpdateInfo updateInfo = new UpdateInfo(attrs);
+        Attributes.unifyCharacterSets(attrs, ctx.getAttributes());
         if (!attrs.updateSelected(updatePolicy, ctx.getAttributes(), null, filter.getSelection(false)))
             return pat;
 
@@ -922,6 +923,7 @@ public class StoreServiceEJB {
         AttributeFilter filter = arcDev.getAttributeFilter(Entity.Study);
         Attributes attrs = study.getAttributes();
         UpdateInfo updateInfo = new UpdateInfo(attrs);
+        Attributes.unifyCharacterSets(attrs, ctx.getAttributes());
         if (!attrs.updateSelected(updatePolicy, ctx.getAttributes(), updateInfo.modified, filter.getSelection(false)))
             return study;
 
@@ -950,6 +952,7 @@ public class StoreServiceEJB {
 
         Attributes attrs = series.getAttributes();
         UpdateInfo updateInfo = new UpdateInfo(attrs);
+        Attributes.unifyCharacterSets(attrs, ctx.getAttributes());
         if (!attrs.updateSelected(updatePolicy, ctx.getAttributes(), updateInfo.modified, filter.getSelection(false)))
             return series;
 
@@ -1152,12 +1155,16 @@ public class StoreServiceEJB {
         ArchiveAEExtension arcAE = session.getArchiveAEExtension();
         Study study = new Study();
         study.addStorageID(objectStorageID(ctx));
-        study.setAccessControlID(arcAE.storeAccessControlID(
-                session.getRemoteHostName(),
-                session.getCallingAET(),
-                session.getLocalHostName(),
-                session.getCalledAET(),
-                ctx.getAttributes()));
+        study.setAccessControlID(arcAE.storeAccessControlIDRules()
+                .filter(rule -> rule.match(
+                                session.getRemoteHostName(),
+                                session.getCallingAET(),
+                                session.getLocalHostName(),
+                                session.getCalledAET(),
+                                ctx.getAttributes()))
+                .map(StoreAccessControlIDRule::getStoreAccessControlID)
+                .findFirst()
+                .orElse(arcAE.getStoreAccessControlID()));
         study.setCompleteness(Completeness.COMPLETE);
         study.setExpirationState(ExpirationState.UPDATEABLE);
         setStudyAttributes(ctx, study);

@@ -102,13 +102,12 @@ public class ExportPriorsScheduler {
         ArchiveDeviceExtension arcdev = arcAE.getArchiveDeviceExtension();
         arcAE.prefetchRules()
                 .filter(((Predicate<ExportPriorsRule>) session::isNotProcessed)
-                        .and(ctx::isExportReoccurredInstances)
-                        .and(rule -> rule.match(
-                                session.getRemoteHostName(),
-                                session.getCallingAET(),
-                                session.getLocalHostName(),
-                                session.getCalledAET(),
-                                ctx.getAttributes(), now)))
+                        .and(rule -> rule.match(ctx::match, now,
+                                                session.getRemoteHostName(),
+                                                session.getCallingAET(),
+                                                session.getLocalHostName(),
+                                                session.getCalledAET(),
+                                                ctx.getAttributes())))
                 .forEach(rule -> {
                     export(ctx, rule, arcdev, now);
                     session.markAsProcessed(rule);
@@ -136,7 +135,7 @@ public class ExportPriorsScheduler {
         Calendar now = Calendar.getInstance();
         ArchiveDeviceExtension arcdev = device.getDeviceExtensionNotNull(ArchiveDeviceExtension.class);
         arcHL7App.hl7ExportRules()
-                .filter(rule -> rule.match(host, hl7Fields))
+                .filter(rule -> rule.getConditions().match(host, hl7Fields))
                 .forEach(rule -> export(sock, hl7Fields, rule, arcdev, now));
     }
 

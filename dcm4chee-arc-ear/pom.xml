@@ -45,7 +45,7 @@
   <parent>
     <artifactId>dcm4chee-arc-parent</artifactId>
     <groupId>org.dcm4che.dcm4chee-arc</groupId>
-    <version>5.22.0</version>
+    <version>5.22.4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -409,7 +409,42 @@
     </dependency>
     <dependency>
       <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-ian</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-mppsscu</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-process</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-query-attrs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
       <artifactId>dcm4chee-arc-ups-scp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-stgcmtscu</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-storescu</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-ups-study-size</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -446,6 +481,13 @@
       <artifactId>dcm4chee-arc-xsl-cda</artifactId>
       <version>${project.version}</version>
       <type>war</type>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che.dcm4chee-arc</groupId>
+      <artifactId>dcm4chee-arc-proxy</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <classifier>${dcm4chee-arc-proxy-classifier}</classifier>
     </dependency>
   </dependencies>
 
@@ -484,6 +526,11 @@
               <artifactId>dcm4chee-arc-xsl-cda</artifactId>
               <contextRoot>dcm4chee-arc/xsl</contextRoot>
             </webModule>
+            <webModule>
+              <groupId>org.dcm4che.dcm4chee-arc</groupId>
+              <artifactId>dcm4chee-arc-proxy</artifactId>
+              <contextRoot>dcm4chee-proxy</contextRoot>
+            </webModule>
           </modules>
         </configuration>
       </plugin>
@@ -504,6 +551,7 @@
         <earSourceDirectory>${basedir}/src/main/application</earSourceDirectory>
         <dcm4chee-arc-war-classifier>unsecure</dcm4chee-arc-war-classifier>
         <dcm4chee-arc-ui-classifier>unsecure</dcm4chee-arc-ui-classifier>
+        <dcm4chee-arc-proxy-classifier>unsecure</dcm4chee-arc-proxy-classifier>
       </properties>
     </profile>
     <profile>
@@ -520,6 +568,7 @@
         <earSourceDirectory>${basedir}/src/main/application-secure</earSourceDirectory>
         <dcm4chee-arc-war-classifier>secure</dcm4chee-arc-war-classifier>
         <dcm4chee-arc-ui-classifier>secure</dcm4chee-arc-ui-classifier>
+        <dcm4chee-arc-proxy-classifier>secure</dcm4chee-arc-proxy-classifier>
       </properties>
     </profile>
     <profile>
@@ -535,6 +584,7 @@
         <classifier>${db}-secure-ui</classifier>
         <earSourceDirectory>${basedir}/src/main/application-secure</earSourceDirectory>
         <dcm4chee-arc-war-classifier>unsecure</dcm4chee-arc-war-classifier>
+        <dcm4chee-arc-proxy-classifier>unsecure</dcm4chee-arc-proxy-classifier>
         <dcm4chee-arc-ui-classifier>secure</dcm4chee-arc-ui-classifier>
       </properties>
     </profile>

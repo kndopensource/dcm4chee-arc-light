@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import {FilterSchema, SelectDropdown} from "../../interfaces";
+import {FilterSchema, LocalLanguageObject, SelectDropdown} from "../../interfaces";
 import {J4careHttpService} from "../../helpers/j4care-http.service";
-import * as _ from "lodash";
+import * as _ from "lodash-es";
 import {AeListService} from "../ae-list/ae-list.service";
 import {DevicesService} from "../devices/devices.service";
 import {Device} from "../../models/device";
@@ -27,7 +27,12 @@ export class WebAppsListService {
     }
 
     getServiceClasses = () => {
-        return this.$http.get("./assets/schema/webApplication.schema.json").pipe(map(schema=>{
+        const currentSavedLanguage = <LocalLanguageObject> JSON.parse(localStorage.getItem('current_language'));
+        let deviceSchemaURL = `./assets/schema/webApplication.schema.json`;
+        if(_.hasIn(currentSavedLanguage,"language.code") && currentSavedLanguage.language.code && currentSavedLanguage.language.code != "en"){
+            deviceSchemaURL = `./assets/schema/${currentSavedLanguage.language.code}/webApplication.schema.json`;
+        }
+        return this.$http.get(deviceSchemaURL).pipe(map(schema=>{
           return (<any[]>_.get(schema,"properties.dcmWebServiceClass.items.enum")).map(serviceClass=>{
               return new SelectDropdown(serviceClass,serviceClass);
           });
@@ -52,14 +57,14 @@ export class WebAppsListService {
             filterKey:"dicomDeviceName",
             options:devices,
             showStar:true,
-            description:$localize `:@@web-apps-list.device_name:Device Name`,
-            placeholder:$localize `:@@web-apps-list.device_name:Device Name`
+            description:$localize `:@@device_name:Device Name`,
+            placeholder:$localize `:@@device_name:Device Name`
         },{
             tag:"input",
             type:"text",
             filterKey:"dicomDescription",
-            description:$localize `:@@web-apps-list.device_description:Device Description`,
-            placeholder:$localize `:@@web-apps-list.device_description:Device Description`
+            description:$localize `:@@device_description:Device Description`,
+            placeholder:$localize `:@@device_description:Device Description`
         },{
             tag:"input",
             type:"text",
@@ -96,8 +101,8 @@ export class WebAppsListService {
             tag:"input",
             type:"text",
             filterKey:"dicomApplicationCluster",
-            description:$localize `:@@web-apps-list.application_cluster:Application Cluster`,
-            placeholder:$localize `:@@web-apps-list.application_cluster:Application Cluster`
+            description:$localize `:@@application_cluster:Application Cluster`,
+            placeholder:$localize `:@@application_cluster:Application Cluster`
         },
         {
             tag:"button",
@@ -121,8 +126,8 @@ export class WebAppsListService {
             }),
             new TableSchemaElement({
                 type:"value",
-                title:$localize `:@@dame:Name`,
-                header: $localize `:@@dame:Name`,
+                title:$localize `:@@name:Name`,
+                header: $localize `:@@name:Name`,
                 widthWeight:1,
                 pathToValue:"dcmWebAppName"
             }),

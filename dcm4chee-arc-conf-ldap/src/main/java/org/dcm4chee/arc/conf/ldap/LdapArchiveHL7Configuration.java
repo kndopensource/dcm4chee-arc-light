@@ -94,6 +94,10 @@ public class LdapArchiveHL7Configuration extends LdapHL7ConfigurationExtension {
         LdapUtils.storeNotNullOrDef(ldapObj, attrs, "hl7VeterinaryUsePatientName",
                 ext.getHl7VeterinaryUsePatientName(), null);
         LdapUtils.storeNotEmpty(ldapObj, attrs, "hl7ORUAction", ext.getHl7ORUAction());
+        LdapUtils.storeNotNullOrDef(ldapObj, attrs, "hl7ReferredMergedPatientPolicy",
+                ext.getHl7ReferredMergedPatientPolicy(), null);
+        LdapUtils.storeNotNullOrDef(ldapObj, attrs, "hl7PatientArrivalMessageType",
+                ext.getHL7PatientArrivalMessageType(), null);
     }
 
     @Override
@@ -144,6 +148,9 @@ public class LdapArchiveHL7Configuration extends LdapHL7ConfigurationExtension {
         ext.setHl7DicomCharacterSet(LdapUtils.stringValue(attrs.get("hl7DicomCharacterSet"), null));
         ext.setHl7VeterinaryUsePatientName(LdapUtils.booleanValue(attrs.get("hl7VeterinaryUsePatientName"), null));
         ext.setHl7ORUAction(LdapUtils.enumArray(HL7ORUAction.class, attrs.get("hl7ORUAction")));
+        ext.setHl7ReferredMergedPatientPolicy(LdapUtils.enumValue(HL7ReferredMergedPatientPolicy.class,
+                attrs.get("hl7ReferredMergedPatientPolicy"), null));
+        ext.setHL7PatientArrivalMessageType(LdapUtils.stringValue(attrs.get("hl7PatientArrivalMessageType"), null));
     }
 
     @Override
@@ -215,6 +222,10 @@ public class LdapArchiveHL7Configuration extends LdapHL7ConfigurationExtension {
         LdapUtils.storeDiffObject(ldapObj, mods, "hl7VeterinaryUsePatientName",
                 aa.getHl7VeterinaryUsePatientName(), bb.getHl7VeterinaryUsePatientName(), null);
         LdapUtils.storeDiff(ldapObj, mods, "hl7ORUAction", aa.getHl7ORUAction(), bb.getHl7ORUAction());
+        LdapUtils.storeDiffObject(ldapObj, mods, "hl7ReferredMergedPatientPolicy",
+                aa.getHl7ReferredMergedPatientPolicy(), bb.getHl7ReferredMergedPatientPolicy(), null);
+        LdapUtils.storeDiffObject(ldapObj, mods, "hl7PatientArrivalMessageType",
+                aa.getHL7PatientArrivalMessageType(), bb.getHL7PatientArrivalMessageType(), null);
         if (remove)
             mods.add(new ModificationItem(DirContext.REMOVE_ATTRIBUTE,
                     LdapUtils.attr("objectClass", "dcmArchiveHL7Application")));

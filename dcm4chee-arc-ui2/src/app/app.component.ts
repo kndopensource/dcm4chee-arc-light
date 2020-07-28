@@ -3,12 +3,12 @@ import { MatDialog, MatDialogRef, MatDialogConfig } from '@angular/material/dial
 import {MessagingComponent} from './widgets/messaging/messaging.component';
 import {AppService} from './app.service';
 import {ViewChild} from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/share';
+
+
 import {ProductLabellingComponent} from './widgets/dialogs/product-labelling/product-labelling.component';
 import {HostListener} from '@angular/core';
 import {WindowRefService} from "./helpers/window-ref.service";
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {J4careHttpService} from "./helpers/j4care-http.service";
 import {j4care} from "./helpers/j4care.service";
 import {PermissionService} from "./helpers/permissions/permission.service";
@@ -21,7 +21,7 @@ import {KeycloakHttpClient} from "./helpers/keycloak-service/keycloak-http-clien
 import {User} from "./models/user";
 import {LanguageSwitcher} from "./models/language-switcher";
 import {HttpErrorHandler} from "./helpers/http-error-handler";
-import {LanguageConfig} from "./interfaces";
+import {LanguageConfig, LanguageObject, LocalLanguageObject} from "./interfaces";
 declare var DCM4CHE: any;
 declare var Keycloak: any;
 
@@ -74,22 +74,28 @@ export class AppComponent implements OnInit {
         // const savedLanguageCode = localStorage.getItem('language_code');
 /*        let languageConfig:any = localStorage.getItem('languageConfig');
         console.log("global",this.mainservice.global);
-        if(languageConfig){
-            this.languageSwitcher = new LanguageSwitcher(JSON.parse(languageConfig));
-        }*/
-        this.mainservice.globalSet$.subscribe(global=>{
-            if(_.hasIn(global,"uiConfig")){
-/*                if(_.hasIn(global, "uiConfig.dcmuiLanguageConfig[0]")) {
-                    if (languageConfig != JSON.stringify(_.get(global, "uiConfig.dcmuiLanguageConfig[0]"))) {
-                        localStorage.setItem('languageConfig', JSON.stringify(_.get(global, "uiConfig.dcmuiLanguageConfig[0]")));
-                        languageConfig = _.get(global, "uiConfig.dcmuiLanguageConfig[0]");
-                        if(languageConfig){
-                            this.languageSwitcher = new LanguageSwitcher(languageConfig);
+        console.log("this.user1",this.mainservice.user);
+        console.log("_keycloakService",this._keycloakService.getUserInfo())
+        this._keycloakService.getUserInfo().subscribe(user=>{
+            console.log("user",user);
+            if(languageConfig){
+                this.languageSwitcher = new LanguageSwitcher(JSON.parse(languageConfig));
+            }
+            this.mainservice.globalSet$.subscribe(global=>{
+                if(_.hasIn(global,"uiConfig")){
+                    if(_.hasIn(global, "uiConfig.dcmuiLanguageConfig[0]")) {
+                        console.log("this.user",this.mainservice.user);
+                        if (languageConfig != JSON.stringify(_.get(global, "uiConfig.dcmuiLanguageConfig[0]"))) {
+                            localStorage.setItem('languageConfig', JSON.stringify(_.get(global, "uiConfig.dcmuiLanguageConfig[0]")));
+                            languageConfig = _.get(global, "uiConfig.dcmuiLanguageConfig[0]");
+                            if(languageConfig){
+                                this.languageSwitcher = new LanguageSwitcher(languageConfig);
+                            }
                         }
                     }
-                }*/
-            }
-        });
+                }
+            });
+        });*/
 /*        this.mainservice.getUiConfig().subscribe(res=>{
             console.log("uiconfgi",res);
         },err=>{
@@ -106,8 +112,31 @@ export class AppComponent implements OnInit {
             })
         }
     }
+    initLanguage(){
+        let languageConfig:any = localStorage.getItem('languageConfig');
+        if(languageConfig){
+            this.languageSwitcher = new LanguageSwitcher(JSON.parse(languageConfig), this.mainservice.user);
+        }
+        this.mainservice.globalSet$.subscribe(global=>{
+            if(_.hasIn(global,"uiConfig")){
+                if(_.hasIn(global, "uiConfig.dcmuiLanguageConfig[0]")) {
+                    if (languageConfig != JSON.stringify(_.get(global, "uiConfig.dcmuiLanguageConfig[0]"))) { //TODO comparing with stringify is not a good idea
+                        localStorage.setItem('languageConfig', JSON.stringify(_.get(global, "uiConfig.dcmuiLanguageConfig[0]")));
+                        languageConfig = _.get(global, "uiConfig.dcmuiLanguageConfig[0]");
+                        if(languageConfig){
+                            this.languageSwitcher = new LanguageSwitcher(languageConfig, this.mainservice.user);
+                        }
+                    }
+                    //TODO check if the current_language is the same with the default language of the uiConfig if not update default language in LDAP and Localstorage
+
+                }
+            }
+        });
+    }
     init(){
-        this.setUserInformation();
+        this.setUserInformation(()=>{
+            this.initLanguage();
+        });
         Date.prototype.toDateString = function() {
             return `${this.getFullYear()}${j4care.getSingleDateTimeValueFromInt(this.getMonth()+1)}${j4care.getSingleDateTimeValueFromInt(this.getDate())}${j4care.getSingleDateTimeValueFromInt(this.getHours())}${j4care.getSingleDateTimeValueFromInt(this.getMinutes())}${j4care.getSingleDateTimeValueFromInt(this.getSeconds())}`;
         };
@@ -116,15 +145,20 @@ export class AppComponent implements OnInit {
             this.initGetPDQServices();
         });
     }
-    switchLanguage(languageCode){
-        if(languageCode === "en"){
-            localStorage.removeItem('language_code');
-        }else{
-            localStorage.setItem('language_code', languageCode);
-        }
+    switchLanguage(language:LanguageObject){
+/*        if(language.code === "en"){
+            localStorage.removeItem('current_language');
+        }else{*/
+            const localLanguage:LocalLanguageObject = {
+                language:language,
+                username:this.mainservice.user.user
+            };
+            localStorage.setItem('current_language', JSON.stringify(localLanguage));
+            //TODO update the uiConfig so that the new choose language to be the default one for this user
+        //}
         setTimeout(()=>{
             location.reload();
-        },200);
+        },1);
     }
     testUser(){
         KeycloakService.keycloakAuth.loadUserInfo().success(user=>{
@@ -151,12 +185,13 @@ export class AppComponent implements OnInit {
                     recall.apply(this);
             });
     }
-    setUserInformation(){
+    setUserInformation(recall:Function){
         if(this.mainservice.global && this.mainservice.global.notSecure){
             this.user = null;
             this.realm = null;
             this.superUser = true;
             this.authServerUrl = null;
+            recall.apply(this);
         }else{
             try{
                 this.mainservice.getUser().subscribe((user:User)=>{
@@ -164,11 +199,13 @@ export class AppComponent implements OnInit {
                     this.realm = user.realm;
                     this.superUser = user.su;
                     this.authServerUrl = user.authServerUrl;
+                    recall.apply(this);
                 },(err)=>{
-
+                    recall.apply(this);
                 });
             }catch (e) {
                 j4care.log("User information couldn't be set",e);
+                recall.apply(this);
             }
         }
     }
@@ -176,8 +213,18 @@ export class AppComponent implements OnInit {
         KeycloakService.keycloakAuth.logout();
     }
     gotToWildflyConsole(e){
-        e.preventDefault();
-        window.open(            `//${window.location.hostname}:9990`, "_blank");
+        try{
+            let url;
+            if(window.location.protocol.toLowerCase() === "https:"){
+                url = `//${window.location.hostname}:${this.mainservice["management-https-port"]}/console`
+            }else{
+                url = `//${window.location.hostname}:${this.mainservice["management-http-port"]}/console`
+            }
+            e.preventDefault();
+            window.open(url, "_blank");
+        }catch (e) {
+            window.open(`//${window.location.hostname}:9990/console`, "_blank");
+        }
     }
     closeFromOutside(){
         if(this.showMenu)
@@ -240,7 +287,7 @@ export class AppComponent implements OnInit {
 
         this.msg.setMsg({
             'title': 'Warning',
-            'text': $localize `:@@app.attribute_exist:Attribute already exists!`,
+            'text': $localize `:@@attribute_already_exists:Attribute already exists!`,
             'status': 'warning',
             'timeout': 50000
         });
@@ -306,6 +353,8 @@ export class AppComponent implements OnInit {
                 (res) => {
                     // $this.mainservice["deviceName"] = res.dicomDeviceName;
                     $this.mainservice["xRoad"] = res.xRoad || false;
+                    $this.mainservice["management-http-port"] = res["management-http-port"] || 9990;
+                    $this.mainservice["management-https-port"] = res["management-https-port"] || 9993;
                     this.getDeviceInfo(res.dicomDeviceName)
                         .subscribe(
                             arc => {

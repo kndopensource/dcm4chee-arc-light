@@ -1,5 +1,5 @@
 import {Component, HostListener, Input, OnInit} from '@angular/core';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {WindowRefService} from "../../helpers/window-ref.service";
 import {j4care} from "../../helpers/j4care.service";
 
@@ -72,14 +72,14 @@ export class DicomFlatListComponent implements OnInit {
             cssClass:"hideMobile"
         },
         {
-            title:$localize `:@@number_of_patient_related_studies:#S`,
+            title:$localize `:@@number_of_related_series:#S`,
             code:"00201206",
             description:$localize `:@@number_of_study_related_series:Number of Study Related Series`,
             widthWeight:0.2,
             calculatedWidth:"20%"
         },
         {
-            title:$localize `:@@number_of_related_instances:#I`,
+            title:$localize `:@@number_of_instances:#I`,
             code:"00201208",
             description:$localize `:@@number_of_study_related_instances:Number of Study Related Instances`,
             widthWeight:0.2,

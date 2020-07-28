@@ -46,7 +46,7 @@
 
   <groupId>org.dcm4che.dcm4chee-arc</groupId>
   <artifactId>dcm4chee-arc-parent</artifactId>
-  <version>5.22.0</version>
+  <version>5.22.4</version>
   <packaging>pom</packaging>
 
   <properties>
@@ -55,12 +55,15 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
     <!-- Define the version of the JBoss BOMs we want to import to specify tested stacks. -->
-    <wildfly-jakartaee8.version>18.0.1.Final</wildfly-jakartaee8.version>
-      <!-- Versions -->
+    <wildfly-jakartaee8.version>20.0.0.Final</wildfly-jakartaee8.version>
+    <!-- Versions -->
     <dcm4che.version>${project.version}</dcm4che.version>
-    <keycloak.version>9.0.0</keycloak.version>
+    <keycloak.version>10.0.2</keycloak.version>
+    <jbossws-cxf-client.version>5.4.1.Final</jbossws-cxf-client.version>
+    <jaxb-xjc.version>2.3.3-b02</jaxb-xjc.version>
+    <apache-cxf.version>3.3.6</apache-cxf.version>
     <apache-commons-csv.version>1.7</apache-commons-csv.version>
-    <jclouds.version>2.2.0</jclouds.version>
+    <jclouds.version>2.2.1</jclouds.version>
     <ecs-object-client.version>3.0.0</ecs-object-client.version>
 
     <!-- JPA -->
@@ -133,18 +136,28 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-simple</artifactId>
-        <version>3.3.3</version>
+        <version>${apache-cxf.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.ws.cxf</groupId>
         <artifactId>jbossws-cxf-client</artifactId>
-        <version>5.3.0.Final</version>
+        <version>${jbossws-cxf-client.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.jboss.com.sun.httpserver</groupId>
             <artifactId>httpserver</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+          </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-xjc</artifactId>
+        <version>${jaxb-xjc.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.keycloak</groupId>
@@ -203,25 +216,25 @@
       <dependency>
         <groupId>org.dcm4che</groupId>
         <artifactId>jdbc-jboss-modules-mysql</artifactId>
-        <version>8.0.18</version>
+        <version>8.0.20</version>
         <type>zip</type>
       </dependency>
       <dependency>
         <groupId>org.dcm4che</groupId>
         <artifactId>jdbc-jboss-modules-oracle</artifactId>
-        <version>12.2.0.1</version>
+        <version>19.6.0.0</version>
         <type>zip</type>
       </dependency>
       <dependency>
         <groupId>org.dcm4che</groupId>
         <artifactId>jdbc-jboss-modules-psql</artifactId>
-        <version>42.2.10</version>
+        <version>42.2.12</version>
         <type>zip</type>
       </dependency>
       <dependency>
         <groupId>org.dcm4che</groupId>
         <artifactId>jdbc-jboss-modules-sqlserver</artifactId>
-        <version>7.4.1.jre11</version>
+        <version>8.2.2.jre11</version>
         <type>zip</type>
       </dependency>
     </dependencies>
@@ -571,6 +584,7 @@
     <module>dcm4chee-arc-pdq-xroad</module>
     <module>dcm4chee-arc-prefetch</module>
     <module>dcm4chee-arc-procedure</module>
+    <module>dcm4chee-arc-proxy</module>
     <module>dcm4chee-arc-qido</module>
     <module>dcm4chee-arc-qmgt</module>
     <module>dcm4chee-arc-qmgt-rs</module>
@@ -600,8 +614,15 @@
     <module>dcm4chee-arc-stow</module>
     <module>dcm4chee-arc-study</module>
     <module>dcm4chee-arc-ups</module>
+    <module>dcm4chee-arc-ups-ian</module>
+    <module>dcm4chee-arc-ups-mppsscu</module>
+    <module>dcm4chee-arc-ups-process</module>
+    <module>dcm4chee-arc-ups-query-attrs</module>
     <module>dcm4chee-arc-ups-rs</module>
     <module>dcm4chee-arc-ups-scp</module>
+    <module>dcm4chee-arc-ups-stgcmtscu</module>
+    <module>dcm4chee-arc-ups-storescu</module>
+    <module>dcm4chee-arc-ups-study-size</module>
     <module>dcm4chee-arc-validation</module>
     <module>dcm4chee-arc-wado</module>
     <module>dcm4chee-arc-war</module>
@@ -611,7 +632,6 @@
     <module>dcm4chee-arc-xsl-cda</module>
     <module>dcm4chee-arc-ear</module>
     <module>dcm4chee-arc-assembly</module>
-    <module>dcm4chee-arr-proxy</module>
     <module>dcm4chee-arr-query</module>
   </modules>
 

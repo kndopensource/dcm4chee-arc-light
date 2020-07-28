@@ -509,6 +509,64 @@
       }
     }
   },
+  "attributeFilter": {
+    "title": "Attribute Filter",
+    "description": "Attributes stored in the database",
+    "type": "object",
+    "required": [
+      "dcmEntity",
+      "dcmTag"
+    ],
+    "properties": {
+      "dcmEntity": {
+        "title": "Attribute Entity",
+        "description": "Entity of the Attribute Filter or Export Rule ('Patient', 'Study', 'Series', 'Instance', 'MPPS', 'MWL').",
+        "type": "string",
+        "enum": [
+          "Patient",
+          "Study",
+          "Series",
+          "Instance",
+          "MPPS",
+          "MWL"
+        ]
+      },
+      "dcmTag": {
+        "title": "Attribute Tag",
+        "description": "DICOM Tag as hex string",
+        "type": "array",
+        "items" : { "type": "string" },
+        "format": "dcmTag"
+      },
+      "dcmCustomAttribute1": {
+        "title": "Custom Attribute 1",
+        "description": "Configure any attribute from the DICOM object which shall be inserted in database as Custom Attribute 1. Eg. DicomAttribute[@tag=\"00200070\"]/Value[@number=\"1\"] or for a Private attribute DicomAttribute[@tag=\"00E10024\" and @privateCreator=\"ELSCINT1\"]/Value[@number=\"1\"]",
+        "type": "string"
+      },
+      "dcmCustomAttribute2": {
+        "title": "Custom Attribute 2",
+        "description": "Configure any attribute from the DICOM object which shall be inserted in database as Custom Attribute 2. Eg. DicomAttribute[@tag=\"00200070\"]/Value[@number=\"1\"] or for a Private attribute DicomAttribute[@tag=\"00E10024\" and @privateCreator=\"ELSCINT1\"]/Value[@number=\"1\"]",
+        "type": "string"
+      },
+      "dcmCustomAttribute3": {
+        "title": "Custom Attribute 3",
+        "description": "Configure any attribute from the DICOM object which shall be inserted in database as Custom Attribute 3. Eg. DicomAttribute[@tag=\"00200070\"]/Value[@number=\"1\"] or for a Private attribute DicomAttribute[@tag=\"00E10024\" and @privateCreator=\"ELSCINT1\"]/Value[@number=\"1\"]",
+        "type": "string"
+      },
+      "dcmAttributeUpdatePolicy": {
+        "title": "Attribute Update Policy",
+        "description": "Specifies update policy for extracted attributes into the DB on Series, Study & Patient level on receive of further instance of the entity. PRESERVE (= nullify attributes in the new dataset which are not present in the original dataset), SUPPLEMENT (= attributes not present in original dataset will be supplemented), REPLACE (= original dataset is completely replaced), MERGE (= attribute values will be written from new dataset), OVERWRITE (= attribute values if null in new dataset, will be nullified in original dataset). If absent, PRESERVE will be applied",
+        "type": "string",
+        "enum": [
+          "PRESERVE",
+          "SUPPLEMENT",
+          "MERGE",
+          "OVERWRITE",
+          "REPLACE"
+        ]
+      }
+    }
+  },
   "attributeSets": {
     "title": "Attribute Sets",
     "type": "array",
@@ -1186,7 +1244,7 @@
         "id"
       ],
       "properties": {
-        "name": {
+        "id": {
           "title": "Exporter ID",
           "description": "Exporter ID",
           "type": "string"
@@ -1194,6 +1252,27 @@
         "description": {
           "title": "Exporter Description",
           "description": "Unconstrained text description of the exporter",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "upstpls": {
+    "title": "UPS Templates",
+    "type": "array",
+    "items": {
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "title": "UPS Template ID",
+          "description": "UPS Template ID",
+          "type": "string"
+        },
+        "description": {
+          "title": "UPS Template Description",
+          "description": "Unconstrained text description of the UPS Template",
           "type": "string"
         }
       }
@@ -1209,8 +1288,7 @@
         "dicomDeviceName",
         "ExporterID",
         "createdTime",
-        "updatedTime",
-        "scheduledTime"
+        "updatedTime"
       ],
       "properties": {
         "pk": {
@@ -1554,7 +1632,41 @@
     }
   },
   "metrics": {
-    "title": "Metrics",
+    "title": "Metrics Descriptors",
+    "type": "array",
+    "items": {
+      "required": [
+        "dcmMetricsName",
+        "dcmMetricsRetentionPeriod"
+      ],
+      "properties": {
+        "dcmMetricsName": {
+          "title": "Metrics Name",
+          "description": "Metrics Name",
+          "type": "string"
+        },
+        "dicomDescription": {
+          "title": "Metrics Description",
+          "description": "Unconstrained text description of the metrics",
+          "type": "string"
+        },
+        "dcmMetricsRetentionPeriod": {
+          "title": "Metrics Retention Period",
+          "description": "Metrics Retention Period in minutes",
+          "type": "integer",
+          "default": 60,
+          "minimum": 1
+        },
+        "dcmUnit": {
+          "title": "Metrics Unit",
+          "description": "Unit of metrics data",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "metric": {
+    "title": "Metric",
     "type": "array",
     "items": {
       "properties": {
@@ -2615,7 +2727,7 @@
     }
   },
   "webappList": {
-    "title": "HL7 Application List",
+    "title": "Web Application List",
     "type": "array",
     "items": {
       "required": [

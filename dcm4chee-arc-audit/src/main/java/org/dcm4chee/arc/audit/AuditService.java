@@ -82,13 +82,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
-import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -185,10 +185,10 @@ public class AuditService {
                 auditLogger);
     }
 
-    private void spoolInstancesDeleted(StoreContext ctx) {
+    private void spoolInstancesDeleted(StoreContext ctx, String suffix) {
         AuditUtils.EventType eventType = AuditUtils.EventType.forInstancesDeleted(ctx);
         try {
-            writeSpoolFile(eventType,null,
+            writeSpoolFile(eventType,suffix,
                     DeletionAuditService.instancesDeletedAuditInfo(ctx, getArchiveDevice()));
         } catch (Exception e) {
             LOG.warn("Failed to spool Instances Deleted [AuditEventType={}]\n", eventType, e);
@@ -408,7 +408,7 @@ public class AuditService {
 
             RejectionNote rejectionNote = ctx.getRejectionNote();
             if (rejectionNote != null && !rejectionNote.isRevokeRejection()) {
-                spoolInstancesDeleted(ctx);
+                spoolInstancesDeleted(ctx, null);
                 return;
             }
 
@@ -472,6 +472,9 @@ public class AuditService {
                     + '-' + ctx.getStudyInstanceUID();
             suffix = outcome != null ? suffix.concat("_ERROR") : suffix;
             writeSpoolFile(AuditUtils.EventType.forInstanceStored(ctx), suffix, info, instanceInfo);
+            if (ctx.getPreviousInstance() != null
+                    && ctx.getPreviousInstance().getSopInstanceUID().equals(ctx.getStoredInstance().getSopInstanceUID()))
+                spoolInstancesDeleted(ctx, suffix);
             if (ctx.getImpaxReportPatientMismatch() != null) {
                 AuditInfoBuilder patMismatchInfo = infoBuilder
                         .patMismatchCode(ctx.getImpaxReportPatientMismatch().toString())
@@ -776,7 +779,7 @@ public class AuditService {
     }
 
     void spoolProcedureRecord(ProcedureContext ctx) {
-        if (ctx.getUnparsedHL7Message() != null)
+        if (ctx.getUnparsedHL7Message() != null && !ctx.getUnparsedHL7Message().msh().getMessageType().equals("ADT^A10"))
             return;
 
         try {
@@ -884,10 +887,10 @@ public class AuditService {
         return log.getConnections().get(0).getHostname();
     }
 
-    private Path toDirPath(AuditLogger auditLogger) {
+    private Path toDirPath(AuditLogger auditLogger) throws UnsupportedEncodingException {
         return Paths.get(
                 StringUtils.replaceSystemProperties(getArchiveDevice().getAuditSpoolDirectory()),
-                auditLogger.getCommonName().replaceAll(" ", "_"));
+                URLEncoder.encode(auditLogger.getCommonName(), "UTF-8"));
     }
 
     private void writeSpoolFile(
@@ -906,10 +909,10 @@ public class AuditService {
         }
         FileTime eventTime = null;
         AuditLoggerDeviceExtension ext = device.getDeviceExtension(AuditLoggerDeviceExtension.class);
-        for (AuditLogger auditLogger : ext.getAuditLoggers()) {
+        for (AuditLogger auditLogger : ext.getAuditLoggers())
             if (auditLogger.isInstalled()) {
-                Path dir = toDirPath(auditLogger);
                 try {
+                    Path dir = toDirPath(auditLogger);
                     Files.createDirectories(dir);
                     Path file = Files.createTempFile(dir, eventType.name(), null);
                     try (BufferedOutputStream out = new BufferedOutputStream(
@@ -933,7 +936,6 @@ public class AuditService {
                             eventType, auditLogger.getCommonName(), e);
                 }
             }
-        }
     }
 
     private void writeSpoolFile(AuditUtils.EventType eventType, String suffix, AuditInfoBuilder... auditInfoBuilders) {
@@ -944,12 +946,13 @@ public class AuditService {
         }
         FileTime eventTime = null;
         AuditLoggerDeviceExtension ext = device.getDeviceExtension(AuditLoggerDeviceExtension.class);
-        for (AuditLogger auditLogger : ext.getAuditLoggers()) {
+        for (AuditLogger auditLogger : ext.getAuditLoggers())
             if (auditLogger.isInstalled()) {
-                Path dir = toDirPath(auditLogger);
                 try {
+                    Path dir = toDirPath(auditLogger);
                     Files.createDirectories(dir);
                     Path filePath = eventType.eventClass == AuditUtils.EventClass.STORE_WADOR
+                            || (suffix != null && eventType.eventClass == AuditUtils.EventClass.USER_DELETED)
                             ? filePath(file, dir, auditInfoBuilders)
                             : filePath(eventType, dir, auditInfoBuilders);
                     if (eventTime == null)
@@ -963,7 +966,6 @@ public class AuditService {
                             file, auditLogger.getCommonName(), e);
                 }
             }
-        }
     }
 
     private Path filePath(AuditUtils.EventType eventType, Path dir, AuditInfoBuilder... auditInfoBuilders)

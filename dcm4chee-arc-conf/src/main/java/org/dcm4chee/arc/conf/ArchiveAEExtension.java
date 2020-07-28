@@ -48,7 +48,6 @@ import org.dcm4che3.net.Dimse;
 import org.dcm4che3.net.TransferCapability;
 import org.dcm4che3.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.time.Period;
 import java.util.*;
@@ -100,6 +99,8 @@ public class ArchiveAEExtension extends AEExtension {
     private String fallbackCMoveSCPCallingAET;
     private String fallbackCMoveSCPLeadingCFindSCP;
     private String fallbackCMoveSCPStudyOlderThan;
+    private String fallbackWadoURIWebApplication;
+    private Integer fallbackWadoURIHttpStatusCode;
     private String externalRetrieveAEDestination;
     private String alternativeCMoveSCP;
     private Integer queryMaxNumberOfResults;
@@ -145,6 +146,8 @@ public class ArchiveAEExtension extends AEExtension {
     private Boolean stowRetiredTransferSyntax;
     private Boolean stowExcludeAPPMarkers;
     private Boolean restrictRetrieveSilently;
+    private Boolean retrieveTaskWarningOnNoMatch;
+    private Boolean retrieveTaskWarningOnWarnings;
     private Boolean stowQuicktime2MP4;
     private int[] rejectConflictingPatientAttribute = {};
     private MultipleStoreAssociations[] multipleStoreAssociations = {};
@@ -682,6 +685,34 @@ public class ArchiveAEExtension extends AEExtension {
                 : getArchiveDeviceExtension().getFallbackCMoveSCPRetries();
     }
 
+
+    public String getFallbackWadoURIWebApplication() {
+        return fallbackWadoURIWebApplication;
+    }
+
+    public void setFallbackWadoURIWebApplication(String fallbackWadoURIWebApplication) {
+        this.fallbackWadoURIWebApplication = fallbackWadoURIWebApplication;
+    }
+
+    public String fallbackWadoURIWebApplication() {
+        return fallbackWadoURIWebApplication != null
+                ? fallbackWadoURIWebApplication
+                : getArchiveDeviceExtension().getFallbackWadoURIWebApplication();
+    }
+
+    public Integer getFallbackWadoURIHttpStatusCode() {
+        return fallbackWadoURIHttpStatusCode;
+    }
+
+    public void setFallbackWadoURIHttpStatusCode(Integer fallbackWadoURIHttpStatusCode) {
+        this.fallbackWadoURIHttpStatusCode = fallbackWadoURIHttpStatusCode;
+    }
+
+    public int fallbackWadoURIHttpStatusCode() {
+        return fallbackWadoURIHttpStatusCode != null
+                ? fallbackWadoURIHttpStatusCode
+                : getArchiveDeviceExtension().getFallbackWadoURIHttpStatusCode();
+    }
     public String getExternalRetrieveAEDestination() {
         return externalRetrieveAEDestination;
     }
@@ -1268,11 +1299,6 @@ public class ArchiveAEExtension extends AEExtension {
                 ? hl7PSUConditions : getArchiveDeviceExtension().getHl7PSUConditions();
     }
 
-    public boolean match(String sendingHost, String sendingAET,
-                         String receivingHost, String receivingAET, Attributes attrs) {
-        return hl7PSUConditions().match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
-    }
-
     public AcceptConflictingPatientID getAcceptConflictingPatientID() {
         return acceptConflictingPatientID;
     }
@@ -1498,6 +1524,34 @@ public class ArchiveAEExtension extends AEExtension {
                 getArchiveDeviceExtension().getMultipleStoreAssociations());
     }
 
+    public Boolean getRetrieveTaskWarningOnNoMatch() {
+        return retrieveTaskWarningOnNoMatch;
+    }
+
+    public void setRetrieveTaskWarningOnNoMatch(Boolean retrieveTaskWarningOnNoMatch) {
+        this.retrieveTaskWarningOnNoMatch = retrieveTaskWarningOnNoMatch;
+    }
+
+    public boolean retrieveTaskWarningOnNoMatch() {
+        return retrieveTaskWarningOnNoMatch != null
+                ? retrieveTaskWarningOnNoMatch
+                : getArchiveDeviceExtension().isRetrieveTaskWarningOnNoMatch();
+    }
+
+    public Boolean getRetrieveTaskWarningOnWarnings() {
+        return retrieveTaskWarningOnWarnings;
+    }
+
+    public void setRetrieveTaskWarningOnWarnings(Boolean retrieveTaskWarningOnWarnings) {
+        this.retrieveTaskWarningOnWarnings = retrieveTaskWarningOnWarnings;
+    }
+
+    public boolean retrieveTaskWarningOnWarnings() {
+        return retrieveTaskWarningOnWarnings != null
+                ? retrieveTaskWarningOnWarnings
+                : getArchiveDeviceExtension().isRetrieveTaskWarningOnWarnings();
+    }
+
     public Boolean getStowQuicktime2MP4() {
         return stowQuicktime2MP4;
     }
@@ -1553,6 +1607,8 @@ public class ArchiveAEExtension extends AEExtension {
         fallbackCMoveSCPCallingAET = aeExt.fallbackCMoveSCPCallingAET;
         fallbackCMoveSCPLeadingCFindSCP = aeExt.fallbackCMoveSCPLeadingCFindSCP;
         fallbackCMoveSCPRetries = aeExt.fallbackCMoveSCPRetries;
+        fallbackWadoURIWebApplication = aeExt.fallbackWadoURIWebApplication;
+        fallbackWadoURIHttpStatusCode = aeExt.fallbackWadoURIHttpStatusCode;
         externalRetrieveAEDestination = aeExt.externalRetrieveAEDestination;
         alternativeCMoveSCP = aeExt.alternativeCMoveSCP;
         queryMaxNumberOfResults = aeExt.queryMaxNumberOfResults;
@@ -1600,6 +1656,8 @@ public class ArchiveAEExtension extends AEExtension {
         stowRetiredTransferSyntax = aeExt.stowRetiredTransferSyntax;
         stowExcludeAPPMarkers = aeExt.stowExcludeAPPMarkers;
         restrictRetrieveSilently = aeExt.restrictRetrieveSilently;
+        retrieveTaskWarningOnNoMatch = aeExt.retrieveTaskWarningOnNoMatch;
+        retrieveTaskWarningOnWarnings = aeExt.retrieveTaskWarningOnWarnings;
         stowQuicktime2MP4 = aeExt.stowQuicktime2MP4;
         multipleStoreAssociations = aeExt.multipleStoreAssociations;
         acceptedMoveDestinations.clear();
@@ -1626,87 +1684,73 @@ public class ArchiveAEExtension extends AEExtension {
         return ae.getDevice().getDeviceExtension(ArchiveDeviceExtension.class);
     }
 
-    public Map<String, ExportRule> findExportRules(
-            String sendingHost, String sendingAET, String receivingHost, String receivingAET, Attributes attrs, Calendar cal) {
-        HashMap<String, ExportRule> result = new HashMap<>();
-        for (Collection<ExportRule> rules
-                : new Collection[]{exportRules, getArchiveDeviceExtension().getExportRules() })
-            for (ExportRule rule : rules)
-                if (rule.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs, cal))
-                    for (String exporterID : rule.getExporterIDs()) {
-                        ExportRule rule1 = result.get(exporterID);
-                        if (rule1 == null || rule1.getEntity().compareTo(rule.getEntity()) > 0)
-                            result.put(exporterID, rule);
-                    }
-        return result;
+    public Stream<ExportRule> exportRules() {
+        return Utils.concatCopyStream(exportRules,
+                getArchiveDeviceExtension().getExportRules(),
+                ExportRule.EMPTY);
     }
 
     public Stream<UPSOnStore> upsOnStoreStream() {
-        return Stream.concat(upsOnStoreList.stream(), getArchiveDeviceExtension().listUPSOnStore().stream());
+        return Utils.concatCopyStream(upsOnStoreList,
+                getArchiveDeviceExtension().listUPSOnStore(),
+                UPSOnStore.EMPTY);
     }
 
     public Stream<ExportPriorsRule> prefetchRules() {
-        return Stream.concat(exportPriorsRules.stream(), getArchiveDeviceExtension().getExportPriorsRules().stream());
+        return Utils.concatCopyStream(exportPriorsRules,
+                getArchiveDeviceExtension().getExportPriorsRules(),
+                ExportPriorsRule.EMPTY);
     }
 
-    public List<RSForwardRule> findRSForwardRules(RSOperation rsOperation, HttpServletRequest request) {
-        ArrayList<RSForwardRule> result = new ArrayList<>();
-        for (Collection<RSForwardRule> rules
-                : new Collection[]{rsForwardRules, getArchiveDeviceExtension().getRSForwardRules()})
-            for (RSForwardRule rule : rules)
-                if (rule.match(rsOperation, request))
-                    result.add(rule);
-        return result;
+    public Stream<RSForwardRule> rsForwardRules() {
+        return Utils.concatCopyStream(rsForwardRules,
+                getArchiveDeviceExtension().getRSForwardRules(),
+                RSForwardRule.EMPTY);
     }
 
-    public ArchiveCompressionRule findCompressionRule(String sendingHost, String sendingAET,
-            String receivingHost, String receivingAET, Attributes attrs) {
-        ArchiveCompressionRule rule1 = null;
-        for (Collection<ArchiveCompressionRule> rules
-                : new Collection[]{ compressionRules, getArchiveDeviceExtension().getCompressionRules() })
-            for (ArchiveCompressionRule rule : rules)
-                if (rule.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs))
-                    if (rule1 == null || rule1.getPriority() < rule.getPriority())
-                        rule1 = rule;
-        return rule1;
+    public Stream<ArchiveCompressionRule> compressionRules() {
+        return Utils.concatCopyStream(compressionRules,
+                getArchiveDeviceExtension().getCompressionRules(),
+                ArchiveCompressionRule.EMPTY)
+                .sorted(Comparator.comparingInt(ArchiveCompressionRule::getPriority).reversed());
+    }
+
+    public Stream<ArchiveAttributeCoercion> attributeCoercions() {
+        return Utils.concatCopyStream(attributeCoercions,
+                getArchiveDeviceExtension().getAttributeCoercions(),
+                ArchiveAttributeCoercion.EMPTY)
+                .sorted(Comparator.comparingInt(ArchiveAttributeCoercion::getPriority).reversed());
     }
 
     public ArchiveAttributeCoercion findAttributeCoercion(Dimse dimse, TransferCapability.Role role, String sopClass,
             String sendingHost, String sendingAET, String receivingHost, String receivingAET, Attributes attrs) {
-        ArchiveAttributeCoercion coercion1 = null;
-        for (Collection<ArchiveAttributeCoercion> coercions
-                : new Collection[]{ attributeCoercions, getArchiveDeviceExtension().getAttributeCoercions() })
-            for (ArchiveAttributeCoercion coercion : coercions)
-                if (coercion.match(dimse, role, sopClass, sendingHost, sendingAET, receivingHost, receivingAET, attrs))
-                    if (coercion1 == null || coercion1.getPriority() < coercion.getPriority())
-                        coercion1 = coercion;
-        return coercion1;
+        return attributeCoercions()
+                .filter(coercion -> coercion.match(role, dimse, sopClass,
+                        sendingHost, sendingAET, receivingHost, receivingAET, attrs))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Stream<StudyRetentionPolicy> studyRetentionPolicies() {
+        return Utils.concatCopyStream(studyRetentionPolicies,
+                getArchiveDeviceExtension().getStudyRetentionPolicies(),
+                StudyRetentionPolicy.EMPTY)
+                .sorted(Comparator.comparingInt(StudyRetentionPolicy::getPriority).reversed());
     }
 
     public StudyRetentionPolicy findStudyRetentionPolicy(String sendingHost, String sendingAET,
             String receivingHost, String receivingAET, Attributes attrs) {
-        StudyRetentionPolicy policy1 = null;
-        for (Collection<StudyRetentionPolicy> policies
-                : new Collection[]{ studyRetentionPolicies, getArchiveDeviceExtension().getStudyRetentionPolicies() })
-            for (StudyRetentionPolicy policy : policies)
-                if (policy.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs))
-                    if (policy1 == null || policy1.getPriority() < policy.getPriority())
-                        policy1 = policy;
-        return policy1;
+        return studyRetentionPolicies()
+                .filter(policy -> policy.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs))
+                .findFirst()
+                .orElse(null);
     }
 
-    public String storeAccessControlID(String sendingHost, String sendingAET,
-            String receivingHost, String receivingAET, Attributes attrs) {
-        StoreAccessControlIDRule rule1 = null;
-        for (Collection<StoreAccessControlIDRule> rules : new Collection[]{
-                storeAccessControlIDRules,
-                    getArchiveDeviceExtension().getStoreAccessControlIDRules()
-        }) {
-            for (StoreAccessControlIDRule rule : rules)
-                if (rule.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs))
-                    if (rule1 == null || rule.getPriority() < rule.getPriority())
-                        rule1 = rule;
-        }
-        return rule1 != null ? rule1.getStoreAccessControlID() : storeAccessControlID;
+    public Stream<StoreAccessControlIDRule> storeAccessControlIDRules() {
+        return Utils.concatCopyStream(storeAccessControlIDRules,
+                getArchiveDeviceExtension().getStoreAccessControlIDRules(),
+                StoreAccessControlIDRule.EMPTY)
+                .sorted(Comparator.comparingInt(StoreAccessControlIDRule::getPriority).reversed());
     }
+
 }

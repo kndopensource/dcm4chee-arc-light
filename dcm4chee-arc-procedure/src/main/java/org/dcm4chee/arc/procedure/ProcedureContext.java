@@ -81,6 +81,10 @@ public interface ProcedureContext {
 
     void setException(Exception exception);
 
+    String getOutcomeMsg();
+
+    void setOutcomeMsg(String outcomeMsg);
+
     void setStudyInstanceUID(String studyUID);
 
     Association getAssociation();
@@ -110,4 +114,12 @@ public interface ProcedureContext {
     ArchiveHL7ApplicationExtension getArchiveHL7AppExtension();
 
     void setArchiveHL7AppExtension(ArchiveHL7ApplicationExtension arcHL7App);
+
+    String getMppsUID();
+
+    void setMppsUID(String mppsUID);
+
+    String getStatus();
+
+    void setStatus(String status);
 }

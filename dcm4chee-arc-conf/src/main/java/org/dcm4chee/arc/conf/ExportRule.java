@@ -44,6 +44,7 @@ import org.dcm4che3.data.Attributes;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.function.Predicate;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
@@ -52,20 +53,15 @@ import java.util.Calendar;
  */
 public class ExportRule {
 
+    public static final ExportRule[] EMPTY = {};
     private String commonName;
-
     private ScheduleExpression[] schedules = {};
-
     private Conditions conditions = new Conditions();
-
+    private String exporterDeviceName;
     private String[] exporterIDs = {};
-
     private Entity entity;
-
     private Duration exportDelay;
-
     private boolean exportPreviousEntity;
-
     private ExportReoccurredInstances exportReoccurredInstances = ExportReoccurredInstances.REPLACE;
 
     public ExportRule() {
@@ -97,6 +93,14 @@ public class ExportRule {
 
     public void setConditions(Conditions conditions) {
         this.conditions = conditions;
+    }
+
+    public String getExporterDeviceName() {
+        return exporterDeviceName;
+    }
+
+    public void setExporterDeviceName(String exporterDeviceName) {
+        this.exporterDeviceName = exporterDeviceName;
     }
 
     public String[] getExporterIDs() {
@@ -131,12 +135,6 @@ public class ExportRule {
         this.exportDelay = exportDelay;
     }
 
-    public boolean match(String sendingHost, String sendingAET,
-            String receivingHost, String receivingAET, Attributes attrs, Calendar cal) {
-        return ScheduleExpression.emptyOrAnyContains(cal, schedules)
-                && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
-    }
-
     public boolean isExportPreviousEntity() {
         return exportPreviousEntity;
     }
@@ -153,12 +151,21 @@ public class ExportRule {
         this.exportReoccurredInstances = exportReoccurredInstances;
     }
 
+    public boolean match(Predicate<ExportReoccurredInstances> predicate, Calendar now,
+            String sendingHost, String sendingAET, String receivingHost, String receivingAET,
+            Attributes attrs) {
+        return predicate.test(exportReoccurredInstances)
+                && ScheduleExpression.emptyOrAnyContains(now, schedules)
+                && conditions.match(sendingHost, sendingAET, receivingHost, receivingAET, attrs);
+    }
+
     @Override
     public String toString() {
         return "ExportRule{" +
                 "cn=" + commonName +
                 ", conditions=" + conditions +
                 ", schedules=" + Arrays.toString(schedules) +
+                ", exporterDeviceName=" + exporterDeviceName +
                 ", exporterIDs=" + Arrays.toString(exporterIDs) +
                 ", entity=" + entity +
                 ", exporterDelay=" + exportDelay +

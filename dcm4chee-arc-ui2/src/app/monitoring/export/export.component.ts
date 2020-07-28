@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, ViewContainerRef} from '@angular/core';
 import {User} from '../../models/user';
 import {ConfirmComponent} from '../../widgets/dialogs/confirm/confirm.component';
 import { MatDialogConfig, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {AppService} from '../../app.service';
 import {ExportService} from './export.service';
 import {ExportDialogComponent} from '../../widgets/dialogs/export/export.component';
@@ -36,8 +36,8 @@ export class ExportComponent implements OnInit, OnDestroy {
     exportTasks = [];
     timer = {
         started:false,
-        startText:$localize `:@@export.start_auto_refresh:Start Auto Refresh`,
-        stopText:$localize `:@@export.stop_auto_refresh:Stop Auto Refresh`
+        startText:$localize `:@@start_auto_refresh:Start Auto Refresh`,
+        stopText:$localize `:@@stop_auto_refresh:Stop Auto Refresh`
     };
     statusValues = {};
     refreshInterval;
@@ -53,13 +53,13 @@ export class ExportComponent implements OnInit, OnDestroy {
     allActionsOptions = [
         {
             value:"cancel",
-            label:$localize `:@@export.cancel_all_matching_tasks:Cancel all matching tasks`
+            label:$localize `:@@cancel_all_matching_tasks:Cancel all matching tasks`
         },{
             value:"reschedule",
-            label:$localize `:@@export.reschedule_all_matching_tasks:Reschedule all matching tasks`
+            label:$localize `:@@reschedule_all_matching_tasks:Reschedule all matching tasks`
         },{
             value:"delete",
-            label:$localize `:@@export.delete_all_matching_tasks:Delete all matching tasks`
+            label:$localize `:@@edelete_all_matching_tasks:Delete all matching tasks`
         }
     ];
     allActionsActive = [];
@@ -111,10 +111,11 @@ export class ExportComponent implements OnInit, OnDestroy {
         this.initExporters(1);
         this.getAets();
         // this.init();
-        this.service.statusValues().forEach(status =>{
-            this.statusValues[status] = {
+        this.service.statusValues().forEach(val =>{
+            this.statusValues[val.value] = {
                 count: 0,
-                loader: false
+                loader: false,
+                text:val.text
             };
         });
         this.statusChange();
@@ -202,7 +203,7 @@ export class ExportComponent implements OnInit, OnDestroy {
     downloadCsv(){
         this.confirm({
             content:$localize `:@@use_semicolon_delimiter:Do you want to use semicolon as delimiter?`,
-            cancelButton:$localize `:@@No:No`,
+            cancelButton:$localize `:@@no:No`,
             saveButton:$localize `:@@Yes:Yes`,
             result:$localize `:@@yes:yes`
         }).subscribe((ok)=>{
@@ -248,7 +249,7 @@ export class ExportComponent implements OnInit, OnDestroy {
                     tag:"range-picker-time",
                     type:"text",
                     filterKey:"scheduledTime",
-                    description:$localize `:@@scheduled_times:Scheduled times`
+                    description:$localize `:@@scheduled_time:Scheduled time`
                 },
                 //scheduledTime
                 {
@@ -415,8 +416,12 @@ export class ExportComponent implements OnInit, OnDestroy {
                     if (ok) {
                         this.cfpLoadingBar.start();
                         this.service.cancelAll(filter).subscribe((res) => {
-                            this.mainservice.showMsg($localize `:@@tasks_deleted:${res.count} tasks deleted successfully!`)
                             this.cfpLoadingBar.complete();
+                            if(_.hasIn(res,"count")){
+                                this.mainservice.showMsg($localize `:@@tasks_canceled_param:${res.count}:@@count: tasks canceled successfully!`);
+                            }else{
+                                this.mainservice.showMsg($localize `:@@tasks_canceled:Tasks canceled successfully!`);
+                            }
                         }, (err) => {
                             this.cfpLoadingBar.complete();
                             this.httpErrorHandler.handleError(err);
@@ -437,8 +442,12 @@ export class ExportComponent implements OnInit, OnDestroy {
                             filter["scheduledTime"] = ok.schema_model.scheduledTime;
                         }
                         this.service.rescheduleAll(filter,ok.schema_model.selectedExporter).subscribe((res)=>{
-                            this.mainservice.showMsg($localize `:@@tasks_rescheduled:${res.count}:@@count: tasks rescheduled successfully!`);
                             this.cfpLoadingBar.complete();
+                            if(_.hasIn(res,"count")){
+                                this.mainservice.showMsg($localize `:@@tasks_rescheduled_param:${res.count}:@@count: tasks rescheduled successfully!`);
+                            }else{
+                                this.mainservice.showMsg($localize `:@@tasks_rescheduled:Tasks rescheduled successfully!`);
+                            }
                         }, (err) => {
                             this.cfpLoadingBar.complete();
                             this.httpErrorHandler.handleError(err);
@@ -455,8 +464,12 @@ export class ExportComponent implements OnInit, OnDestroy {
                     if(ok){
                         this.cfpLoadingBar.start();
                         this.service.deleteAll(filter).subscribe((res)=>{
-                            this.mainservice.showMsg($localize `:@@tasks_deleted:${res.deleted} tasks deleted successfully!`);
                             this.cfpLoadingBar.complete();
+                            if(_.hasIn(res,"deleted")){
+                                this.mainservice.showMsg($localize `:@@task_deleted:${res.deleted} tasks deleted successfully!`);
+                            }else{
+                                this.mainservice.showMsg($localize `:@@tasks_deleted:Tasks deleted successfully!`);
+                            }
                         }, (err) => {
                             this.cfpLoadingBar.complete();
                             this.httpErrorHandler.handleError(err);
@@ -668,12 +681,17 @@ export class ExportComponent implements OnInit, OnDestroy {
                 this.service.reschedule(match.properties.pk, id || match.properties.ExporterID, filter)
                     .subscribe(
                         (res) => {
-                            this.mainservice.showMsg($localize `:@@tasks_rescheduled:${res.count}:@@count: tasks rescheduled successfully!`);
-                                this.cfpLoadingBar.complete();
+                            this.cfpLoadingBar.complete();
+                            if(_.hasIn(res,"count")){
+                                this.mainservice.showMsg($localize `:@@tasks_rescheduled_param:${res.count}:@@count: tasks rescheduled successfully!`);
+                            }else{
+                                this.mainservice.showMsg($localize `:@@task_rescheduled:Task rescheduled successfully!`);
+
+                            }
                         },
                         (err) => {
+                            this.cfpLoadingBar.complete();
                             this.httpErrorHandler.handleError(err);
-                                this.cfpLoadingBar.complete();
                         });
 
             }

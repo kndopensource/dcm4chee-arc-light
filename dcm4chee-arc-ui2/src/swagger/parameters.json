@@ -237,7 +237,7 @@
         "READY",
         "STARTED",
         "DEPARTED",
-        "CANCELLED",
+        "CANCELED",
         "DISCONTINUED",
         "COMPLETED"
       ]
@@ -526,6 +526,15 @@
     "description": "Alternative to Accept header field for WADO-RS Retrieve Thumbnail Services",
     "schema": {
       "$ref": "schemas.json#/wadoRetrieveThumbnailAccept"
+    }
+  },
+  "dicomdir": {
+    "name": "dicomdir",
+    "in": "query",
+    "description": "If present with a value of true a DICOMDIR file will be included in the returned ZIP payload.",
+    "schema": {
+      "type": "boolean",
+      "default": false
     }
   },
   "contentType": {
@@ -1437,7 +1446,7 @@
   "dcmQueueNameRetrieve": {
     "name": "dcmQueueName",
     "in": "query",
-    "description": "name of retrieve queue to filter by",
+    "description": "name of retrieve queue to schedule retrieve task",
     "schema": {
       "$ref": "schemas.json#/dcmQueueNameRetrieve"
     }
@@ -1535,22 +1544,6 @@
     "schema": {
       "type": "boolean",
       "default": false
-    }
-  },
-  "only-stgcmt": {
-    "name": "only-stgcmt",
-    "in": "query",
-    "description": "Only enable storage commitment without export",
-    "schema": {
-      "type": "boolean"
-    }
-  },
-  "only-ian": {
-    "name": "only-ian",
-    "in": "query",
-    "description": "Only enable Instance Availability Notification without export",
-    "schema": {
-      "type": "boolean"
     }
   },
   "merge": {

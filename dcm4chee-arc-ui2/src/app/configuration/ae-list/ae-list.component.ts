@@ -1,5 +1,5 @@
 import {Component, ViewContainerRef, HostListener, OnInit} from '@angular/core';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import {ConfirmComponent} from '../../widgets/dialogs/confirm/confirm.component';
 import {AppService} from '../../app.service';
 import {CreateAeComponent} from '../../widgets/dialogs/create-ae/create-ae.component';
@@ -403,7 +403,7 @@ export class AeListComponent implements OnInit{
                     });
                 });
                 this.devicesService.saveDeviceChanges(deviceName,device).subscribe(result=>{
-                    this.mainservice.showMsg($localize `:@@ae-list.set_as_accpeted_aet:${newAet.dicomAETitle}:@@newAet: was set successfully as 'Accepted Calling AE Title' to following AETs: ${j4care.join(setAetAsAcceptedCallingAet,", ", " and ")}:@@aets:`);
+                    this.mainservice.showMsg($localize `:@@ae-list.set_as_accepted_aet:${newAet.dicomAETitle}:@@newAet: was set successfully as 'Accepted Calling AE Title' to following AETs: ${j4care.join(setAetAsAcceptedCallingAet,", ", " and ")}:@@aets:`);
                     this.$http.post('../ctrl/reload', {},  new HttpHeaders({ 'Content-Type': 'application/json' })).subscribe((res) => {
                         this.mainservice.showMsg($localize `:@@archive_reloaded_successfully:Archive reloaded successfully!`);
                     });
